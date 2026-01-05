@@ -13,3 +13,137 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+  email    String
+  contact  String
+  role     Role
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+model AdminOf {
+  id                    String   @id @default(uuid())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  name                  String
+  address               String
+  description           String
+  officeNumber          String
+  buildingNumberFrom    Int
+  buildingNumberTo      Int
+  floorCountPerBuilding Int
+  unitCountPerFloor     Int
+  adminId               String
+  admin                 Users    @relation(fields: [adminId], references: [id])
+}
+
+model Resident {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String
+  email         String
+  contact       String
+  building      Int
+  unit          Int
+  isHouseholder Boolean
+  userId        String
+  user          Users    @relation(fields: [userId], references: [id])
+  apartmentId   String
+  apartment     AdminOf  @relation(fields: [apartmentId], references: [id])
+}
+
+model Comments {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Complaints {
+  id           String          @id @default(uuid())
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  title        String
+  content      String
+  status       ComplaintStatus @default(PENDING)
+  isPublic     Boolean         @default(true)
+  viewCount    Int             @default(0)
+  apartmentId  String
+  apartment    AdminOf         @relation(fields: [apartmentId], references: [id])
+  userId       String
+  complaintant Users           @relation(fields: [userId], references: [id])
+  commentId    String?
+  comment      Comments?       @relation(fields: [commentId], references: [id])
+}
+
+enum ComplaintStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Polls {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  title     String
+  content   String
+  status    PollStatus @default(PENDING)
+  startDate DateTime
+  endDate   DateTime
+  apartmentId String
+  apartment   AdminOf   @relation(fields: [apartmentId], references: [id])
+  building   Int
+  userId     String
+  author     Users     @relation(fields: [userId], references: [id])
+
+}
+
+enum PollStatus {
+  IN_PROGRESS
+  PENDING
+  CLOSED
+}
+
+model Notices {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  title     String
+  content   String
+  category  NoticeCategory
+  isPinned  Boolean    @default(false)
+  viewCount Int        @default(0)
+  apartmentId String
+  apartment   AdminOf   @relation(fields: [apartmentId], references: [id])
+  userId     String
+  author     Users     @relation(fields: [userId], references: [id])
+  commentId  String?
+  comment    Comments? @relation(fields: [commentId], references: [id])
+}
+
+enum NoticeCategory {
+MAINTENCE
+URGENT
+COMMUNITY
+VOTING
+BOARD_MEETING
+ETC
+}
+
+model Notifications {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  content   String
+  userId    String
+  author    Users      @relation(fields: [userId], references: [id])
+}
