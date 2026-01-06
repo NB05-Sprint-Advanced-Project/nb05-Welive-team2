@@ -2,7 +2,7 @@ import { NoticeCategory } from '@prisma/client';
 import { NoticeView } from '../views/notice-view';
 import { INoticeQueryRepo } from '../../ports/repos/query/i-notice-query-repo';
 
-export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
+export const createPollQueryService = (repo: INoticeQueryRepo) => {
   const getNotice = async (noticeId: string): Promise<NoticeView> => {
     const notice = await repo.findById(noticeId);
 
@@ -25,5 +25,3 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
 
   return { getNotice, getAllNotice };
 };
-
-export type NoticeQueryService = ReturnType<typeof createNoticeQueryService>;
