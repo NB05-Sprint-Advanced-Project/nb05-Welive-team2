@@ -27,6 +27,7 @@ model Users {
   polls         Polls[]
   notices       Notices[]
   notifications Notifications[]
+  comments      Comments[]
 }
 
 enum Role {
@@ -146,8 +147,10 @@ model Notices {
   apartment   AdminOf        @relation(fields: [apartmentId], references: [id])
   userId      String
   author      Users          @relation(fields: [userId], references: [id])
-  
-  comments    Comments[]
+  comment     Comments[]     
+
+  startDate   DateTime
+  endDate     DateTime
 }
 
 enum NoticeCategory {
