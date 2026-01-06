@@ -1,4 +1,4 @@
-export interface CommentsView {
+export interface CommentView {
   id: string;
   createdAt: Date;
   updatedAt: Date;

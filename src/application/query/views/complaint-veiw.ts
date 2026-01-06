@@ -1,6 +1,6 @@
 export type ComplaintStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
 
-export interface ComplaintsView {
+export interface ComplaintView {
   id: string;
   createdAt: Date;
   updatedAt: Date;

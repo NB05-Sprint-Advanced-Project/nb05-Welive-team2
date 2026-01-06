@@ -1,4 +1,4 @@
-export interface IComplaintsQueryRepo {
+export interface IComplaintQueryRepo {
   findId(complaintId: string): Promise<any>;
   findAll(
     page: number,
