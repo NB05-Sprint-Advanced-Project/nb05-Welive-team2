@@ -15,12 +15,19 @@ datasource db {
 }
 
 model Users {
-  id       String @id @default(uuid())
+  id       String @id
   username String @unique
   password String
   email    String
   contact  String
   role     Role
+
+  admins        AdminOf[]
+  residents     Resident[]
+  complaints    Complaints[]
+  polls         Polls[]
+  notices       Notices[]
+  notifications Notifications[]
 }
 
 enum Role {
@@ -30,9 +37,9 @@ enum Role {
 }
 
 model AdminOf {
-  id                    String   @id @default(uuid())
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                    String   @id
+  createdAt             DateTime
+  updatedAt             DateTime
   name                  String
   address               String
   description           String
@@ -43,12 +50,17 @@ model AdminOf {
   unitCountPerFloor     Int
   adminId               String
   admin                 Users    @relation(fields: [adminId], references: [id])
+
+  residents  Resident[]
+  complaints Complaints[]
+  polls      Polls[]
+  notices    Notices[]
 }
 
 model Resident {
-  id            String   @id @default(uuid())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id            String   @id
+  createdAt     DateTime
+  updatedAt     DateTime
   name          String
   email         String
   contact       String
@@ -62,15 +74,17 @@ model Resident {
 }
 
 model Comments {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String       @id
+  createdAt  DateTime
+  updatedAt  DateTime
+  complaints Complaints[]
+  notices    Notices[]
 }
 
 model Complaints {
-  id           String          @id @default(uuid())
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id           String          @id
+  createdAt    DateTime
+  updatedAt    DateTime
   title        String
   content      String
   status       ComplaintStatus @default(PENDING)
@@ -91,20 +105,19 @@ enum ComplaintStatus {
 }
 
 model Polls {
-  id        String     @id @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  title     String
-  content   String
-  status    PollStatus @default(PENDING)
-  startDate DateTime
-  endDate   DateTime
+  id          String     @id
+  createdAt   DateTime
+  updatedAt   DateTime
+  title       String
+  content     String
+  status      PollStatus @default(PENDING)
+  startDate   DateTime
+  endDate     DateTime
   apartmentId String
-  apartment   AdminOf   @relation(fields: [apartmentId], references: [id])
-  building   Int
-  userId     String
-  author     Users     @relation(fields: [userId], references: [id])
-
+  apartment   AdminOf    @relation(fields: [apartmentId], references: [id])
+  building    Int
+  userId      String
+  author      Users      @relation(fields: [userId], references: [id])
 }
 
 enum PollStatus {
@@ -114,36 +127,36 @@ enum PollStatus {
 }
 
 model Notices {
-  id        String     @id @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  title     String
-  content   String
-  category  NoticeCategory
-  isPinned  Boolean    @default(false)
-  viewCount Int        @default(0)
+  id          String         @id
+  createdAt   DateTime
+  updatedAt   DateTime
+  title       String
+  content     String
+  category    NoticeCategory
+  isPinned    Boolean        @default(false)
+  viewCount   Int            @default(0)
   apartmentId String
-  apartment   AdminOf   @relation(fields: [apartmentId], references: [id])
-  userId     String
-  author     Users     @relation(fields: [userId], references: [id])
-  commentId  String?
-  comment    Comments? @relation(fields: [commentId], references: [id])
+  apartment   AdminOf        @relation(fields: [apartmentId], references: [id])
+  userId      String
+  author      Users          @relation(fields: [userId], references: [id])
+  commentId   String?
+  comment     Comments?      @relation(fields: [commentId], references: [id])
 }
 
 enum NoticeCategory {
-MAINTENCE
-URGENT
-COMMUNITY
-VOTING
-BOARD_MEETING
-ETC
+  MAINTENCE
+  URGENT
+  COMMUNITY
+  VOTING
+  BOARD_MEETING
+  ETC
 }
 
 model Notifications {
-  id        String     @id @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id
+  createdAt DateTime
+  updatedAt DateTime
   content   String
   userId    String
-  author    Users      @relation(fields: [userId], references: [id])
+  author    Users    @relation(fields: [userId], references: [id])
 }
