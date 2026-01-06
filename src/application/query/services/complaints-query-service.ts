@@ -1,8 +1,9 @@
+import { IComplaintsQueryRepo } from '../../ports/repos/query/i-complaints-query-repo';
 import { ComplaintStatus, ComplaintsView } from '../views/complaints-veiw';
 
 export const createComplaintsQueryService = (repo: IComplaintsQueryRepo) => {
   const getComplaint = async (complaintId: string): Promise<ComplaintsView> => {
-    const complaint = await repo.findById(complaintId);
+    const complaint = await repo.findId(complaintId);
 
     if (!complaint) {
       throw new Error();
@@ -15,9 +16,20 @@ export const createComplaintsQueryService = (repo: IComplaintsQueryRepo) => {
     page: number,
     limit: number,
     searchKeyword: string,
-    status: ComplaintStatus | null,
+    status: string,
+    isPublic: boolean,
+    building: number,
+    unit: number,
   ): Promise<ComplaintsView[]> => {
-    const complaints = await repo.findAll(page, limit, searchKeyword, status);
+    const complaints = await repo.findAll(
+      page,
+      limit,
+      searchKeyword,
+      status,
+      isPublic,
+      building,
+      unit,
+    );
     return complaints;
   };
 
