@@ -12,18 +12,16 @@ export const createPollQueryService = (repo: IPollQueryRepo) => {
     return poll;
   };
 
-  const getAllPolls = async ({
+  const getAllPoll = async (
     page: number,
     limit: number,
     searchKeyword: string,
     status: PollStatus,
     building: number,
-  }): Promise<PollView[]> => {
+  ): Promise<PollView[]> => {
     const polls = await repo.findAll(page, limit, searchKeyword, status, building);
 
     return polls;
   };
-  return { getPoll, getAllPolls };
+  return { getPoll, getAllPoll };
 };
-
-export type PollQueryService = ReturnType<typeof createPollQueryService>;

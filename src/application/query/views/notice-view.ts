@@ -1,4 +1,4 @@
-import { NoticeCategory } from '@prisma/client';
+import { NoticeCategory } from "@prisma/client";
 
 export interface NoticeView {
   id: string;
