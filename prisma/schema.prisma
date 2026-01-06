@@ -19,7 +19,7 @@ model Users {
   username String @unique
   password String
   email    String
-  contact  String
+  contact  Int
   role     Role
 
   admins        AdminOf[]
