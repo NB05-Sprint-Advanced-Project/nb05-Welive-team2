@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -22,7 +22,7 @@ model Users {
   contact  String
   role     Role
 
-  admins        AdminOf[]
+  aparment      Apartment[]
   residents     Resident[]
   complaints    Complaints[]
   polls         Polls[]
@@ -36,7 +36,7 @@ enum Role {
   USER
 }
 
-model AdminOf {
+model Apartment {
   id                    String   @id
   createdAt             DateTime
   updatedAt             DateTime
@@ -58,7 +58,7 @@ model AdminOf {
 }
 
 model Resident {
-  id            String   @id
+  id            String    @id
   createdAt     DateTime
   updatedAt     DateTime
   name          String
@@ -68,9 +68,9 @@ model Resident {
   unit          Int
   isHouseholder Boolean
   userId        String
-  user          Users    @relation(fields: [userId], references: [id])
+  user          Users     @relation(fields: [userId], references: [id])
   apartmentId   String
-  apartment     AdminOf  @relation(fields: [apartmentId], references: [id])
+  apartment     Apartment @relation(fields: [apartmentId], references: [id])
 }
 
 model Comments {
@@ -91,7 +91,7 @@ model Complaints {
   isPublic     Boolean         @default(true)
   viewCount    Int             @default(0)
   apartmentId  String
-  apartment    AdminOf         @relation(fields: [apartmentId], references: [id])
+  apartment    Apartment       @relation(fields: [apartmentId], references: [id])
   userId       String
   complaintant Users           @relation(fields: [userId], references: [id])
   commentId    String?
@@ -114,7 +114,7 @@ model Polls {
   startDate   DateTime
   endDate     DateTime
   apartmentId String
-  apartment   AdminOf    @relation(fields: [apartmentId], references: [id])
+  apartment   Apartment  @relation(fields: [apartmentId], references: [id])
   building    Int
   userId      String
   author      Users      @relation(fields: [userId], references: [id])
@@ -136,7 +136,7 @@ model Notices {
   isPinned    Boolean        @default(false)
   viewCount   Int            @default(0)
   apartmentId String
-  apartment   AdminOf        @relation(fields: [apartmentId], references: [id])
+  apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
   author      Users          @relation(fields: [userId], references: [id])
   commentId   String?
