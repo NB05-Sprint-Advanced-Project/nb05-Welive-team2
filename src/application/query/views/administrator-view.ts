@@ -20,4 +20,3 @@ export interface AdministratorView {
   limit: number;
   hasNext: boolean;
 }
-
