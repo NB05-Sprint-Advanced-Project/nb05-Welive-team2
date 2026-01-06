@@ -140,6 +140,9 @@ model Notices {
   author      Users          @relation(fields: [userId], references: [id])
   commentId   String?
   comment     Comments?      @relation(fields: [commentId], references: [id])
+
+  startDate   DateTime
+  endDate     DateTime
 }
 
 enum NoticeCategory {
