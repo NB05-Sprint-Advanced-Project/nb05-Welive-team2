@@ -76,8 +76,16 @@ model Comments {
   id         String       @id
   createdAt  DateTime
   updatedAt  DateTime
-  complaints Complaints[]
-  notices    Notices[]
+  content    String
+
+  userId     String
+  author     Users        @relation(fields: [userId], references: [id])
+
+  complaintId String?
+  complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  noticeId   String?
+  notice     Notices?     @relation(fields: [noticeId], references: [id], onDelete: Cascade)
 }
 
 model Complaints {
@@ -88,19 +96,19 @@ model Complaints {
   content      String
   status       ComplaintStatus @default(PENDING)
   isPublic     Boolean         @default(true)
-  viewCount    Int             @default(0)
+  viewsCount    Int             @default(0)
   apartmentId  String
   apartment    AdminOf         @relation(fields: [apartmentId], references: [id])
   userId       String
-  complaintant Users           @relation(fields: [userId], references: [id])
-  commentId    String?
-  comment      Comments?       @relation(fields: [commentId], references: [id])
+  complaintant Users           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments Comments[]
 }
 
 enum ComplaintStatus {
   PENDING
-  APPROVED
-  REJECTED
+  IN_PROGRESS
+  RESOLVED
 }
 
 model Polls {
@@ -138,8 +146,8 @@ model Notices {
   apartment   AdminOf        @relation(fields: [apartmentId], references: [id])
   userId      String
   author      Users          @relation(fields: [userId], references: [id])
-  commentId   String?
-  comment     Comments?      @relation(fields: [commentId], references: [id])
+  
+  comments    Comments[]
 }
 
 enum NoticeCategory {
