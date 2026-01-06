@@ -17,8 +17,8 @@ export interface PollView {
   options: {
     id: string;
     title: string;
-    voteCount: number
+    voteCount: number;
   }[];
-  
-  optionIdVotedByMe: string
+
+  optionIdVotedByMe: string;
 }
