@@ -1,45 +1,28 @@
 import { randomUUID } from 'crypto';
 
-export class OptionEntity {
-  private _id: string;
-  private _title: string;
-  private _count: number;
-
-  private constructor(props: { id: string; title: string; count?: number }) {
-    this._id = props.id;
-    this._title = props.title;
-    this._count = props.count ?? 0;
-  }
-
-  get id() {
-    return this._id;
-  }
-  get title() {
-    return this._title;
-  }
-  get count() {
-    return this._count;
-  }
-
-  static create(props: { title: string }) {
-    return new OptionEntity({
+export type OptionModel = {
+  id: string;
+  title: string;
+  count: number;
+};
+export const OptionEntity = {
+  create: (props: { title: string }): OptionModel => {
+    return {
       id: randomUUID(),
       title: props.title,
-    });
-  }
-
-  static restore(props: { id: string; title: string; count: number }) {
-    return new OptionEntity({ ...props });
-  }
-
-  updateTitle(title: string) {
-    this._title = title;
-  }
-
-  vote() {
-    this._count++;
-  }
-  cancle() {
-    this._count--;
-  }
-}
+      count: 0,
+    } as OptionModel;
+  },
+  restore: (props: { id: string; title: string; count: number }): OptionModel => {
+    return { ...props } as OptionModel;
+  },
+  updateTitle: (option: OptionModel, title: string) => {
+    option.title = title;
+  },
+  vote: (option: OptionModel) => {
+    option.count++;
+  },
+  cancle: (option: OptionModel) => {
+    option.count--;
+  },
+};
