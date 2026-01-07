@@ -1,21 +1,21 @@
 import { PollStatus } from '@prisma/client';
-import { OptionsEntity } from './option-entity';
+import { OptionEntity } from './option-entity';
 import { randomUUID } from 'crypto';
 
 export class PollEntity {
   private readonly _id: string;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
-  private readonly _title: string;
-  private readonly _content: string;
-  private readonly _status: PollStatus;
-  private readonly _startDate: Date;
-  private readonly _endDate: Date;
+  private _title: string;
+  private _content: string;
+  private _status: PollStatus;
+  private _startDate: Date;
+  private _endDate: Date;
   private readonly _apartmentId: string;
-  private readonly _building: number;
+  private _building: number;
   private readonly _userId: string;
 
-  private _options: OptionsEntity[];
+  private _options: OptionEntity[];
 
   private constructor(props: {
     id: string;
@@ -29,7 +29,7 @@ export class PollEntity {
     apartmentId: string;
     building: number;
     userId: string;
-    options: OptionsEntity[];
+    options: OptionEntity[];
   }) {
     this._id = props.id;
     this._createdAt = props.createdAt;
@@ -89,7 +89,7 @@ export class PollEntity {
     endDate: Date;
     apartmentId: string;
     building: number;
-    options: OptionsEntity[];
+    options: OptionEntity[];
   }): PollEntity {
     const now = new Date();
 
@@ -124,8 +124,51 @@ export class PollEntity {
     apartmentId: string;
     building: number;
     userId: string;
-    options: OptionsEntity[];
+    options: OptionEntity[];
   }): PollEntity {
     return new PollEntity({ ...props });
+  }
+
+  update(props: {
+    title?: string;
+    content?: string;
+    startDate?: Date;
+    endDate?: Date;
+    building?: number;
+    options?: {
+      id?: string;
+      title: string;
+    }[];
+  }) {
+    if (props.title) {
+      this._title = props.title;
+    }
+    if (props.content) {
+      this._content = props.content;
+    }
+    if (props.startDate) {
+      this._startDate = props.startDate;
+    }
+    if (props.endDate) {
+      this._endDate = props.endDate;
+    }
+    if (props.building) {
+      this._building = props.building;
+    }
+    if (props.options) {
+      const existOpt = props.options.filter((opt) => opt.id !== undefined);
+      const newOpt = props.options.filter((opt) => !opt.id);
+
+      for (const opt of newOpt) {
+        this._options.push(OptionEntity.create({title: opt.title}));
+      }
+
+      for(const opt of existOpt){
+        const target = this._options.find((befOpt) => befOpt.id === opt.id);
+        if(target){
+          target.updateTitle(opt.title);
+        }
+      }
+    }
   }
 }
