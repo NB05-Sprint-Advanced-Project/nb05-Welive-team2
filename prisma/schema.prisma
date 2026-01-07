@@ -103,6 +103,14 @@ enum ComplaintStatus {
   REJECTED
 }
 
+model Options{
+  id        String @id
+  title     String
+  voteCount Int @default(0)
+  pollId    String
+  poll      Polls @relation(fields: [pollId], references: [id], onDelete: Cascade)
+}
+
 model Polls {
   id          String     @id
   createdAt   DateTime
@@ -117,6 +125,8 @@ model Polls {
   building    Int
   userId      String
   author      Users      @relation(fields: [userId], references: [id])
+
+  options     Options[]
 }
 
 enum PollStatus {
