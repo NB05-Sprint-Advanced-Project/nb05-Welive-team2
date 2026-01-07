@@ -60,6 +60,7 @@ model Apartment {
   complaints Complaints[]
   polls      Polls[]
   notices    Notices[]
+	@@map("AdminOf")
 }
 
 // todo: article include tag
