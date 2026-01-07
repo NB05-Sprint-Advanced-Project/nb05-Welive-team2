@@ -153,7 +153,7 @@ model Polls {
   updatedAt   DateTime
   title       String
   content     String
-  status      PollStatus @default(PENDING)
+  status      PollStatus
   startDate   DateTime
   endDate     DateTime
   apartmentId String
@@ -178,8 +178,8 @@ model Notices {
   title       String
   content     String
   category    NoticeCategory
-  isPinned    Boolean        @default(false)
-  viewCount   Int            @default(0)
+  isPinned    Boolean
+  viewCount   Int
   apartmentId String
   apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
