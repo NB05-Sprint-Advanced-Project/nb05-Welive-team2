@@ -13,3 +13,7 @@ export const TechnicalException = (type: TechnicalExceptionType, error?: Error, 
   exception.meta = meta;
   return exception;
 };
+
+// 에러 타입 가드
+export const isTechnicalException = (e: unknown): e is TechnicalException =>
+  typeof e === 'object' && e !== null && 'type' in e;
