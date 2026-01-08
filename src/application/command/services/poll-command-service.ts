@@ -2,6 +2,7 @@ import {
   CreatePollDto,
   DeletePollDto,
   UpdatePollDto,
+  voteDto,
 } from '../../../inbound/requests/poll-request';
 import { IPollCommandRepo } from '../../ports/repos/command/i-poll-command-repo';
 import { PollEntity, PollModel } from '../entities/poll/poll-entity';
@@ -36,9 +37,13 @@ export const createPollCommandService = (repo: IPollCommandRepo) => {
     await repo.delete(pollId);
   };
 
+  const vote = async (dto: voteDto) => {
+    // 로그인 된 후에 구현하겠습니다...ㅠ
+  };
   return {
     createPoll,
     updatePoll,
     deletePoll,
+    vote
   };
 };

@@ -116,16 +116,4 @@ export const PollEntity = {
 
     return poll as PollModel;
   },
-  vote: (poll: PollModel, optionId: string) => {
-    const target = poll.options.find((opt) => optionId);
-    if (target) {
-      OptionEntity.vote(target);
-    }
-  },
-  cancle: (poll: PollModel, optionId: string) => {
-    const target = poll.options.find((opt) => optionId);
-    if (target) {
-      OptionEntity.cancle(target);
-    }
-  },
 };

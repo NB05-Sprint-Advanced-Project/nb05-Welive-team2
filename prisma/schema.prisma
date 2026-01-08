@@ -144,7 +144,9 @@ model Options {
   title     String
   voteCount Int    @default(0)
   pollId    String
-  poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  poll      Polls @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  userIds   String[] // 이 항목에 투표한 사람.
 }
 
 model Polls {
