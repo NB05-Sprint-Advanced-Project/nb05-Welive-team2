@@ -7,3 +7,5 @@ export const createNotFoundMiddleware = () => {
     next(BusinessException(BusinessExceptionType.NOT_FOUND));
   };
 };
+
+export type NotFoundMiddleware = ReturnType<typeof createNotFoundMiddleware>;
