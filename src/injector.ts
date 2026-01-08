@@ -10,7 +10,7 @@ export const createInjector = () => {
   };
 
   const globalErrorMiddleware = createGlobalErrorMiddleware(utils);
-  const notFoundMiddleware = createNotFoundMiddleware(utils);
+  const notFoundMiddleware = createNotFoundMiddleware();
 
   const middlewares = {
     globalErrorMiddleware,
