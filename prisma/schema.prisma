@@ -173,6 +173,14 @@ enum PollStatus {
   CLOSED
 }
 
+model Events {
+  id String @id
+  startDate DateTime
+  endDate DateTime
+
+  noticeId  String   @unique // 1:1 관계를 위해 @unique가 필수입니다.
+  notice    Notices  @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+}
 model Notices {
   id          String         @id
   createdAt   DateTime
@@ -188,8 +196,7 @@ model Notices {
   author      User           @relation(fields: [userId], references: [id])
   comment     Comments[]
 
-  startDate DateTime
-  endDate   DateTime
+  event       Events?
 }
 
 enum NoticeCategory {

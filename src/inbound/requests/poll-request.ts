@@ -29,7 +29,7 @@ export const createPollReqBodySchema = z.object({
 export type CreatePollDto = z.infer<typeof createPollReqBodySchema>;
 
 // update poll
-export const updatePollReqPraramsSchema = z.object({
+export const updatePollReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
   startDate: z.date(),
@@ -38,7 +38,7 @@ export const updatePollReqPraramsSchema = z.object({
   options: z.array(updateOptionSchema),
 });
 
-export type UpdatePollDto = z.infer<typeof updatePollReqPraramsSchema> & {
+export type UpdatePollDto = z.infer<typeof updatePollReqBodySchema> & {
   pollId: string;
 };
 

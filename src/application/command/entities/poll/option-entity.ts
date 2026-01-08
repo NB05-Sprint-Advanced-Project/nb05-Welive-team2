@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 
 export type OptionModel = {
-  id: string;
+  readonly id: string;
   title: string;
   count: number;
   userIds: string[];
