@@ -71,15 +71,6 @@ model UserApartmentLink {
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
-  // 1. 아파트만 cascasde할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (롯데캐슬 아파트 사라짐)
-  // 사람 2,3 => 내가 살던 롯데캐슬아파트 어디감??
-
-  // 2. 유저를 cascade할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (사람1 사라짐)
-  // 사람2,3 => 롯데캐슬아파트 계속 존재  
 
   @@id([userId, apartmentId])
   @@index([apartmentId])
