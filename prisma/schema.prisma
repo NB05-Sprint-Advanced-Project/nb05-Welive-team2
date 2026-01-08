@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -38,6 +37,7 @@ model User {
   polls         Polls[]
   notices       Notices[]
   notifications Notifications[]
+  comments      Comments[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -62,28 +62,12 @@ model Apartment {
   notices    Notices[]
 }
 
-
-// todo: article include tag
-
-
-
-
 model UserApartmentLink {
   userId      String
   apartmentId String
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
-  // 1. 아파트만 cascasde할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (롯데캐슬 아파트 사라짐)
-  // 사람 2,3 => 내가 살던 롯데캐슬아파트 어디감??
-
-  // 2. 유저를 cascade할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (사람1 사라짐)
-  // 사람2,3 => 롯데캐슬아파트 계속 존재  
-
 
   @@id([userId, apartmentId])
   @@index([apartmentId])
@@ -95,7 +79,7 @@ model Address {
   unit          String
   building      String
 
-  user User @relation(fields: [userId], references: [id] , onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
@@ -105,11 +89,19 @@ enum Role {
 }
 
 model Comments {
-  id         String       @id
-  createdAt  DateTime
-  updatedAt  DateTime
-  complaints Complaints[]
-  notices    Notices[]
+  id        String   @id
+  createdAt DateTime
+  updatedAt DateTime
+  content   String
+
+  userId String
+  author User   @relation(fields: [userId], references: [id])
+
+  complaintId String?
+  complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  noticeId String?
+  notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
 }
 
 model Complaints {
@@ -118,21 +110,29 @@ model Complaints {
   updatedAt    DateTime
   title        String
   content      String
-  status       ComplaintStatus
-  isPublic     Boolean
-  viewCount    Int
+  status       ComplaintStatus @default(PENDING)
+  isPublic     Boolean         @default(true)
+  viewsCount   Int             @default(0)
   apartmentId  String
   apartment    Apartment       @relation(fields: [apartmentId], references: [id])
   userId       String
-  complaintant User            @relation(fields: [userId], references: [id])
-  commentId    String?
-  comment      Comments?       @relation(fields: [commentId], references: [id])
+  complaintant User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments Comments[]
 }
 
 enum ComplaintStatus {
   PENDING
-  APPROVED
-  REJECTED
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Options {
+  id        String @id
+  title     String
+  voteCount Int    @default(0)
+  pollId    String
+  poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 }
 
 model Polls {
@@ -141,7 +141,7 @@ model Polls {
   updatedAt   DateTime
   title       String
   content     String
-  status      PollStatus
+  status      PollStatus @default(PENDING)
   startDate   DateTime
   endDate     DateTime
   apartmentId String
@@ -149,6 +149,8 @@ model Polls {
   building    Int
   userId      String
   author      User       @relation(fields: [userId], references: [id])
+
+  options Options[]
 }
 
 enum PollStatus {
@@ -164,14 +166,16 @@ model Notices {
   title       String
   content     String
   category    NoticeCategory
-  isPinned    Boolean
-  viewCount   Int
+  isPinned    Boolean        @default(false)
+  viewCount   Int            @default(0)
   apartmentId String
   apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
   author      User           @relation(fields: [userId], references: [id])
-  commentId   String?
-  comment     Comments?      @relation(fields: [commentId], references: [id])
+  comment     Comments[]
+
+  startDate DateTime
+  endDate   DateTime
 }
 
 enum NoticeCategory {
