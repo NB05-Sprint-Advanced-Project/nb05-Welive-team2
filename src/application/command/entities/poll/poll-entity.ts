@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 export type PollModel = {
   readonly id: string;
   readonly createdAt: Date;
-  readonly updatedAt: Date;
+  updatedAt: Date;
   title: string;
   content: string;
   status: PollStatus;
@@ -24,8 +24,14 @@ export const PollEntity = {
     endDate: Date;
     apartmentId: string;
     building: number;
-    options: OptionModel[];
+    options: { title: string }[];
   }): PollModel => {
+    const { options, ...data } = props;
+    let newOptions: OptionModel[] = [];
+
+    for (const title of options) {
+      newOptions.push(OptionEntity.create(title));
+    }
     const now = new Date();
 
     let status: PollStatus = 'IN_PROGRESS';
@@ -38,12 +44,13 @@ export const PollEntity = {
     const userId = 'test'; // 추후 로그한 관리자의 id 가져오도록 수정
 
     return {
-      ...props,
+      ...data,
       id: randomUUID(),
       createdAt: now,
       updatedAt: now,
       userId,
       status,
+      options: newOptions,
     } as PollModel;
   },
   restore: (props: {
@@ -75,7 +82,7 @@ export const PollEntity = {
         title: string;
       }[];
     },
-  ) => {
+  ): PollModel => {
     if (props.title) {
       poll.title = props.title;
     }
@@ -106,6 +113,8 @@ export const PollEntity = {
         }
       }
     }
+
+    return poll as PollModel;
   },
   vote: (poll: PollModel, optionId: string) => {
     const target = poll.options.find((opt) => optionId);
