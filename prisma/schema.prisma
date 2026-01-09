@@ -13,11 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  PENDING
-  APPROVED
-  REJECTED
-}
+
 
 model User {
   id           String   @id
@@ -28,7 +24,7 @@ model User {
   avatarUrl    String?
   password     String
   role         Role
-  joinedStatus Status
+  joinedStatus String
   refreshToken String?
   createdAt    DateTime
   updatedAt    DateTime
@@ -95,11 +91,7 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum Role {
-  SUPERADMIN
-  ADMIN
-  USER
-}
+
 
 model Comments {
   id        String   @id
