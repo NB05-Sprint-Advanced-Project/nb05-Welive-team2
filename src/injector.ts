@@ -1,5 +1,6 @@
 import { createGlobalErrorMiddleware } from './inbound/middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './inbound/middlewares/not-found-middleware';
+import { createHttpServer } from './inbound/servers/http-server';
 import { loadConfig } from './shared/utils/config-util';
 
 export const createInjector = () => {
@@ -9,6 +10,7 @@ export const createInjector = () => {
     config,
   };
 
+  //middleware
   const globalErrorMiddleware = createGlobalErrorMiddleware(utils);
   const notFoundMiddleware = createNotFoundMiddleware();
 
@@ -17,7 +19,22 @@ export const createInjector = () => {
     notFoundMiddleware,
   };
 
+  //controller
+
+  //service
+
+  // const httpServer = createHttpServer(middlewares, controllers, utils);
+
+  //  const wsServer = createWsServer(
+  //   httpServer.defaultHttpServer,
+  //   middlewares,
+  //   gateways,
+  //   utils,
+  // );
+
   return {
+    // httpServer,
+    // wsServer,
     utils,
   };
 };
