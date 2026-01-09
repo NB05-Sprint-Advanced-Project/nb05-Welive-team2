@@ -1,3 +1,5 @@
+import { Status } from "@prisma/client"
+
 export interface AdministratorView {
   data: {
     id: string;
@@ -18,3 +20,4 @@ export interface AdministratorView {
   limit: number;
   hasNext: boolean;
 }
+
