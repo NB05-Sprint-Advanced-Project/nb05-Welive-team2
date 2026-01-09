@@ -13,11 +13,17 @@ export const createPollQueryService = (repo: IPollQueryRepo) => {
   };
 
   const getAllPolls = async ({
-    page: number,
-    limit: number,
-    searchKeyword: string,
-    status: PollStatus,
-    building: number,
+    page,
+    limit,
+    searchKeyword,
+    status,
+    building,
+  }: {
+    page: number;
+    limit: number;
+    searchKeyword: string;
+    status: PollStatus;
+    building: number;
   }): Promise<PollView[]> => {
     const polls = await repo.findAll(page, limit, searchKeyword, status, building);
 

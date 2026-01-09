@@ -1,11 +1,10 @@
-import { AdministratorView } from "../../query/views/administrator-view";
-
+import { AdministratorView } from '../../query/views/administrator-view';
 
 export interface IAdministratorQueryRepo {
-    findAll(
-        page: number,
-        limit: number,
-        searchKeyword: string,
-        joinStatus: string
-    ): Promise<AdministratorView>[];
+  findAll(
+    page: number,
+    limit: number,
+    searchKeyword: string,
+    joinStatus: string,
+  ): Promise<AdministratorView>[];
 }

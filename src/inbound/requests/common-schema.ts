@@ -12,4 +12,4 @@ export const updateOptionSchema = z.object({
 export const eventSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
-})
+});

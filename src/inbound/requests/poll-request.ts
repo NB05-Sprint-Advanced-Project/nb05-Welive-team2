@@ -44,6 +44,7 @@ export const updatePollReqBodySchema = z.object({
 
 export type UpdatePollDto = z.infer<typeof updatePollReqBodySchema> &
   z.infer<typeof updatePollReqParamsSchema>;
+
 // delete poll
 export const deletePollReqParamsSchema = z.object({
   pollId: z.string(),
