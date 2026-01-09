@@ -1,4 +1,4 @@
-export type ResidentAddressFields = {
+export type ResidentAddressProps = {
   readonly building: string; // 동
   readonly unit: string; // 호
   readonly isHouseholder: boolean; // 세대주이면 true, 세대원이면 false
@@ -9,7 +9,7 @@ export const ResidentAddressVO = {
     building: string;
     unit: string;
     isHouseholder: boolean;
-  }): ResidentAddressFields => {
+  }): ResidentAddressProps => {
     return {
       ...props,
     };
@@ -19,20 +19,21 @@ export const ResidentAddressVO = {
     building: string;
     unit: string;
     isHouseholder: boolean;
-  }): ResidentAddressFields => {
+  }): ResidentAddressProps => {
     return {
       ...props,
     };
   },
 
-  isEqual: (
-    previousAddress: ResidentAddressFields,
-    nextAddress: ResidentAddressFields,
-  ): boolean => {
+  /**
+   * 기본 들어있는 값이 새로 들어온 값이랑 같으면 재생성 x,
+   * 기본 들어있는 값이 새로 들어온 값이랑 다르면 재생성 o
+   */
+  isEqual: (currentAddress: ResidentAddressProps, newAddress: ResidentAddressProps): boolean => {
     return (
-      previousAddress.building === nextAddress.building &&
-      previousAddress.unit === nextAddress.unit &&
-      previousAddress.isHouseholder === nextAddress.isHouseholder
+      currentAddress.building === newAddress.building &&
+      currentAddress.unit === newAddress.unit &&
+      currentAddress.isHouseholder === newAddress.isHouseholder
     );
   },
 };

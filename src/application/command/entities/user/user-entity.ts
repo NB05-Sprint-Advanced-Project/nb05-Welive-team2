@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
-import { ResidentAddressFields } from './resident-address-vo';
+import { ResidentAddressProps } from './resident-address-vo';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
+import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
 enum Status {
   PENDING,
@@ -8,7 +9,7 @@ enum Status {
   REJECTED,
 }
 
-export type UserFields = {
+export type UserProps = {
   readonly id: string;
   readonly username: string; // ID
   readonly password: string;
@@ -22,7 +23,8 @@ export type UserFields = {
   readonly createdAt: Date;
   readonly updatedAt: Date;
 
-  readonly residentAddress?: ResidentAddressFields;
+  readonly residentAddress?: ResidentAddressProps;
+  readonly userApartmentLink: UserApartmentLinkProps[];
 };
 
 export const UserEntity = {
@@ -35,8 +37,9 @@ export const UserEntity = {
     role: string;
     joinedStatus: Status;
     hashManager: IHashManager;
-    residentAddress?: ResidentAddressFields;
-  }): Promise<UserFields> => {
+    residentAddress?: ResidentAddressProps;
+    userApartmentLink: UserApartmentLinkProps[];
+  }): Promise<UserProps> => {
     const { hashManager, ...rest } = props;
     const hashedPassword = await hashManager.hash(props.password);
     const now = new Date();
@@ -63,8 +66,9 @@ export const UserEntity = {
     refreshToken?: string;
     createdAt: Date;
     updatedAt: Date;
-    residentAddress?: ResidentAddressFields;
-  }): UserFields => {
+    residentAddress?: ResidentAddressProps;
+    userApartmentLink: UserApartmentLinkProps[];
+  }): UserProps => {
     return {
       ...props,
     };
@@ -72,12 +76,12 @@ export const UserEntity = {
 
   // API 명세서에서 기존 데이터 + 수정할 데이터를 합쳐서 와서 각각 컬럼에 Optional를 안 줌
   update: (props: {
-    user: UserFields;
+    user: UserProps;
     name: string;
     email: string;
     contact: Number;
-    residentAddress?: ResidentAddressFields;
-  }): UserFields => {
+    residentAddress?: ResidentAddressProps;
+  }): UserProps => {
     const { name, email, contact, residentAddress, ...rest } = props.user;
 
     return {
@@ -90,10 +94,10 @@ export const UserEntity = {
   },
 
   updatePassword: async (
-    user: UserFields,
+    user: UserProps,
     newPassword: string,
     hashManager: IHashManager,
-  ): Promise<UserFields> => {
+  ): Promise<UserProps> => {
     const hashedPassword = await hashManager.hash(newPassword);
 
     return {
@@ -102,7 +106,7 @@ export const UserEntity = {
     };
   },
 
-  updateAvatar: (user: UserFields, newAvatarUrl: string): UserFields => {
+  updateAvatar: (user: UserProps, newAvatarUrl: string): UserProps => {
     return {
       ...user,
       avatarUrl: newAvatarUrl,
@@ -110,10 +114,10 @@ export const UserEntity = {
   },
 
   updateRefreshToken: async (
-    user: UserFields,
+    user: UserProps,
     newRefreshToken: string,
     hashManager: IHashManager,
-  ): Promise<UserFields> => {
+  ): Promise<UserProps> => {
     const hashedRefreshToken = await hashManager.hash(newRefreshToken);
     return {
       ...user,
