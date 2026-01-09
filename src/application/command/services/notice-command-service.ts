@@ -4,10 +4,10 @@ import {
   UpdateNoticeDto,
 } from '../../../inbound/requests/notice-request';
 import { INoticeCommandRepo } from '../../ports/repos/command/i-notice-command-repo';
-import { NoticeEntity, NoticeModel } from '../entities/notice/notice-entity';
+import { NoticeEntity, NoticeProps } from '../entities/notice/notice-entity';
 
-export const createNotcieCommandService = (repo: INoticeCommandRepo) => {
-  const createNotice = async (dto: CreateNoticeDto): Promise<NoticeModel> => {
+export const createNoticeCommandService = (repo: INoticeCommandRepo) => {
+  const createNotice = async (dto: CreateNoticeDto): Promise<NoticeProps> => {
     const { title, content, category, isPinned, apartmentId, event } = dto;
 
     return await repo.create(
@@ -40,3 +40,5 @@ export const createNotcieCommandService = (repo: INoticeCommandRepo) => {
     deleteNotice,
   };
 };
+
+export type NoticeCommandService = ReturnType<typeof createNoticeCommandService>;

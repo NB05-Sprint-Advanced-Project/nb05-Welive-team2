@@ -5,10 +5,10 @@ import {
   voteDto,
 } from '../../../inbound/requests/poll-request';
 import { IPollCommandRepo } from '../../ports/repos/command/i-poll-command-repo';
-import { PollEntity, PollModel } from '../entities/poll/poll-entity';
+import { PollEntity, PollProps } from '../entities/poll/poll-entity';
 
 export const createPollCommandService = (repo: IPollCommandRepo) => {
-  const createPoll = async (dto: CreatePollDto): Promise<PollModel> => {
+  const createPoll = async (dto: CreatePollDto): Promise<PollProps> => {
     const { title, content, startDate, endDate, apartmentId, building, options } = dto;
 
     return await repo.create(
@@ -44,6 +44,8 @@ export const createPollCommandService = (repo: IPollCommandRepo) => {
     createPoll,
     updatePoll,
     deletePoll,
-    vote
+    vote,
   };
 };
+
+export type PollCommandService = ReturnType<typeof createPollCommandService>;

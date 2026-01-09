@@ -1,8 +1,8 @@
 import { PollStatus } from '@prisma/client';
-import { OptionEntity, OptionModel } from './option-entity';
+import { OptionEntity, OptionProps } from './option-entity';
 import { randomUUID } from 'crypto';
 
-export type PollModel = {
+export type PollProps = {
   readonly id: string;
   readonly createdAt: Date;
   updatedAt: Date;
@@ -14,7 +14,7 @@ export type PollModel = {
   readonly apartmentId: string;
   building: number;
   readonly userId: string;
-  options: OptionModel[];
+  options: OptionProps[];
 };
 export const PollEntity = {
   create: (props: {
@@ -25,9 +25,9 @@ export const PollEntity = {
     apartmentId: string;
     building: number;
     options: { title: string }[];
-  }): PollModel => {
+  }): PollProps => {
     const { options, ...data } = props;
-    let newOptions: OptionModel[] = [];
+    let newOptions: OptionProps[] = [];
 
     for (const title of options) {
       newOptions.push(OptionEntity.create(title));
@@ -51,7 +51,7 @@ export const PollEntity = {
       userId,
       status,
       options: newOptions,
-    } as PollModel;
+    } as PollProps;
   },
   restore: (props: {
     id: string;
@@ -65,12 +65,12 @@ export const PollEntity = {
     apartmentId: string;
     building: number;
     userId: string;
-    options: OptionModel[];
-  }): PollModel => {
-    return { ...props } as PollModel;
+    options: OptionProps[];
+  }): PollProps => {
+    return { ...props } as PollProps;
   },
   update: (
-    poll: PollModel,
+    poll: PollProps,
     props: {
       title?: string;
       content?: string;
@@ -82,7 +82,7 @@ export const PollEntity = {
         title: string;
       }[];
     },
-  ): PollModel => {
+  ): PollProps => {
     if (props.title) {
       poll.title = props.title;
     }
@@ -114,6 +114,6 @@ export const PollEntity = {
       }
     }
 
-    return poll as PollModel;
+    return poll as PollProps;
   },
 };

@@ -29,6 +29,10 @@ export const createPollReqBodySchema = z.object({
 export type CreatePollDto = z.infer<typeof createPollReqBodySchema>;
 
 // update poll
+export const updatePollReqParamsSchema = z.object({
+  pollId: z.string(),
+});
+
 export const updatePollReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
@@ -38,10 +42,8 @@ export const updatePollReqBodySchema = z.object({
   options: z.array(updateOptionSchema),
 });
 
-export type UpdatePollDto = z.infer<typeof updatePollReqBodySchema> & {
-  pollId: string;
-};
-
+export type UpdatePollDto = z.infer<typeof updatePollReqBodySchema> &
+  z.infer<typeof updatePollReqParamsSchema>;
 // delete poll
 export const deletePollReqParamsSchema = z.object({
   pollId: z.string(),

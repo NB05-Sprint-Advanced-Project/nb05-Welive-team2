@@ -1,20 +1,20 @@
 import { randomUUID } from 'crypto';
 
-export type EventModel = {
+export type EventProps = {
   readonly id: string;
   startDate: Date;
   endDtae: Date;
 };
 
 export const EventEntity = {
-  create: (props: { startDate: Date; endDate: Date }): EventModel => {
+  create: (props: { startDate: Date; endDate: Date }): EventProps => {
     return {
       id: randomUUID(),
       startDate: props.startDate,
       endDtae: props.endDate,
-    } as EventModel;
+    } as EventProps;
   },
-  updateDate: (event: EventModel, props: { startDate: Date; endDate: Date }) => {
+  updateDate: (event: EventProps, props: { startDate: Date; endDate: Date }) => {
     event.startDate = props.startDate;
     event.endDtae = props.endDate;
   },

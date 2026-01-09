@@ -25,3 +25,5 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
 
   return { getNotice, getAllNotice };
 };
+
+export type NoticeQueryService = ReturnType<typeof createNoticeQueryService>;

@@ -1,8 +1,8 @@
 import { NoticeCategory } from '@prisma/client';
-import { EventEntity, EventModel } from './event-entity';
+import { EventEntity, EventProps } from './event-entity';
 import { randomUUID } from 'crypto';
 
-export type NoticeModel = {
+export type NoticeProps = {
   readonly id: string;
   readonly createdAt: Date;
   updatedAt: Date;
@@ -14,7 +14,7 @@ export type NoticeModel = {
   readonly apartmentId: string;
   readonly userId: string;
   // comments: Comment[];
-  event?: EventModel;
+  event?: EventProps;
 };
 
 export const NoticeEntity = {
@@ -28,7 +28,7 @@ export const NoticeEntity = {
       startDate: Date;
       endDate: Date;
     };
-  }): NoticeModel => {
+  }): NoticeProps => {
     const { event, ...data } = props;
     let createdEvent;
     if (event) {
@@ -48,7 +48,7 @@ export const NoticeEntity = {
     };
   },
   update: (
-    notice: NoticeModel,
+    notice: NoticeProps,
     props: {
       title?: string;
       content?: string;
@@ -59,7 +59,7 @@ export const NoticeEntity = {
         endDate: Date;
       };
     },
-  ): NoticeModel => {
+  ): NoticeProps => {
     if (props.title) {
       notice.title = props.title;
     }
@@ -79,6 +79,6 @@ export const NoticeEntity = {
         notice.event = EventEntity.create(props.event);
       }
     }
-    return notice as NoticeModel;
+    return notice as NoticeProps;
   },
 };
