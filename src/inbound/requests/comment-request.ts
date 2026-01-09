@@ -14,7 +14,7 @@ export const getAllCommentsReqParamsSchema = z.object({
 // command
 export const createCommentReqBodySchema = z.object({
   body: z.object({
-    content: z.string(),
+    content: z.string().min(1, '내용을 입력해주세요.'),
     resourceId: z.string(),
     resourceType: z.enum(['NOTICE', 'COMPLAINT']),
   }),
@@ -24,7 +24,7 @@ export const updateCommentReqBodySchema = z.object({
   params: z.object({ commentId: z.string() }),
 
   body: z.object({
-    content: z.string(),
+    content: z.string().min(1, '내용을 입력해주세요.'),
   }),
 });
 

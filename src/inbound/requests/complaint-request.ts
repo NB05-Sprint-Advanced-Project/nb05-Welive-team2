@@ -8,8 +8,8 @@ export const getAllConplaintsReqParamsSchema = z.object({
     searchKeyword: z.string().optional(),
     status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']),
     isPublic: z.boolean(),
-    building: z.string().optional(),
-    unit: z.string().optional(),
+    building: z.number().optional(),
+    unit: z.number().optional(),
   }),
 });
 
@@ -19,8 +19,8 @@ export const getComplaintReqParamsSchema = z.object({
 
 // command
 export const createComplaintReqBodySchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z.string().min(1, '제목을 입력해주세요.'),
+  content: z.string().min(1, '내용을 입력해주세요.'),
   isPublic: z.boolean(),
   apartmentId: z.string(),
 });
@@ -29,8 +29,8 @@ export const updateComplaintReqBodySchema = z.object({
   params: z.object({ complaintId: z.string() }),
 
   body: z.object({
-    title: z.string().optional(),
-    content: z.string().optional(),
+    title: z.string().min(1, '제목을 입력해주세요.'),
+    content: z.string().min(1, '내용을 입력해주세요.'),
     isPublic: z.boolean().optional(),
   }),
 });
