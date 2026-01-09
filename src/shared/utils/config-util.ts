@@ -1,5 +1,4 @@
-import { TechnicalException } from '../exceptioins/technical-exception/technical-exception';
-import { configSchema, ConfigType } from './i-config';
+import { configSchema, ConfigType } from '../types/i-config';
 import dotenv from 'dotenv';
 
 const resolveEnvPath = (nodeEnv: string | undefined = process.env.NODE_ENV) => {
