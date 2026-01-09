@@ -1,4 +1,4 @@
-export type ComplaintStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
+export type ComplaintStatus = 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' | 'REJECTED';
 
 export interface ComplaintView {
   id: string;

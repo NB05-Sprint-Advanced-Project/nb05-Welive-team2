@@ -1,12 +1,14 @@
+import { ComplaintStatus, ComplaintView } from '../../../query/views/complaint-veiw';
+
 export interface IComplaintQueryRepo {
-  findId(complaintId: string): Promise<any>;
+  findById(complaintId: string): Promise<ComplaintView>;
   findAll(
     page: number,
     limit: number,
     searchKeyword: string,
-    status: string,
+    status: ComplaintStatus,
     isPublic: boolean,
     building: number,
     unit: number,
-  ): Promise<any[]>;
+  ): Promise<ComplaintView[]>;
 }

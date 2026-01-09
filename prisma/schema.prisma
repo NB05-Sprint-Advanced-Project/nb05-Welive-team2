@@ -108,36 +108,45 @@ model Comments {
   content   String
 
   userId String
-  author User   @relation(fields: [userId], references: [id])
+  author User   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   complaintId String?
   complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
 
   noticeId String?
   notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@index([noticeId])
 }
 
 model Complaints {
-  id           String          @id
-  createdAt    DateTime
-  updatedAt    DateTime
-  title        String
-  content      String
-  status       ComplaintStatus @default(PENDING)
-  isPublic     Boolean         @default(true)
-  viewsCount   Int             @default(0)
-  apartmentId  String
-  apartment    Apartment       @relation(fields: [apartmentId], references: [id])
-  userId       String
-  complaintant User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String          @id
+  createdAt  DateTime
+  updatedAt  DateTime
+  title      String
+  content    String
+  status     ComplaintStatus
+  isPublic   Boolean
+  viewsCount Int
+
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+
+  userId      String
+  complainant User   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   comments Comments[]
+
+  @@index([apartmentId])
+  @@index([userId])
 }
 
 enum ComplaintStatus {
   PENDING
   IN_PROGRESS
   RESOLVED
+  REJECTED
 }
 
 model Options {

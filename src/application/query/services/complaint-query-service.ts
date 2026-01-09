@@ -16,7 +16,7 @@ export const createComplaintQueryService = (repo: IComplaintQueryRepo) => {
     page: number,
     limit: number,
     searchKeyword: string,
-    status: string,
+    status: ComplaintStatus,
     isPublic: boolean,
     building: number,
     unit: number,
