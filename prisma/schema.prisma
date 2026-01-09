@@ -25,9 +25,11 @@ model User {
   name         String
   email        String   @unique
   contact      String   @unique
+  avatarUrl    String?
   password     String
   role         Role
   joinedStatus Status
+  refreshToken String?
   createdAt    DateTime
   updatedAt    DateTime
 
