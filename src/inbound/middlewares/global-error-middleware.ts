@@ -1,20 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
-import { BusinessException } from '../../shared/exceptioins/business-exception/business-exception';
-import { TechnicalException } from '../../shared/exceptioins/technical-exception/technical-exception';
+import { isBusinessException } from '../../shared/exceptioins/business-exception/business-exception';
+import { isTechnicalException } from '../../shared/exceptioins/technical-exception/technical-exception';
 import { IUtils } from '../../shared/i-utils';
+import { ZodError } from 'zod';
 
 export const createGlobalErrorMiddleware = (utils: IUtils) => {
   return (err: any, req: Request, res: Response, next: NextFunction) => {
     const isDev = utils.config.NODE_ENV === 'development';
 
-    if (err.type === 'BusinessException') {
+    if (err instanceof ZodError) {
+      const issue = err.issues[0];
+      return res.json({ message: issue?.message ?? '입력 값을 확인해주세요' });
+    }
+
+    if (isBusinessException(err)) {
       if (isDev) console.error(err);
       return res.status(err.statusCode).json({ message: err.message });
     }
 
-    if (err instanceof TechnicalException) {
+    if (isTechnicalException(err)) {
       if (isDev) console.error(err);
-      return res.status(500).json({ message: '서버 내부 오류입니다.' });
+      return res.json({ message: err.message, meta: err.meta });
     }
 
     if (isDev) console.error(err);

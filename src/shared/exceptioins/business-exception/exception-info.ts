@@ -1,16 +1,18 @@
 export enum BusinessExceptionType {
-  BAD_REQUEST,
-  INVALID_REQUEST,
-  INVALID_INPUT,
-  NOT_FOUND,
-  UNAUTHORIZED,
-  FORBIDDEN,
-  CONFLICT,
+  BAD_REQUEST = 'BAD_REQUEST',
+  INVALID_REQUEST = 'INVALID_REQUEST',
+  INVALID_INPUT = 'INVALID_INPUT',
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  CONFLICT = 'CONFLICT',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  COMPLAINT_NOT_FOUND = 'COMPLAINT_NOT_FOUND',
 }
 
 export const BusinessExceptionTable: Record<
   BusinessExceptionType,
-  { statusCode: number; message: string }
+  { statusCode: number; message?: string }
 > = {
   // 공통
   [BusinessExceptionType.BAD_REQUEST]: {
@@ -20,6 +22,9 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.INVALID_REQUEST]: {
     statusCode: 400,
     message: '요청 형식이 올바르지 않습니다.',
+  },
+  [BusinessExceptionType.VALIDATION_ERROR]: {
+    statusCode: 422,
   },
 
   // 형식 오류
@@ -32,6 +37,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.NOT_FOUND]: {
     statusCode: 404,
     message: '요청을 찾을 수 없습니다.',
+  },
+  [BusinessExceptionType.COMPLAINT_NOT_FOUND]: {
+    statusCode: 404,
+    message: '민원을 찾을 수 없습니다.',
   },
 
   // 권한 오류

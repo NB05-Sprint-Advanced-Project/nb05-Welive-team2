@@ -4,9 +4,8 @@ import { z } from 'zod';
 export const validate = <T extends z.ZodType>(schema: T, data: unknown) => {
   const parsedDate = schema.safeParse(data);
   if (!parsedDate.success) {
-    throw new Error();
+    throw parsedDate.error;
   }
-
   return parsedDate.data;
 };
 
