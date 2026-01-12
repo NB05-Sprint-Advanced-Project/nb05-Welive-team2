@@ -20,7 +20,7 @@ export type UserProps = {
   readonly id: string;
   readonly name: string;
   readonly email: string;
-  readonly contact: Number; // 전화번호
+  readonly contact: string; // 전화번호
   readonly avatarUrl?: string; // 프로필 사진 url
   readonly role: Role;
   readonly createdAt: Date;
@@ -33,7 +33,7 @@ export type NotJoinedResidentProps = {
   readonly residentAddress: ResidentAddressProps;
 } & UserProps;
 
-export const UserEntity = {
+export const BaseUserEntity = {
   isPasswordMatch: async (
     currentPassword: string,
     newPassword: string,

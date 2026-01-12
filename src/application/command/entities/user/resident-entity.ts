@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Role, UserProps } from './base-entity';
+import { Role, UserProps } from './base-user-entity';
 import { ResidentAddressProps } from './resident-address-vo';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
@@ -11,7 +11,7 @@ export const ResidentEntity = {
   create: (props: {
     name: string;
     email: string;
-    contact: number;
+    contact: string;
     role: Role;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
@@ -30,7 +30,7 @@ export const ResidentEntity = {
     id: string;
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
     role: Role;
     createdAt: Date;
     updatedAt: Date;
@@ -47,7 +47,7 @@ export const ResidentEntity = {
     user: NotJoinedResidentProps; // DB에 저장된 데이터
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
     residentAddress?: ResidentAddressProps;
   }): NotJoinedResidentProps => {
     const { name, email, contact, residentAddress, ...rest } = props.user;

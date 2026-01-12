@@ -1,4 +1,4 @@
-import { Status } from '../../command/entities/user/base-entity';
+import { Status } from '../../command/entities/user/base-user-entity';
 import { AdministratorView } from '../../query/views/administrator-view';
 
 export interface IUserQueryRepo {
