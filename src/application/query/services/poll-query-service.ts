@@ -1,10 +1,10 @@
 import { PollStatus } from '@prisma/client';
-import { PollView } from '../views/poll-view';
+import { PollsView, PollView } from '../views/poll-view';
 import { IPollQueryRepo } from '../../ports/repos/query/i-poll-query-repo';
 
 export const createPollQueryService = (repo: IPollQueryRepo) => {
-  const getPoll = async (pollId: string): Promise<PollView> => {
-    const poll = await repo.findById(pollId);
+  const getPoll = async (pollId: string, userId: string): Promise<PollView> => {
+    const poll = await repo.findById(pollId, userId);
 
     if (!poll) {
       throw new Error();
