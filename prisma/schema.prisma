@@ -8,13 +8,10 @@ generator client {
   provider = "prisma-client-js"
   // output   = "../src/generated/prisma"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-
 
 model User {
   id           String   @id
@@ -92,8 +89,6 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
-
 model Comments {
   id        String   @id
   createdAt DateTime
@@ -101,7 +96,7 @@ model Comments {
   content   String
 
   userId String
-  author User   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  author User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   complaintId String?
   complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
@@ -127,7 +122,7 @@ model Complaints {
   apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
 
   userId      String
-  complainant User   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  complainant User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   comments Comments[]
 
@@ -220,3 +215,4 @@ model Notifications {
   userId    String
   author    User     @relation(fields: [userId], references: [id])
 }
+
