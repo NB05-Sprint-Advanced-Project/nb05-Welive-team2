@@ -1,4 +1,4 @@
-import { NoticeCategory } from "@prisma/client";
+import { NoticeCategory } from '@prisma/client';
 
 export interface NoticeView {
   id: string;
@@ -21,5 +21,13 @@ export interface NoticeView {
     id: string;
     startDate: Date;
     endDate: Date;
-  };
+  } | null;
+}
+
+export interface NoticesView {
+  data: Omit<NoticeView, 'event'>[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  hasNext: boolean;
 }
