@@ -14,7 +14,6 @@ export const createUserQueryService = (userQueryRepo: IUserQueryRepo) => {
       params.searchKeyword,
       params.joinStatus,
     );
-
     return administrators;
   };
 
