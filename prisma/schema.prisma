@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -13,11 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  PENDING
-  APPROVED
-  REJECTED
-}
+
 
 model User {
   id           String   @id
@@ -27,19 +24,19 @@ model User {
   contact      String   @unique
   avatarUrl    String?
   password     String
-  role         Role
-  joinedStatus Status
+  role         String
+  joinedStatus String
   refreshToken String?
   createdAt    DateTime
   updatedAt    DateTime
 
-  address       Address?
-  apartments    UserApartmentLink[]
-  complaints    Complaints[]
-  polls         Polls[]
-  notices       Notices[]
-  notifications Notifications[]
-  comments      Comments[]
+  Address           Address?
+  UserApartmentLink UserApartmentLink[]
+  Complaints        Complaints[]
+  Polls             Polls[]
+  Notices           Notices[]
+  Notifications     Notifications[]
+  Comments          Comments[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -58,10 +55,10 @@ model Apartment {
   createdAt             DateTime
   updatedAt             DateTime
 
-  User       UserApartmentLink[]
-  complaints Complaints[]
-  polls      Polls[]
-  notices    Notices[]
+  UserApartmentLink UserApartmentLink[]
+  complaints        Complaints[]
+  polls             Polls[]
+  notices           Notices[]
 }
 
 // todo: article include tag
@@ -95,11 +92,7 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum Role {
-  SUPERADMIN
-  ADMIN
-  USER
-}
+
 
 model Comments {
   id        String   @id
@@ -152,6 +145,7 @@ enum ComplaintStatus {
 model Options {
   id        String @id
   title     String
+  voteCount Int    @default(0)
   pollId    String
   poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
