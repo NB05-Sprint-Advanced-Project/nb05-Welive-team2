@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Status } from '../../application/command/entities/user/base-user-entity';
 
 export const createOptionSchema = z.object({
   title: z.string(),
@@ -57,4 +58,4 @@ export const unitSchema = z
   .number({ message: '호(아파트 호수)은 숫자이어야 합니다.' })
   .min(1, { message: '호(아파트 호수)은 필수 항목입니다.' });
 
-export const joinedStatusSchma = z.enum(['PENDING', 'APPROVED', 'REJECTED']);
+export const joinedStatusSchma = z.enum(Status);

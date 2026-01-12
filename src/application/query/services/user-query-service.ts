@@ -1,19 +1,20 @@
 import { Status } from '../../command/entities/user/base-user-entity';
-import { IUserQueryRepo } from '../../ports/repos/I.user.query.repo';
+import { IUserQueryRepo } from '../../ports/repos/query/i.user.query.repo';
 
 export const createUserQueryService = (userQueryRepo: IUserQueryRepo) => {
-  const getAdministrators = (params: {
+  const getAdministrators = async (params: {
     page: number;
     limit: number;
     searchKeyword: string;
     joinStatus: Status;
   }) => {
-    const administrators = userQueryRepo.findAllAdmins(
+    const administrators = await userQueryRepo.findAllAdmins(
       params.page,
       params.limit,
       params.searchKeyword,
       params.joinStatus,
     );
+
     return administrators;
   };
 

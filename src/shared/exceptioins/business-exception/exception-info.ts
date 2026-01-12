@@ -1,13 +1,18 @@
 export enum BusinessExceptionType {
-  BAD_REQUEST,
-  INVALID_REQUEST,
-  INVALID_INPUT,
-  NOT_FOUND,
-  UNAUTHORIZED,
-  FORBIDDEN,
-  CONFLICT,
-  VALIDATION_ERROR,
-  COMPLAINT_NOT_FOUND,
+  BAD_REQUEST = 'BAD_REQUEST',
+  INVALID_REQUEST = 'INVALID_REQUEST',
+  INVALID_INPUT = 'INVALID_INPUT',
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  CONFLICT = 'CONFLICT',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  COMPLAINT_NOT_FOUND = 'COMPLAINT_NOT_FOUND',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  APARTMENT_NOT_FOUND = 'APARTMENT_NOT_FOUND',
+  EMAIL_ALREADY_IN_USE = 'EMAIL_ALREADY_IN_USE',
+  USERNAME_ALREADY_IN_USE = 'USERNAME_ALREADY_IN_USE',
+  CONTACT_ALREADY_IN_USE = 'CONTACT_ALREADY_IN_USE',
 }
 
 export const BusinessExceptionTable: Record<
@@ -42,6 +47,14 @@ export const BusinessExceptionTable: Record<
     statusCode: 404,
     message: '민원을 찾을 수 없습니다.',
   },
+  [BusinessExceptionType.USER_NOT_FOUND]: {
+    statusCode: 404,
+    message: '유저를 찾을 수 없습니다.',
+  },
+  [BusinessExceptionType.APARTMENT_NOT_FOUND]: {
+    statusCode: 404,
+    message: '아파트를 찾을 수 없습니다.',
+  },
 
   // 권한 오류
   [BusinessExceptionType.UNAUTHORIZED]: {
@@ -57,6 +70,19 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.CONFLICT]: {
     statusCode: 409,
     message: '이미 처리된 요청입니다.',
+  },
+
+  [BusinessExceptionType.EMAIL_ALREADY_IN_USE]: {
+    statusCode: 409,
+    message: '이미 사용중인 이메일입니다.',
+  },
+  [BusinessExceptionType.USERNAME_ALREADY_IN_USE]: {
+    statusCode: 409,
+    message: '이미 사용중인 닉네임입니다.',
+  },
+  [BusinessExceptionType.CONTACT_ALREADY_IN_USE]: {
+    statusCode: 409,
+    message: '이미 사용중인 연락처입니다.',
   },
 
   // 기타

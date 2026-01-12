@@ -1,5 +1,5 @@
-import { Status } from '../../command/entities/user/base-user-entity';
-import { AdministratorView } from '../../query/views/administrator-view';
+import { Status } from '../../../command/entities/user/base-user-entity';
+import { AdministratorView } from '../../../query/views/administrator-view';
 
 export interface IUserQueryRepo {
   findAllAdmins(
