@@ -1,5 +1,3 @@
-import { Status } from '../../command/entities/user/base-entity';
-
 export interface AdministratorView {
   data: {
     id: string;
