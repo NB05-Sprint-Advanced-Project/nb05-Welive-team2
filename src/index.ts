@@ -1,4 +1,4 @@
 import { createInjector } from './injector';
 
-// const { httpServer } = createInjector();
-// httpServer.listen();
+const { httpServer } = createInjector();
+httpServer.listen();

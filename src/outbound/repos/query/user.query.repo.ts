@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { IAdministratorQueryRepo } from '../../../application/ports/repos/I.administrator.query.repo';
-import { Status } from '../../../application/command/entities/user/user-entity';
+import { Status } from '../../../application/command/entities/user/base-entity';
+import { IUserQueryRepo } from '../../../application/ports/repos/I.user.query.repo';
 
-export const createAdministratorQueryRepo = (prisma: PrismaClient): IAdministratorQueryRepo => {
-  const findAll = async (
+export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
+  const findAllAdmins = async (
     page: number,
     limit: number,
     searchKeyword: string,
@@ -56,6 +56,6 @@ export const createAdministratorQueryRepo = (prisma: PrismaClient): IAdministrat
   };
 
   return {
-    findAll,
+    findAllAdmins,
   };
 };

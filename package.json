@@ -2,11 +2,10 @@
   "name": "project-test",
   "version": "1.0.0",
   "description": "nodejs 백엔드 고급 프로젝트",
-  "type": "module",
   "scripts": {
     "start": "node ./build/main.js",
     "build": "tsc",
-    "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/main.ts",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/index.ts",
     "prepare": "husky",
     "format": "prettier . --write",
     "test:db": "dotenv -e .env.test -- prisma migrate deploy",

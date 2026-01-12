@@ -1,12 +1,10 @@
-import { Status } from '../../command/entities/user/base-entity';
-
 export interface AdministratorView {
   data: {
     id: string;
     email: string;
     contact: string;
     name: string;
-    joinStatus: Status;
+    joinStatus: string;
     adminOf: {
       id: string;
       name: string;
