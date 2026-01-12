@@ -145,7 +145,6 @@ enum ComplaintStatus {
 model Options {
   id        String @id
   title     String
-  voteCount Int    @default(0)
   pollId    String
   poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
