@@ -1,37 +1,35 @@
-import { IComplaintQueryRepo } from '../../ports/repos/query/i-complaint-query-repo';
-import { ComplaintStatus, ComplaintView } from '../views/complaint-veiw';
+import { PageView } from '../../../shared/types/page-view';
+import {
+  ComplaintListFilter,
+  IComplaintQueryRepo,
+} from '../../ports/repos/query/i-complaint-query-repo';
+import { ComplaintView } from '../views/complaint-veiw';
 
-export const createComplaintQueryService = (repo: IComplaintQueryRepo) => {
+export const createComplaintQueryService = (compliantRepo: IComplaintQueryRepo) => {
   const getComplaint = async (complaintId: string): Promise<ComplaintView> => {
-    const complaint = await repo.findId(complaintId);
+    const complaint = await compliantRepo.findById(complaintId);
 
     if (!complaint) {
-      throw new Error();
+      throw null;
     }
 
     return complaint;
   };
 
   const getAllComplaints = async (
-    page: number,
-    limit: number,
-    searchKeyword: string,
-    status: ComplaintStatus,
-    isPublic: boolean,
-    building: number,
-    unit: number,
-  ): Promise<ComplaintView[]> => {
-    const complaints = await repo.findAll(
-      page,
-      limit,
-      searchKeyword,
-      status,
-      isPublic,
-      building,
-      unit,
-    );
+    apartmentId: number,
+    params: ComplaintListFilter & { page: number; limit: number },
+  ): Promise<PageView<ComplaintView>> => {
+    const { page, limit, ...filter } = params;
+    const complaints = await compliantRepo.findAll(apartmentId, page, limit, filter);
+
+    if (!complaints) {
+      throw null;
+    }
     return complaints;
   };
 
   return { getComplaint, getAllComplaints };
 };
+
+export type ComplaintQueryService = ReturnType<typeof createComplaintQueryService>;

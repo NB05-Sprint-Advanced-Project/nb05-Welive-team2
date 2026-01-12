@@ -3,13 +3,13 @@ import { z } from 'zod';
 // query
 export const getAllConplaintsReqParamsSchema = z.object({
   params: z.object({
-    page: z.number(),
-    limit: z.number(),
+    page: z.coerce.number(),
+    limit: z.coerce.number(),
     searchKeyword: z.string().optional(),
-    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).default('PENDING'),
-    isPublic: z.boolean().default(true),
-    building: z.number().optional(),
-    unit: z.number().optional(),
+    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).optional(),
+    isPublic: z.coerce.boolean().optional(),
+    building: z.coerce.number().optional(),
+    unit: z.coerce.number().optional(),
   }),
 });
 
@@ -46,7 +46,10 @@ export const updateComplaintStatusReqBodySchema = z.object({
   params: z.object({ complaintId: z.string() }),
 
   body: z.object({
-    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).default('PENDING'),
+    status: z
+      .enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'])
+      .default('PENDING')
+      .optional(),
   }),
 });
 
