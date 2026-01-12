@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client"
+import { Status } from '../../command/entities/user/base-entity';
 
 export interface AdministratorView {
   data: {
@@ -14,7 +14,7 @@ export interface AdministratorView {
       description: string;
       officeNumber: string;
     }[];
-  }[],
+  }[];
   totalCount: number;
   page: number;
   limit: number;
