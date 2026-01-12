@@ -1,7 +1,6 @@
 import { PollStatus, PrismaClient } from '@prisma/client';
 import { IPollQueryRepo } from '../../../application/ports/repos/query/i-poll-query-repo';
 import { PollsView, PollView } from '../../../application/query/views/poll-view';
-import { describe } from 'zod/v4/core';
 
 export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo => {
   const findById = async (pollId: string, userId: string): Promise<PollView | null> => {
@@ -95,3 +94,5 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
 
   return { findById, findAll };
 };
+
+export type PollQueryRepo = ReturnType<typeof createPollQueryRepo>;
