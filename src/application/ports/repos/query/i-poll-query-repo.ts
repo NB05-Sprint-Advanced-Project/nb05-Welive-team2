@@ -1,5 +1,5 @@
 import { PollStatus } from '@prisma/client';
-import { PollView } from '../query/views/poll-view';
+import { PollView } from '../../../query/views/poll-view';
 
 export interface IPollQueryRepo {
   findById(pollId: string): Promise<PollView>;
