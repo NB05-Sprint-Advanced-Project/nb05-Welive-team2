@@ -13,7 +13,15 @@ export interface TechnicalException extends Error {
   meta?: unknown;
 }
 
-export const TechnicalException = (type: TechnicalExceptionType, error?: Error, meta?: unknown) => {
+export const TechnicalException = ({
+  type,
+  error,
+  meta,
+}: {
+  type: TechnicalExceptionType;
+  error?: Error;
+  meta?: unknown;
+}) => {
   const exception = new Error(TechnicalExceptionTable[type]) as TechnicalException;
   exception.error = error;
   exception.type = type;

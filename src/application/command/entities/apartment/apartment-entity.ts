@@ -41,4 +41,21 @@ export const ApartmentEntity = {
       unitCountPerFloor: props.unitCountPerFloor,
     } as ApartmentProps;
   },
+
+  update: (props: {
+    apartment: ApartmentProps;
+    name: string;
+    address: string;
+    description: string;
+    officeNumber: string;
+  }): ApartmentProps => {
+    const { apartment, name, address, description, officeNumber } = props;
+    return {
+      ...apartment,
+      name,
+      address,
+      description,
+      officeNumber,
+    };
+  },
 };

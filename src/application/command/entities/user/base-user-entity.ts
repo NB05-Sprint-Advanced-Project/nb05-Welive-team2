@@ -4,29 +4,29 @@ import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
 export enum Status {
-  PENDING,
-  APPROVED,
-  REJECTED,
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
 }
 
 export enum Role {
-  SUPERADMIN,
-  ADMIN,
-  RESIDENT,
-  NOTJOINEDRESIENT,
+  SUPERADMIN = 'SUPERADMIN',
+  ADMIN = 'ADMIN',
+  RESIDENT = 'RESIDENT',
+  NOTJOINEDRESIDENT = 'NOTJOINEDRESIDENT',
 }
 
 export type UserProps = {
   readonly id: string;
   readonly name: string;
   readonly email: string;
-  readonly contact: Number; // 전화번호
+  readonly contact: string; // 전화번호
   readonly avatarUrl?: string; // 프로필 사진 url
-  readonly role: Role;
+  readonly role: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 
-  readonly userApartmentLink: UserApartmentLinkProps[];
+  readonly userApartmentLink?: UserApartmentLinkProps[];
 };
 
 export type NotJoinedResidentProps = {

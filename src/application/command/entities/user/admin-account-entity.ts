@@ -1,12 +1,12 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
-import { Role, Status, UserProps } from './base-entity';
+import { Role, Status, UserProps } from './base-user-entity';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
 export type AdminProps = {
   readonly username: string;
   readonly password: string;
-  readonly joinedStatus: Status;
+  readonly joinedStatus: string;
   readonly refreshToken?: string;
 } & UserProps;
 
@@ -16,10 +16,10 @@ export const AdminAccountEntity = {
     password: string;
     name: string;
     email: string;
-    contact: number;
+    contact: string;
     role: Role;
     hashManager: IHashManager;
-    userApartmentLink: UserApartmentLinkProps[];
+    userApartmentLink?: UserApartmentLinkProps[];
   }): Promise<AdminProps> => {
     const { hashManager, ...rest } = props;
     const hashedPassword = await hashManager.hash(props.password);
@@ -41,7 +41,7 @@ export const AdminAccountEntity = {
     password: string;
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
     avatarUrl?: string;
     role: Role;
     joinedStatus: Status;
@@ -59,7 +59,7 @@ export const AdminAccountEntity = {
     user: AdminProps; // DB에 저장된 데이터
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
   }): AdminProps => {
     const { name, email, contact, ...rest } = props.user;
 
