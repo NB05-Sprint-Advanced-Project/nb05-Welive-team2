@@ -23,7 +23,7 @@ export const createNoticeCommandService = (repo: INoticeCommandRepo) => {
   };
 
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
-    const { title, content, category, isPinned, apartmentId, event, noticeId } = dto;
+    const { title, content, category, isPinned, event, noticeId } = dto;
     const foundNotice = await repo.findById(noticeId);
     await repo.update(
       NoticeEntity.update(foundNotice, { title, content, category, isPinned, event }),

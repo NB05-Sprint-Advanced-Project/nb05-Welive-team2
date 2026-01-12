@@ -31,7 +31,7 @@ export const createPollController = (
   const getAllPolls = async (req: Request, res: Response) => {
     const params = validate(getAllPollsReqParamsSchema, req.params);
     const polls = await pollQueryService.getAllPolls({ ...params });
-    return polls;
+    return res.json(polls);
   };
 
   const createPoll = async (req: Request, res: Response) => {
