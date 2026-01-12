@@ -1,20 +1,24 @@
 import { BusinessExceptionTable, BusinessExceptionType } from './exception-info';
 
 /* example
-throw BusinessException(BusinessExceptionType.NOT_FOUND)
-throw BusinessException(BusinessExceptionType.NOT_FOUND, err as Error)
+throw BusinessException(props:{type: BusinessExceptionType.NOT_FOUND})
 
-return res.status(err.statusCode).json({ message: err.message });
 */
 
-export interface BusinessException extends Error {
+export type BusinessException = Error & {
+  type: BusinessExceptionType;
   statusCode: number;
+  error?: Error;
+};
+
+export const CreateBusinessException = (props: {
   type: BusinessExceptionType;
   error?: Error;
-}
+  message?: string;
+}) => {
+  const { type, error, message } = props;
 
-export const BusinessException = (type: BusinessExceptionType, error?: Error) => {
-  const exception = new Error(BusinessExceptionTable[type].message) as BusinessException;
+  const exception = new Error(message ?? BusinessExceptionTable[type].message) as BusinessException;
   exception.statusCode = BusinessExceptionTable[type].statusCode;
   exception.type = type;
   exception.error = error;
@@ -22,10 +26,11 @@ export const BusinessException = (type: BusinessExceptionType, error?: Error) =>
 };
 
 // 에러 타입 가드
-export const isBusinessException = (e: unknown): e is BusinessException => {
-  if (typeof e !== 'object' || e === null) return false;
+export const isBusinessException = (error: unknown): error is BusinessException => {
+  if (!(error instanceof Error)) return false;
 
-  const maybe = e as Record<string, unknown>;
+  // 글로벌에서는 어떤 에러가 들어오는지 확정 짓을 수 없어서 Partial로 사용
+  const maybe = error as Partial<BusinessException>;
 
   return (
     typeof maybe.statusCode === 'number' &&
