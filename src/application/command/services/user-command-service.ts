@@ -1,4 +1,4 @@
-export const createUserCommandService = (repo: IUserCommandRepo) => {
+export const createUserCommandService = () => {
   // 관리자
 
   // 입주민

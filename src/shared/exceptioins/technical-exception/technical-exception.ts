@@ -3,18 +3,23 @@ import { TechnicalExceptionTable, TechnicalExceptionType } from './exception-inf
 /* example
 throw TechnicalException(TechnicalExceptionType.DATABASE_ERROR)
 throw TechnicalException(TechnicalExceptionType.DATABASE_ERROR, err as Error, { query: 'SELECT ...' })
-
-return res.status(err.statusCode).json({ message: err.message , err.meta});
 */
 
-export interface TechnicalException extends Error {
+export type TechnicalException = Error & {
   type: TechnicalExceptionType;
   error?: Error;
   meta?: unknown;
-}
+};
 
-export const TechnicalException = (type: TechnicalExceptionType, error?: Error, meta?: unknown) => {
-  const exception = new Error(TechnicalExceptionTable[type]) as TechnicalException;
+export const TechnicalException = (props: {
+  type: TechnicalExceptionType;
+  error?: Error;
+  meta?: unknown;
+  message?: string;
+}) => {
+  const { type, error, meta, message } = props;
+
+  const exception = new Error(message ?? TechnicalExceptionTable[type]) as TechnicalException;
   exception.error = error;
   exception.type = type;
   exception.meta = meta;
@@ -22,10 +27,10 @@ export const TechnicalException = (type: TechnicalExceptionType, error?: Error, 
 };
 
 // 에러 타입 가드
-export const isTechnicalException = (e: unknown): e is TechnicalException => {
-  if (typeof e !== 'object' || e === null) return false;
+export const isTechnicalException = (error: unknown): error is TechnicalException => {
+  if (!(error instanceof Error)) return false;
 
-  const maybe = e as Record<string, unknown>;
+  const maybe = error as Partial<TechnicalException>;
 
   return (
     typeof maybe.type === 'number' &&

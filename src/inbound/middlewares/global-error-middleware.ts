@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { isBusinessException } from '../../shared/exceptioins/business-exception/business-exception';
+import {
+  BusinessException,
+  isBusinessException,
+} from '../../shared/exceptioins/business-exception/business-exception';
 import { isTechnicalException } from '../../shared/exceptioins/technical-exception/technical-exception';
 import { IUtils } from '../../shared/i-utils';
 import { ZodError } from 'zod';
@@ -7,11 +10,6 @@ import { ZodError } from 'zod';
 export const createGlobalErrorMiddleware = (utils: IUtils) => {
   return (err: any, req: Request, res: Response, next: NextFunction) => {
     const isDev = utils.config.NODE_ENV === 'development';
-
-    if (err instanceof ZodError) {
-      const issue = err.issues[0];
-      return res.json({ message: issue?.message ?? '입력 값을 확인해주세요' });
-    }
 
     if (isBusinessException(err)) {
       if (isDev) console.error(err);
