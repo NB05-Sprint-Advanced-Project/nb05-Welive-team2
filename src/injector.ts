@@ -6,6 +6,11 @@ import { loadConfig } from './shared/utils/config-util';
 import { createUserQueryRepo } from './outbound/repos/query/user.query.repo';
 import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
+import { createUserCommandService } from './application/command/services/user-command-service';
+import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
+import { create } from 'node:domain';
+import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
+import { createApartmentCommandRepo } from './outbound/repos/command/apartment.command.repo';
 
 export const createInjector = () => {
   const config = loadConfig();
@@ -23,14 +28,23 @@ export const createInjector = () => {
     notFound: createNotFoundMiddleware(),
   };
 
+  const hashManager = createBcryptHashManager();
+
   // Repository
   const userQueryRepository = createUserQueryRepo(prisma);
+  const userCommandRepo = createUserCommandRepo(prisma);
+  const apartmentCommandRepo = createApartmentCommandRepo(prisma);
 
   // Service
   const userQueryService = createUserQueryService(userQueryRepository);
+  const userCommandService = createUserCommandService(
+    hashManager,
+    userCommandRepo,
+    apartmentCommandRepo,
+  );
 
   // Controller
-  const userController = createUserController(middlewares, userQueryService);
+  const userController = createUserController(middlewares, userQueryService, userCommandService);
 
   const controllers = {
     // authController,

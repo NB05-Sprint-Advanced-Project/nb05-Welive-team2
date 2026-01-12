@@ -11,15 +11,16 @@ export type TechnicalException = Error & {
   meta?: unknown;
 };
 
-export const TechnicalException = (props: {
+export const TechnicalException = ({
+  type,
+  error,
+  meta,
+}: {
   type: TechnicalExceptionType;
   error?: Error;
   meta?: unknown;
-  message?: string;
 }) => {
-  const { type, error, meta, message } = props;
-
-  const exception = new Error(message ?? TechnicalExceptionTable[type]) as TechnicalException;
+  const exception = new Error(TechnicalExceptionTable[type]) as TechnicalException;
   exception.error = error;
   exception.type = type;
   exception.meta = meta;
