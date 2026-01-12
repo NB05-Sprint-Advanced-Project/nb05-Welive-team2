@@ -29,11 +29,11 @@ model User {
 
   Address           Address?
   UserApartmentLink UserApartmentLink[]
-  Complaints        Complaints[]
+  Complaint        Complaint[]
   Polls             Polls[]
   Notices           Notices[]
   Notifications     Notifications[]
-  Comments          Comments[]
+  Comment          Comment[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -53,7 +53,7 @@ model Apartment {
   updatedAt             DateTime
 
   UserApartmentLink UserApartmentLink[]
-  complaints        Complaints[]
+  complaint        Complaint[]
   polls             Polls[]
   notices           Notices[]
 }
@@ -89,7 +89,7 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Comments {
+model Comment {
   id        String   @id
   createdAt DateTime
   updatedAt DateTime
@@ -99,7 +99,7 @@ model Comments {
   author User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   complaintId String?
-  complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
 
   noticeId String?
   notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
@@ -108,13 +108,13 @@ model Comments {
   @@index([noticeId])
 }
 
-model Complaints {
+model Complaint {
   id         String          @id
   createdAt  DateTime
   updatedAt  DateTime
   title      String
   content    String
-  status     ComplaintStatus
+  status     Complainttatus
   isPublic   Boolean
   viewsCount Int
 
@@ -124,13 +124,13 @@ model Complaints {
   userId      String
   complainant User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  comments Comments[]
+  comment Comment[]
 
   @@index([apartmentId])
   @@index([userId])
 }
 
-enum ComplaintStatus {
+enum Complainttatus {
   PENDING
   IN_PROGRESS
   RESOLVED
@@ -193,7 +193,7 @@ model Notices {
   apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
   author      User           @relation(fields: [userId], references: [id])
-  comment     Comments[]
+  comment     Comment[]
 
   event Events?
 }
