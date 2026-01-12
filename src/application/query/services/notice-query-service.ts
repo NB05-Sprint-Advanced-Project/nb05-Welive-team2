@@ -13,12 +13,17 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
     return notice;
   };
 
-  const getAllNotice = async (
-    page: number,
-    limit: number,
-    searchKeyword: string,
-    category: NoticeCategory,
-  ): Promise<NoticeView[]> => {
+  const getAllNotice = async ({
+    page,
+    limit,
+    searchKeyword,
+    category,
+  }: {
+    page: number;
+    limit: number;
+    searchKeyword: string;
+    category: NoticeCategory;
+  }): Promise<NoticeView[]> => {
     const notices = await repo.findAll(page, limit, searchKeyword, category);
     return notices;
   };

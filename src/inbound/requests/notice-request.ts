@@ -27,9 +27,24 @@ export const createNoticeReqBodySchema = z.object({
 export type CreateNoticeDto = z.infer<typeof createNoticeReqBodySchema>;
 
 // update notice
-export type UpdateNoticeDto = z.infer<typeof createNoticeReqBodySchema> & {
-  noticeId: string;
-};
+export const updateNoticeReqParamsSchema = z.object({
+  noticeId: z.string(),
+});
+
+export const updateNoticeReqBodySchema = z.object({
+  title: z.string(),
+  content: z.string(),
+  category: z.enum(['MAINTENCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+  isPinned: z.boolean(),
+  event: eventSchema.optional(),
+});
+
+export type UpdateNoticeDto = z.infer<typeof updateNoticeReqBodySchema> &
+  z.infer<typeof updateNoticeReqParamsSchema>;
 
 // delete notice
-export type DeleteNoticeDto = { noticeId: string };
+export const deleteNoticeReqParamsSchema = z.object({
+  noticeId: z.string(),
+});
+
+export type DeleteNoticeDto = z.infer<typeof deleteNoticeReqParamsSchema>;
