@@ -55,6 +55,10 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     status: PollStatus,
     building: number,
   ): Promise<PollsView> => {
+    // 1. status가 없을 경우 전체 조회
+    // 2. searchKeyword 범위 title, contet, author.name
+    // 3. building이 없을 경우 전체 조회
+
     const where = {
       building,
       status,
