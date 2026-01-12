@@ -1,14 +1,13 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import { IUtils } from '../shared/i-utils';
 import { IUnitOfWork, UnitOfWorkOptions } from '../application/ports/i-unit-of-work';
 import { BasePrismaClient, IRepos } from '../application/ports/i-repos';
 import { TechnicalExceptionType } from '../shared/exceptioins/technical-exception/exception-info';
 import { isTechnicalException } from '../shared/exceptioins/technical-exception/technical-exception';
+import { getEnv } from '../shared/utils/env-util';
 
 export const createUnitOfWork = (
   _prismaClient: PrismaClient,
   _repoFactory: (prismaClient: BasePrismaClient) => IRepos,
-  _utils: IUtils,
 ): IUnitOfWork => {
   const _repos: IRepos = _repoFactory(_prismaClient);
 
@@ -25,7 +24,7 @@ export const createUnitOfWork = (
 
     let lastErr: unknown;
 
-    const maxRetries = useOptimisticLock ? _utils.config.MAX_RETRIES : 0;
+    const maxRetries = useOptimisticLock ? getEnv().MAX_RETRIES : 0;
     for (let i = 0; i <= maxRetries; i++) {
       if (i > 0) {
         console.warn(`재시도 ${i}/${maxRetries}회차`);
@@ -52,7 +51,7 @@ export const createUnitOfWork = (
           err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED &&
           i < maxRetries
         ) {
-          const baseDelay = _utils.config.OPTIMISTIC_LOCK_RETRY_DELAY_MS;
+          const baseDelay = getEnv().OPTIMISTIC_LOCK_RETRY_DELAY_MS;
           const jitter = Math.random() * 100;
           const delay = Math.pow(2, i) * baseDelay + jitter;
           await new Promise((resolve) => setTimeout(resolve, delay));
