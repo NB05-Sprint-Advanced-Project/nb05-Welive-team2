@@ -14,8 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
   id           String   @id
   username     String   @unique
@@ -32,12 +30,12 @@ model User {
 
   Address           Address?
   UserApartmentLink UserApartmentLink[]
-  Complaints        Complaints[]
+  Complaint        Complaint[]
   Polls             Polls[]
   Notices           Notices[]
   Notifications     Notifications[]
-  Comments          Comments[]
-  UserVoteOptions   UserVoteOption[]
+  Comment          Comment[]
+  UserVoteOption   UserVoteOption[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -57,7 +55,7 @@ model Apartment {
   updatedAt             DateTime
 
   UserApartmentLink UserApartmentLink[]
-  complaints        Complaints[]
+  complaint        Complaint[]
   polls             Polls[]
   notices           Notices[]
 }
@@ -93,19 +91,17 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
-
-model Comments {
+model Comment {
   id        String   @id
   createdAt DateTime
   updatedAt DateTime
   content   String
 
   userId String
-  author User   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  author User   @relation(fields: [userId], references: [id], onDelete:Cascade)
 
   complaintId String?
-  complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
 
   noticeId String?
   notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
@@ -114,13 +110,13 @@ model Comments {
   @@index([noticeId])
 }
 
-model Complaints {
+model Complaint {
   id         String          @id
   createdAt  DateTime
   updatedAt  DateTime
   title      String
   content    String
-  status     ComplaintStatus
+  status     Complaintstatus
   isPublic   Boolean
   viewsCount Int
 
@@ -128,15 +124,15 @@ model Complaints {
   apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
 
   userId      String
-  complainant User   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  complainant User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  comments Comments[]
+  comment Comment[]
 
   @@index([apartmentId])
   @@index([userId])
 }
 
-enum ComplaintStatus {
+enum Complaintstatus {
   PENDING
   IN_PROGRESS
   RESOLVED
@@ -151,7 +147,6 @@ model Options {
 
   UserVoteOptions   UserVoteOption[]
 }
-
 model Polls {
   id          String     @id
   createdAt   DateTime
@@ -198,7 +193,7 @@ model Notices {
   apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
   author      User           @relation(fields: [userId], references: [id])
-  comment     Comments[]
+  comment     Comment[]
 
   event Events?
 }
