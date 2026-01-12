@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,7 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
 model User {
   id           String   @id
@@ -24,19 +27,19 @@ model User {
   contact      String   @unique
   avatarUrl    String?
   password     String
-  role         String
-  joinedStatus String
+  role         Role
+  joinedStatus Status
   refreshToken String?
   createdAt    DateTime
   updatedAt    DateTime
 
-  Address           Address?
-  UserApartmentLink UserApartmentLink[]
-  Complaints        Complaints[]
-  Polls             Polls[]
-  Notices           Notices[]
-  Notifications     Notifications[]
-  Comments          Comments[]
+  address       Address?
+  apartments    UserApartmentLink[]
+  complaints    Complaints[]
+  polls         Polls[]
+  notices       Notices[]
+  notifications Notifications[]
+  comments      Comments[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -55,10 +58,10 @@ model Apartment {
   createdAt             DateTime
   updatedAt             DateTime
 
-  UserApartmentLink UserApartmentLink[]
-  complaints        Complaints[]
-  polls             Polls[]
-  notices           Notices[]
+  User       UserApartmentLink[]
+  complaints Complaints[]
+  polls      Polls[]
+  notices    Notices[]
 }
 
 // todo: article include tag
@@ -92,7 +95,11 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
+enum Role {
+  SUPERADMIN
+  ADMIN
+  USER
+}
 
 model Comments {
   id        String   @id
