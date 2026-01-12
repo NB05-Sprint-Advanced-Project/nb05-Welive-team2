@@ -8,7 +8,6 @@ import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
 import { createUserCommandService } from './application/command/services/user-command-service';
 import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
-import { create } from 'node:domain';
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
 import { createApartmentCommandRepo } from './outbound/repos/command/apartment.command.repo';
 
