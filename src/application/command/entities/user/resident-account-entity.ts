@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
-import { Role, Status, UserProps } from './base-entity';
+import { Role, Status, UserProps } from './base-user-entity';
 import { ResidentAddressProps } from './resident-address-vo';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
@@ -19,7 +19,7 @@ export const ResidentAccountEntity = {
     password: string;
     name: string;
     email: string;
-    contact: number;
+    contact: string;
     role: Role;
     hashManager: IHashManager;
     residentAddress: ResidentAddressProps;
@@ -45,7 +45,7 @@ export const ResidentAccountEntity = {
     password: string;
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
     avatarUrl?: string;
     role: Role;
     joinedStatus: Status;
@@ -65,7 +65,7 @@ export const ResidentAccountEntity = {
     user: ResidentProps; // DB에 저장된 데이터
     name: string;
     email: string;
-    contact: Number;
+    contact: string;
     residentAddress?: ResidentAddressProps;
   }): ResidentProps => {
     const { name, email, contact, residentAddress, ...rest } = props.user;

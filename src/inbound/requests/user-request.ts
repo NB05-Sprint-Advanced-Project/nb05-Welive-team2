@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Status } from '../../application/command/entities/user/base-entity';
+import { Status } from '../../application/command/entities/user/base-user-entity';
 
 export const viewAdministratorQuerySchema = z.object({
   page: z.number().default(1),

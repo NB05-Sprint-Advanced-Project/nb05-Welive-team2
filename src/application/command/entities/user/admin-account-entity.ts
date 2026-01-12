@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
-import { Role, Status, UserProps } from './base-entity';
+import { Role, Status, UserProps } from './base-user-entity';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
 export type AdminProps = {

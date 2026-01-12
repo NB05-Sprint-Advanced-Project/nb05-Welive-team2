@@ -1,4 +1,4 @@
-import { Status } from '../../command/entities/user/base-entity';
+import { Status } from '../../command/entities/user/base-user-entity';
 import { IUserQueryRepo } from '../../ports/repos/I.user.query.repo';
 
 export const createUserQueryService = (userQueryRepo: IUserQueryRepo) => {

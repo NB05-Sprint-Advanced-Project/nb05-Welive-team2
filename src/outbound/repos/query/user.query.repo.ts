@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Status } from '../../../application/command/entities/user/base-entity';
+import { Status } from '../../../application/command/entities/user/base-user-entity';
 import { IUserQueryRepo } from '../../../application/ports/repos/I.user.query.repo';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
