@@ -33,8 +33,6 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       prisma.user.count({ where }),
     ]);
 
-    console.log(users);
-
     return {
       data: users.map((user) => ({
         id: user.id,
