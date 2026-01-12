@@ -23,8 +23,9 @@ export const createPollController = (
   const router = express.Router();
 
   const getPoll = async (req: Request, res: Response) => {
+    const userId = 'test'; // 임시로 추가
     const params = validate(getPollReqParamsSchema, req.params);
-    const poll = await pollQueryService.getPoll(params.pollId);
+    const poll = await pollQueryService.getPoll(params.pollId, userId);
     return res.json(poll);
   };
 
