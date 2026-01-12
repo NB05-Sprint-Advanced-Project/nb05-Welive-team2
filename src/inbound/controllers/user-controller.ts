@@ -52,7 +52,11 @@ export const createUserController = (
   };
   const approveAdmin = async (req: Request, res: Response) => {
     const body = validate(approveAdminBodySchema, req.body);
+<<<<<<< HEAD
     const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id as string);
+=======
+    const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id);
+>>>>>>> 1eef5f5 ([feat] Admin API)
     return res.status(204);
   };
 

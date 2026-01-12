@@ -8,6 +8,10 @@ import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
 import { createUserCommandService } from './application/command/services/user-command-service';
 import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
+<<<<<<< HEAD
+=======
+import { create } from 'node:domain';
+>>>>>>> 1eef5f5 ([feat] Admin API)
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
 import { createApartmentCommandRepo } from './outbound/repos/command/apartment.command.repo';
 
