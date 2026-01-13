@@ -5,6 +5,7 @@ export enum TechnicalExceptionType {
   UNIQUE_VIOLATION_EMAIL,
   UNIQUE_VIOLATION_USERNAME,
   UNIQUE_VIOLATION_CONTACT,
+  ROW_NOT_FOUND,
 }
 
 export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
@@ -13,11 +14,11 @@ export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
 
   [TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED]:
     '데이터 버전 충돌이 발생했습니다.(낙관적 락 실패)',
-
   [TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL]:
     '이메일 유니크 제약 조건 위반 에러가 발생했습니다',
   [TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME]:
     '닉네임 유니크 제약 조건 위반 에러가 발생했습니다',
   [TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT]:
     '연락처 유니크 제약 조건 위반 에러가 발생했습니다',
+  [TechnicalExceptionType.ROW_NOT_FOUND]: '해당 행이 존재하지 않습니다.',
 };

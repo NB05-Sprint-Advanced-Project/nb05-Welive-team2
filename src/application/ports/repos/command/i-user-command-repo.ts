@@ -1,6 +1,6 @@
 import { AdminDto, SuperAdminDto } from '../../../../inbound/responses/admin-response';
 import { AdminProps } from '../../../command/entities/user/admin-account-entity';
-import { Status } from '../../../command/entities/user/base-user-entity';
+import { BaseUserProps, Status } from '../../../command/entities/user/base-user-entity';
 
 export interface IUserCommandRepo {
   /**
@@ -17,4 +17,8 @@ export interface IUserCommandRepo {
   approveAllAdmin(status: string): Promise<void>;
 
   approveAdmin(status: string, adminId: string): Promise<void>;
+
+  findUserById: (id: string) => Promise<BaseUserProps | null>;
+  
+  updateAvatar: (entity: BaseUserProps) => Promise<void>;
 }

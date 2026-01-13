@@ -4,12 +4,13 @@ import {
   UpdateAdminDto,
 } from '../../../inbound/requests/user-request';
 import { AdminDto, SuperAdminDto } from '../../../inbound/responses/admin-response';
-import { CreateBusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
+import { createBusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exceptioins/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
 import {
   isTechnicalException,
 } from '../../../shared/exceptioins/technical-exception/technical-exception';
+import { IUnitOfWork } from '../../ports/i-unit-of-work';
 import { IHashManager } from '../../ports/managers/i-bcrypt-hash-manager';
 import { IApartmentCommandRepo } from '../../ports/repos/command/i-apartment-command-repo';
 import { IUserCommandRepo } from '../../ports/repos/command/i-user-command-repo';
@@ -19,8 +20,9 @@ import { Role, Status } from '../entities/user/base-user-entity';
 import { UserApartmentLinkVO } from '../entities/user/user-apartment-link-vo';
 
 export const createUserCommandService = (
+  uow: IUnitOfWork,
   hashManager: IHashManager,
-  userRepo: IUserCommandRepo,
+  userCommandRepo: IUserCommandRepo,
   apartmentRepo: IApartmentCommandRepo,
 ) => {
   // 관리자
@@ -36,7 +38,7 @@ export const createUserCommandService = (
     });
 
     try {
-      const superAdmin = await userRepo.createAdmin(userEntity);
+      const superAdmin = await userCommandRepo.createAdmin(userEntity);
       return {
         username: superAdmin.username,
         email: superAdmin.email,
@@ -47,13 +49,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
         }
       }
       throw err;
@@ -88,7 +90,7 @@ export const createUserCommandService = (
     });
 
     try {
-      const user = await userRepo.createAdmin(userEntity);
+      const user = await userCommandRepo.createAdmin(userEntity);
       return {
         username: user.username,
         email: user.email,
@@ -111,13 +113,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
         }
       }
       throw err;
@@ -126,10 +128,10 @@ export const createUserCommandService = (
 
   const updateAdmin = async (dto: UpdateAdminDto): Promise<AdminDto> => {
     // 1. 특정 Admin 계정 가져오기
-    const foundUser = await userRepo.findAdminById(dto.adminId, Role.ADMIN);
+    const foundUser = await userCommandRepo.findAdminById(dto.adminId, Role.ADMIN);
 
     if (!foundUser) {
-      throw CreateBusinessException({type: BusinessExceptionType.USER_NOT_FOUND});
+      throw createBusinessException({type: BusinessExceptionType.USER_NOT_FOUND});
     }
 
     // 2. 유저 정보 수정
@@ -147,7 +149,7 @@ export const createUserCommandService = (
 
     // 4. 아파트 정보 수정
     if (!foundApartment) {
-      throw CreateBusinessException({type: BusinessExceptionType.APARTMENT_NOT_FOUND});
+      throw createBusinessException({type: BusinessExceptionType.APARTMENT_NOT_FOUND});
     }
     const updatedApartmentEntity = ApartmentEntity.update({
       apartment: foundApartment,
@@ -160,7 +162,7 @@ export const createUserCommandService = (
     const updatedApartment = await apartmentRepo.update(updatedApartmentEntity);
 
     try {
-      const updatedUser = await userRepo.updateAdmin(updatedUserEntity);
+      const updatedUser = await userCommandRepo.updateAdmin(updatedUserEntity);
       return {
         username: updatedUser.username,
         email: updatedUser.email,
@@ -183,13 +185,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
         }
         throw err;
       }
@@ -198,15 +200,48 @@ export const createUserCommandService = (
   };
 
   const approveAllAdmins = async (status: string) => {
-    return userRepo.approveAllAdmin(status);
+    return userCommandRepo.approveAllAdmin(status);
   };
 
   const approveAdmin = async (status: string, adminId: string) => {
-    return userRepo.approveAdmin(status, adminId);
+    return userCommandRepo.approveAdmin(status, adminId);
+  };
+    
+  // 입주민 계정
+  const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {};
+
+  // 입주민(가입한 입주민 + 미가입한 입주민)
+
+  // 기타
+  const updateAvatarUrl = async (dto: UpdateAvatarUrlReqDto): Promise<void> => {
+    uow.doWork(async () => {
+      try {
+        const user = await userCommandRepo.findUserById(dto.userId);
+        if (!user) {
+          throw createBusinessException({
+            type: BusinessExceptionType.USER_NOT_FOUND,
+          });
+        }
+
+        await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, dto.avatarUrl));
+      } catch (err) {
+        if (isTechnicalException(err)) {
+          if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+            throw createBusinessException({
+              type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+            });
+          }
+          if (err.type === TechnicalExceptionType.ROW_NOT_FOUND) {
+            throw createBusinessException({
+              type: BusinessExceptionType.USER_NOT_FOUND,
+            });
+          }
+        }
+      }
+    });
   };
 
-  // 입주민
-  const signUpResident = async (dto: any) => {};
+  const updatePassword = async (dto: UpdatePasswordReqDto) => {};
 
   return {
     createSuperAdmin,
@@ -214,6 +249,9 @@ export const createUserCommandService = (
     updateAdmin,
     approveAllAdmins,
     approveAdmin,
+    createResidentAccount,
+    updateAvatarUrl,
+    updatePassword,
   };
 };
 

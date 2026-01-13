@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
-import { Role, Status, UserProps } from './base-user-entity';
+import { Role, Status, BaseUserProps } from './base-user-entity';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
 export type AdminProps = {
@@ -8,7 +8,7 @@ export type AdminProps = {
   readonly password: string;
   readonly joinedStatus: string;
   readonly refreshToken?: string;
-} & UserProps;
+} & BaseUserProps;
 
 export const AdminAccountEntity = {
   create: async (props: {
@@ -30,6 +30,7 @@ export const AdminAccountEntity = {
       id: randomUUID(),
       joinedStatus: Status.PENDING,
       password: hashedPassword,
+      version: 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -90,13 +91,6 @@ export const AdminAccountEntity = {
     return {
       ...user,
       password: hashedPassword,
-    };
-  },
-
-  updateAvatar: (user: AdminProps, newAvatarUrl: string): AdminProps => {
-    return {
-      ...user,
-      avatarUrl: newAvatarUrl,
     };
   },
 

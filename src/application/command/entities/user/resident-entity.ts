@@ -1,11 +1,11 @@
 import { randomUUID } from 'crypto';
-import { Role, UserProps } from './base-user-entity';
+import { Role, BaseUserProps } from './base-user-entity';
 import { ResidentAddressProps } from './resident-address-vo';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
-export type NotJoinedResidentProps = {
+export type ResidentProps = {
   readonly residentAddress: ResidentAddressProps;
-} & UserProps;
+} & BaseUserProps;
 
 export const ResidentEntity = {
   create: (props: {
@@ -15,7 +15,7 @@ export const ResidentEntity = {
     role: Role;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): NotJoinedResidentProps => {
+  }): ResidentProps => {
     const now = new Date();
 
     return {
@@ -36,7 +36,7 @@ export const ResidentEntity = {
     updatedAt: Date;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): NotJoinedResidentProps => {
+  }): ResidentProps => {
     return {
       ...props,
     };
@@ -44,12 +44,12 @@ export const ResidentEntity = {
 
   // API 명세서에서 기존 데이터 + 수정할 데이터를 합쳐서 와서 각각 컬럼에 Optional를 안 줌
   update: (props: {
-    user: NotJoinedResidentProps; // DB에 저장된 데이터
+    user: ResidentProps; // DB에 저장된 데이터
     name: string;
     email: string;
     contact: string;
     residentAddress?: ResidentAddressProps;
-  }): NotJoinedResidentProps => {
+  }): ResidentProps => {
     const { name, email, contact, residentAddress, ...rest } = props.user;
 
     return {

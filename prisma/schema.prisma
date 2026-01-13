@@ -16,26 +16,26 @@ datasource db {
 
 model User {
   id           String   @id
-  username     String   @unique
+  username     String?  @unique
   name         String
   email        String   @unique
   contact      String   @unique
   avatarUrl    String?
-  password     String
+  password     String?
   role         String
   joinedStatus String
   refreshToken String?
+  version      Int
   createdAt    DateTime
   updatedAt    DateTime
 
   Address           Address?
   UserApartmentLink UserApartmentLink[]
-  Complaint        Complaint[]
+  Complaints        Complaints[]
   Polls             Polls[]
   Notices           Notices[]
   Notifications     Notifications[]
-  Comment          Comment[]
-  UserVoteOption   UserVoteOption[]
+  Comments          Comments[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -55,7 +55,7 @@ model Apartment {
   updatedAt             DateTime
 
   UserApartmentLink UserApartmentLink[]
-  complaint        Complaint[]
+  complaints        Complaints[]
   polls             Polls[]
   notices           Notices[]
 }
@@ -91,17 +91,17 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Comment {
+model Comments {
   id        String   @id
   createdAt DateTime
   updatedAt DateTime
   content   String
 
   userId String
-  author User   @relation(fields: [userId], references: [id], onDelete:Cascade)
+  author User   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   complaintId String?
-  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
 
   noticeId String?
   notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
@@ -110,13 +110,13 @@ model Comment {
   @@index([noticeId])
 }
 
-model Complaint {
+model Complaints {
   id         String          @id
   createdAt  DateTime
   updatedAt  DateTime
   title      String
   content    String
-  status     Complaintstatus
+  status     ComplaintStatus
   isPublic   Boolean
   viewsCount Int
 
@@ -124,15 +124,15 @@ model Complaint {
   apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
 
   userId      String
-  complainant User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  complainant User   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  comment Comment[]
+  comments Comments[]
 
   @@index([apartmentId])
   @@index([userId])
 }
 
-enum Complaintstatus {
+enum ComplaintStatus {
   PENDING
   IN_PROGRESS
   RESOLVED
@@ -142,11 +142,13 @@ enum Complaintstatus {
 model Options {
   id        String @id
   title     String
+  voteCount Int    @default(0)
   pollId    String
   poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
-  UserVoteOptions   UserVoteOption[]
+  userIds String[] // 이 항목에 투표한 사람.
 }
+
 model Polls {
   id          String     @id
   createdAt   DateTime
@@ -193,7 +195,7 @@ model Notices {
   apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
   author      User           @relation(fields: [userId], references: [id])
-  comment     Comment[]
+  comment     Comments[]
 
   event Events?
 }
@@ -214,17 +216,4 @@ model Notifications {
   content   String
   userId    String
   author    User     @relation(fields: [userId], references: [id])
-}
-
-model UserVoteOption {
-  createdAt DateTime
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  optionId String
-  option   Options @relation(fields: [optionId], references: [id], onDelete: Cascade)
-
-  @@id([userId, optionId])
-  @@index([optionId])
 }

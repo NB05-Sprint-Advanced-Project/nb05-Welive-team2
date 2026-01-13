@@ -53,4 +53,7 @@ export const unitSchema = z
   .number({ message: '호(아파트 호수)은 숫자이어야 합니다.' })
   .min(1, { message: '호(아파트 호수)은 필수 항목입니다.' });
 
-export const joinedStatusSchma = z.enum(Status);
+export const joinedStatusSchema = z.enum(Status);
+
+// 인증 payload로 받은 userId, 존재 여부는 인증 미들웨어에서 검증됨
+export const userIdSchema = z.string({ message: '유저 ID는 문자열이어야 합니다.' });

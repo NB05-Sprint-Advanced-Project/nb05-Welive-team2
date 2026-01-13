@@ -1,17 +1,17 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../ports/managers/i-bcrypt-hash-manager';
-import { Role, Status, UserProps } from './base-user-entity';
+import { Role, Status, BaseUserProps } from './base-user-entity';
 import { ResidentAddressProps } from './resident-address-vo';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
-export type ResidentProps = {
+export type ResidentAccountProps = {
   readonly username: string;
   readonly password: string;
   readonly joinedStatus: Status;
   readonly refreshToken?: string;
 
   readonly residentAddress: ResidentAddressProps;
-} & UserProps;
+} & BaseUserProps;
 
 export const ResidentAccountEntity = {
   create: async (props: {
@@ -24,7 +24,7 @@ export const ResidentAccountEntity = {
     hashManager: IHashManager;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): Promise<ResidentProps> => {
+  }): Promise<ResidentAccountProps> => {
     const { hashManager, ...rest } = props;
     const hashedPassword = await hashManager.hash(props.password);
     const now = new Date();
@@ -54,7 +54,7 @@ export const ResidentAccountEntity = {
     updatedAt: Date;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): ResidentProps => {
+  }): ResidentAccountProps => {
     return {
       ...props,
     };
@@ -62,12 +62,12 @@ export const ResidentAccountEntity = {
 
   // API 명세서에서 기존 데이터 + 수정할 데이터를 합쳐서 와서 각각 컬럼에 Optional를 안 줌
   update: (props: {
-    user: ResidentProps; // DB에 저장된 데이터
+    user: ResidentAccountProps; // DB에 저장된 데이터
     name: string;
     email: string;
     contact: string;
     residentAddress?: ResidentAddressProps;
-  }): ResidentProps => {
+  }): ResidentAccountProps => {
     const { name, email, contact, residentAddress, ...rest } = props.user;
 
     return {
@@ -79,7 +79,10 @@ export const ResidentAccountEntity = {
     };
   },
 
-  updateJoinedStatus: (props: { user: ResidentProps; joinedStatus: Status }): ResidentProps => {
+  updateJoinedStatus: (props: {
+    user: ResidentAccountProps;
+    joinedStatus: Status;
+  }): ResidentAccountProps => {
     const { user, joinedStatus } = props;
 
     return {
@@ -89,10 +92,10 @@ export const ResidentAccountEntity = {
   },
 
   updatePassword: async (
-    user: ResidentProps,
+    user: ResidentAccountProps,
     newPassword: string,
     hashManager: IHashManager,
-  ): Promise<ResidentProps> => {
+  ): Promise<ResidentAccountProps> => {
     const hashedPassword = await hashManager.hash(newPassword);
 
     return {
@@ -101,18 +104,11 @@ export const ResidentAccountEntity = {
     };
   },
 
-  updateAvatar: (user: ResidentProps, newAvatarUrl: string): ResidentProps => {
-    return {
-      ...user,
-      avatarUrl: newAvatarUrl,
-    };
-  },
-
   updateRefreshToken: async (
-    user: ResidentProps,
+    user: ResidentAccountProps,
     newRefreshToken: string,
     hashManager: IHashManager,
-  ): Promise<ResidentProps> => {
+  ): Promise<ResidentAccountProps> => {
     const hashedRefreshToken = await hashManager.hash(newRefreshToken);
     return {
       ...user,

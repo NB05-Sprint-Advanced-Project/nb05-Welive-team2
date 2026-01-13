@@ -1,5 +1,3 @@
-import { IRepos } from './i-repos';
-
 export type TransactionOptions =
   | {
       useTransaction: false;
@@ -15,6 +13,5 @@ export type UnitOfWorkOptions = {
 };
 
 export interface IUnitOfWork {
-  repos: IRepos;
-  doWork<T>(work: (repos: IRepos) => Promise<T>, options?: UnitOfWorkOptions): Promise<T>;
+  doWork<T>(work: () => Promise<T>, options?: UnitOfWorkOptions): Promise<T>;
 }

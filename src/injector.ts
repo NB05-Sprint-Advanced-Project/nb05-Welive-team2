@@ -2,16 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import { createGlobalErrorMiddleware } from './inbound/middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './inbound/middlewares/not-found-middleware';
 import { createHttpServer } from './inbound/servers/http-server';
-import { loadConfig } from './shared/utils/config-util';
+import { loadConfig } from './shared/utils/env-util';
 import { createUserQueryRepo } from './outbound/repos/query/user.query.repo';
 import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
 import { createUserCommandService } from './application/command/services/user-command-service';
 import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
-<<<<<<< HEAD
-=======
 import { create } from 'node:domain';
->>>>>>> 1eef5f5 ([feat] Admin API)
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
 import { createApartmentCommandRepo } from './outbound/repos/command/apartment.command.repo';
 

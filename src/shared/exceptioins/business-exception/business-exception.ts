@@ -11,7 +11,7 @@ export type BusinessException = Error & {
   error?: Error;
 };
 
-export const CreateBusinessException = (props: {
+export const createBusinessException = (props: {
   type: BusinessExceptionType;
   error?: Error;
   message?: string;
