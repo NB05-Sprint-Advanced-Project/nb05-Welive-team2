@@ -2,6 +2,7 @@ import { Apartment, Prisma, PrismaClient } from '@prisma/client';
 import { IApartmentCommandRepo } from './i-apartment-command-repo';
 import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
 import { TechnicalException } from '../../shared/exception/technical-exception/technical-exception';
+import { ApartmentProps } from './apartment-entity';
 
 export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentCommandRepo => {
   const create = async (model: Apartment): Promise<Apartment> => {
@@ -52,7 +53,7 @@ export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentComm
     });
   };
 
-  const findById = async (apartmentId: string): Promise<Apartment | null> => {
+  const findById = async (apartmentId: string): Promise<ApartmentProps | null> => {
     return await prisma.apartment.findUnique({
       where: {
         id: apartmentId,
