@@ -1,22 +1,23 @@
 import {
   CreateAdminDto,
   CreateSuperAdminDto,
+  SignUpResidentAccountReqDto,
   UpdateAdminDto,
+  UpdateAvatarUrlReqDto,
+  UpdatePasswordReqDto,
 } from '../../../inbound/requests/user-request';
 import { AdminDto, SuperAdminDto } from '../../../inbound/responses/admin-response';
 import { createBusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exceptioins/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
-import {
-  isTechnicalException,
-} from '../../../shared/exceptioins/technical-exception/technical-exception';
+import { isTechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
 import { IUnitOfWork } from '../../ports/i-unit-of-work';
 import { IHashManager } from '../../ports/managers/i-bcrypt-hash-manager';
 import { IApartmentCommandRepo } from '../../ports/repos/command/i-apartment-command-repo';
 import { IUserCommandRepo } from '../../ports/repos/command/i-user-command-repo';
 import { ApartmentEntity } from '../entities/apartment/apartment-entity';
 import { AdminAccountEntity } from '../entities/user/admin-account-entity';
-import { Role, Status } from '../entities/user/base-user-entity';
+import { BaseUserEntity, Role, Status } from '../entities/user/base-user-entity';
 import { UserApartmentLinkVO } from '../entities/user/user-apartment-link-vo';
 
 export const createUserCommandService = (
@@ -49,13 +50,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -113,13 +114,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -131,7 +132,7 @@ export const createUserCommandService = (
     const foundUser = await userCommandRepo.findAdminById(dto.adminId, Role.ADMIN);
 
     if (!foundUser) {
-      throw createBusinessException({type: BusinessExceptionType.USER_NOT_FOUND});
+      throw createBusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
     }
 
     // 2. 유저 정보 수정
@@ -149,7 +150,7 @@ export const createUserCommandService = (
 
     // 4. 아파트 정보 수정
     if (!foundApartment) {
-      throw createBusinessException({type: BusinessExceptionType.APARTMENT_NOT_FOUND});
+      throw createBusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
     }
     const updatedApartmentEntity = ApartmentEntity.update({
       apartment: foundApartment,
@@ -185,13 +186,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
         throw err;
       }
@@ -206,7 +207,7 @@ export const createUserCommandService = (
   const approveAdmin = async (status: string, adminId: string) => {
     return userCommandRepo.approveAdmin(status, adminId);
   };
-    
+
   // 입주민 계정
   const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {};
 

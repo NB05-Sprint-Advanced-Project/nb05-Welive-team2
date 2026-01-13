@@ -1,9 +1,6 @@
-import { NoticeCommandService } from '../../application/command/services/notice-command-service';
 import { NoticeQueryService } from '../../application/query/services/notice-query-service';
 import { Middlewares } from '../i-middelwares';
 import express, { Request, Response, NextFunction } from 'express';
-import { validate } from './controller-util';
-import { getEventsReqParamsSchema } from '../requests/event-request';
 
 export const createEventController = (
   middlewares: Middlewares,

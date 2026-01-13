@@ -21,6 +21,7 @@ export const ResidentEntity = {
     return {
       ...props,
       id: randomUUID(),
+      version: 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -34,6 +35,7 @@ export const ResidentEntity = {
     role: Role;
     createdAt: Date;
     updatedAt: Date;
+    version: number;
     residentAddress: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
   }): ResidentProps => {

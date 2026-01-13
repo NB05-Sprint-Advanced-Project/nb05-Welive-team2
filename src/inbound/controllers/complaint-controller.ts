@@ -2,7 +2,6 @@ import { Middlewares } from '../i-middelwares';
 import express, { Request, Response, NextFunction } from 'express';
 import { catchHandler, validate } from './controller-util';
 import { ComplaintQueryService } from '../../application/query/services/complaint-query-service';
-import { IUtils } from '../../shared/i-utils';
 import {
   createComplaintReqBodySchema,
   deleteComplaintReqParamsSchema,
@@ -18,7 +17,6 @@ export const createComplaintController = (
   middlewares: Middlewares,
   complaintQueryService: ComplaintQueryService,
   complaintCommandService: ComplaintCommandService,
-  utils: IUtils,
 ) => {
   const path: string = '/complaints';
   const router = express.Router();

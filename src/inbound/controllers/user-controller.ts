@@ -10,9 +10,9 @@ import {
   signUpResidentAccountSchema,
   updateAvatarUrlSchema,
   updatePasswordSchema,
+  viewAdministratorQuerySchema,
   updateResidentAccountJoinedStatusesSchema,
   updateResidentAccountJoinedStatusSchema,
-  viewAdministratorQuerySchema,
 } from '../requests/user-request';
 import { UserCommandService } from '../../application/command/services/user-command-service';
 
