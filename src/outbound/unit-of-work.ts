@@ -1,18 +1,13 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { IUnitOfWork, UnitOfWorkOptions } from '../application/ports/i-unit-of-work';
-import { BasePrismaClient, IRepos } from '../application/ports/i-repos';
 import { TechnicalExceptionType } from '../shared/exceptioins/technical-exception/exception-info';
 import { isTechnicalException } from '../shared/exceptioins/technical-exception/technical-exception';
 import { getEnv } from '../shared/utils/env-util';
+import { asyncContextStorage } from '../shared/utils/async-context-strage-util';
 
-export const createUnitOfWork = (
-  _prismaClient: PrismaClient,
-  _repoFactory: (prismaClient: BasePrismaClient) => IRepos,
-): IUnitOfWork => {
-  const _repos: IRepos = _repoFactory(_prismaClient);
-
+export const createUnitOfWork = (prismaClient: PrismaClient): IUnitOfWork => {
   const doWork = async <T>(
-    work: (repos: IRepos) => Promise<T>,
+    work: () => Promise<T>,
     options: UnitOfWorkOptions = {
       transactionOptions: {
         useTransaction: false,
@@ -31,13 +26,12 @@ export const createUnitOfWork = (
       }
       try {
         if (!transactionOptions.useTransaction) {
-          return await work(_repos);
+          return await work();
         }
 
-        return await _prismaClient.$transaction(
+        return await prismaClient.$transaction(
           async (txPrismaClient: Prisma.TransactionClient) => {
-            const txRepos = _repoFactory(txPrismaClient);
-            return await work(txRepos);
+            return await asyncContextStorage.run(txPrismaClient, work);
           },
           {
             isolationLevel: transactionOptions.isolationLevel,
@@ -67,7 +61,6 @@ export const createUnitOfWork = (
   };
 
   return {
-    repos: _repos,
     doWork,
   };
 };
