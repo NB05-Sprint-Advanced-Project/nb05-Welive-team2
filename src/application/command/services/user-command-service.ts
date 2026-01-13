@@ -9,6 +9,7 @@ import { BusinessExceptionType } from '../../../shared/exceptioins/business-exce
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
 import {
   isTechnicalException,
+  TechnicalException,
 } from '../../../shared/exceptioins/technical-exception/technical-exception';
 import { IHashManager } from '../../ports/managers/i-bcrypt-hash-manager';
 import { IApartmentCommandRepo } from '../../ports/repos/command/i-apartment-command-repo';
@@ -47,13 +48,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -111,13 +112,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -129,7 +130,7 @@ export const createUserCommandService = (
     const foundUser = await userRepo.findAdminById(dto.adminId, Role.ADMIN);
 
     if (!foundUser) {
-      throw CreateBusinessException({type: BusinessExceptionType.USER_NOT_FOUND});
+      throw CreateBusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
     }
 
     // 2. 유저 정보 수정
@@ -147,7 +148,7 @@ export const createUserCommandService = (
 
     // 4. 아파트 정보 수정
     if (!foundApartment) {
-      throw CreateBusinessException({type: BusinessExceptionType.APARTMENT_NOT_FOUND});
+      throw CreateBusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
     }
     const updatedApartmentEntity = ApartmentEntity.update({
       apartment: foundApartment,
@@ -183,13 +184,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw CreateBusinessException({type: BusinessExceptionType.EMAIL_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw CreateBusinessException({type: BusinessExceptionType.USERNAME_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw CreateBusinessException({type: BusinessExceptionType.CONTACT_ALREADY_IN_USE});
+          throw CreateBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
         throw err;
       }

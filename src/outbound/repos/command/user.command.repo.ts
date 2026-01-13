@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client';
 import { IUserCommandRepo } from '../../../application/ports/repos/command/i-user-command-repo';
 import { Status } from '../../../application/command/entities/user/base-user-entity';
 import { AdminProps } from '../../../application/command/entities/user/admin-account-entity';
-import { userInfo } from 'node:os';
 import { Prisma } from '@prisma/client';
 import { TechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
