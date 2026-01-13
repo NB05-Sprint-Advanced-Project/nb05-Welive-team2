@@ -3,13 +3,13 @@ import { z } from 'zod';
 // query
 export const getAllConplaintsReqParamsSchema = z.object({
   params: z.object({
-    page: z.number(),
-    limit: z.number(),
+    page: z.coerce.number(),
+    limit: z.coerce.number(),
     searchKeyword: z.string().optional(),
-    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']),
-    isPublic: z.boolean(),
-    building: z.number().optional(),
-    unit: z.number().optional(),
+    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).optional(),
+    isPublic: z.coerce.boolean().optional(),
+    building: z.coerce.number().optional(),
+    unit: z.coerce.number().optional(),
   }),
 });
 
@@ -19,10 +19,12 @@ export const getComplaintReqParamsSchema = z.object({
 
 // command
 export const createComplaintReqBodySchema = z.object({
-  title: z.string().min(1, '제목을 입력해주세요.'),
-  content: z.string().min(1, '내용을 입력해주세요.'),
-  isPublic: z.boolean(),
-  apartmentId: z.string(),
+  body: z.object({
+    title: z.string().min(1, '제목을 입력해주세요.'),
+    content: z.string().min(1, '내용을 입력해주세요.'),
+    isPublic: z.boolean().default(true),
+    apartmentId: z.string(),
+  }),
 });
 
 export const updateComplaintReqBodySchema = z.object({
@@ -44,7 +46,10 @@ export const updateComplaintStatusReqBodySchema = z.object({
   params: z.object({ complaintId: z.string() }),
 
   body: z.object({
-    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']),
+    status: z
+      .enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'])
+      .default('PENDING')
+      .optional(),
   }),
 });
 
