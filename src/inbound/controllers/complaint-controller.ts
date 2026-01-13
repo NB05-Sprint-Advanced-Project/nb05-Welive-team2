@@ -12,6 +12,7 @@ import {
   updateComplaintStatusReqBodySchema,
 } from '../requests/complaint-request';
 import { ComplaintCommandService } from '../../application/command/services/complaint-command-service';
+import { ComplaintMapper } from '../responses/complaint-response';
 
 export const createComplaintController = (
   middlewares: Middlewares,
@@ -41,17 +42,23 @@ export const createComplaintController = (
   };
 
   const createComplaint = async (req: Request, res: Response) => {
+    /*
+   인증 미들웨어 추가 시 
+   const userId = req.user.userId;
+   */
     const { body } = validate(createComplaintReqBodySchema, req.body);
-    const complaint = await complaintCommandService.createComplaint(body);
+    const entity = await complaintCommandService.createComplaint(userId, body);
+    const complaint = ComplaintMapper.toResponse(entity);
 
     return res.status(201).json(complaint);
   };
 
   const updateComplaint = async (req: Request, res: Response) => {
     const { params, body } = validate(updateComplaintReqBodySchema, { ...req.params, ...req.body });
-    const complaint = await complaintCommandService.updateComplaint(params.complaintId, body);
 
-    return res.status(200).json(complaint);
+    await complaintCommandService.updateComplaint(params.complaintId, body);
+
+    return res.status(204).json();
   };
 
   const deleteComplaint = async (req: Request, res: Response) => {
@@ -66,12 +73,9 @@ export const createComplaintController = (
       ...req.params,
       ...req.body,
     });
-    const complaint = await complaintCommandService.updateComplaintStatus(
-      params.complaintId,
-      body.status,
-    );
+    await complaintCommandService.updateComplaintStatus(params.complaintId, body.status);
 
-    return res.status(200).json(complaint);
+    return res.status(204).json();
   };
 
   router.get('/:complaintId', catchHandler(getComplaint));

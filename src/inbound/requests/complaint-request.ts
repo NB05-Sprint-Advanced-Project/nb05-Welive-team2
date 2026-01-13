@@ -46,10 +46,7 @@ export const updateComplaintStatusReqBodySchema = z.object({
   params: z.object({ complaintId: z.string() }),
 
   body: z.object({
-    status: z
-      .enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'])
-      .default('PENDING')
-      .optional(),
+    status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).default('PENDING'),
   }),
 });
 

@@ -10,6 +10,7 @@ export type ComplaintProps = {
   isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
+  viewsCount: number;
   apartmentId: string;
   userId: string;
 };
@@ -30,6 +31,7 @@ export const ComplaintEntity = {
       status: 'PENDING',
       createdAt: now,
       updatedAt: now,
+      viewsCount: 0,
     };
   },
   restore: (props: {
@@ -40,6 +42,7 @@ export const ComplaintEntity = {
     isPublic: boolean;
     createdAt: Date;
     updatedAt: Date;
+    viewsCount: number;
     apartmentId: string;
     userId: string;
   }): ComplaintProps => {
