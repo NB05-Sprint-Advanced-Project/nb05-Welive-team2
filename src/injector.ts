@@ -2,29 +2,24 @@ import { PrismaClient } from '@prisma/client';
 import { createGlobalErrorMiddleware } from './inbound/middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './inbound/middlewares/not-found-middleware';
 import { createHttpServer } from './inbound/servers/http-server';
-import { loadConfig } from './shared/utils/env-util';
 import { createUserQueryRepo } from './outbound/repos/query/user.query.repo';
 import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
 import { createUserCommandService } from './application/command/services/user-command-service';
-import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
+import { createUserCommandRepo } from './outbound/repos/command/user-command-repo';
 import { create } from 'node:domain';
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
 import { createApartmentCommandRepo } from './outbound/repos/command/apartment-command-repo';
+import { createUnitOfWork } from './outbound/unit-of-work';
 
 export const createInjector = () => {
-  const config = loadConfig();
-  console.log('Configuration loaded:', config);
-
-  const utils = {
-    config,
-  };
-
   const prisma = new PrismaClient();
+  //util
+  const unitOfwork = createUnitOfWork(prisma);
 
   // Middleware
   const middlewares = {
-    globalError: createGlobalErrorMiddleware(utils),
+    globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
   };
 
@@ -38,13 +33,14 @@ export const createInjector = () => {
   // Service
   const userQueryService = createUserQueryService(userQueryRepository);
   const userCommandService = createUserCommandService(
+    unitOfwork,
     hashManager,
     userCommandRepo,
     apartmentCommandRepo,
   );
 
   // Controller
-  const userController = createUserController(middlewares, userQueryService, userCommandService);
+  const userController = createUserController(middlewares, userCommandService, userQueryService);
 
   const controllers = {
     // authController,
@@ -52,7 +48,7 @@ export const createInjector = () => {
   };
 
   // Server
-  const httpServer = createHttpServer(middlewares, controllers, utils);
+  const httpServer = createHttpServer(middlewares, controllers);
 
   //  const wsServer = createWsServer(
   //   httpServer.defaultHttpServer,
@@ -64,6 +60,5 @@ export const createInjector = () => {
   return {
     httpServer,
     // wsServer,
-    utils,
   };
 };

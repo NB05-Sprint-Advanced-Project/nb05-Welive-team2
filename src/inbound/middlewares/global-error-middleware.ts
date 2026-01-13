@@ -1,15 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import {
-  BusinessException,
-  isBusinessException,
-} from '../../shared/exceptioins/business-exception/business-exception';
+import { isBusinessException } from '../../shared/exceptioins/business-exception/business-exception';
 import { isTechnicalException } from '../../shared/exceptioins/technical-exception/technical-exception';
-import { IUtils } from '../../shared/i-utils';
-import { ZodError } from 'zod';
+import { getEnv } from '../../shared/utils/env-util';
 
-export const createGlobalErrorMiddleware = (utils: IUtils) => {
+export const createGlobalErrorMiddleware = () => {
   return (err: any, req: Request, res: Response, next: NextFunction) => {
-    const isDev = utils.config.NODE_ENV === 'development';
+    const isDev = getEnv().NODE_ENV === 'development';
 
     if (isBusinessException(err)) {
       if (isDev) console.error(err);

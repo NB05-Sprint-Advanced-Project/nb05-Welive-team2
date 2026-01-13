@@ -47,6 +47,7 @@ export const AdminAccountEntity = {
     role: Role;
     joinedStatus: Status;
     refreshToken?: string;
+    version: number;
     createdAt: Date;
     updatedAt: Date;
     userApartmentLink: UserApartmentLinkProps[];

@@ -34,6 +34,7 @@ export const ResidentAccountEntity = {
       id: randomUUID(),
       joinedStatus: Status.PENDING,
       password: hashedPassword,
+      version: 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -50,6 +51,7 @@ export const ResidentAccountEntity = {
     role: Role;
     joinedStatus: Status;
     refreshToken?: string;
+    version: number;
     createdAt: Date;
     updatedAt: Date;
     residentAddress: ResidentAddressProps;

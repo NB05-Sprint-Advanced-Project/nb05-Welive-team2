@@ -2,13 +2,9 @@ import express from 'express';
 import http from 'http';
 import { Middlewares } from '../i-middelwares';
 import { Controllers } from '../i-controllers';
-import { IUtils } from '../../shared/i-utils';
+import { getEnv } from '../../shared/utils/env-util';
 
-export const createHttpServer = (
-  middlewares: Middlewares,
-  controllers: Controllers,
-  utils: IUtils,
-) => {
+export const createHttpServer = (middlewares: Middlewares, controllers: Controllers) => {
   const app = express();
   const defaultHttpServer = http.createServer(app);
 
@@ -29,8 +25,8 @@ export const createHttpServer = (
   app.use(middlewares.notFound);
 
   const listen = () => {
-    defaultHttpServer.listen(utils.config.PORT, () => {
-      console.log(`Listening on port ${utils.config.PORT}`);
+    defaultHttpServer.listen(getEnv().PORT, () => {
+      console.log(`Listening on port ${getEnv().PORT}`);
     });
   };
 
