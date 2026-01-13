@@ -8,8 +8,9 @@ import { PageView } from '../../../shared/types/page-view';
 
 export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryRepo => {
   const findById = async (complaintId: string): Promise<ComplaintView> => {
-    const complaint = await prisma.complaint.findUnique({
+    const complaint = await prisma.complaint.update({
       where: { id: complaintId },
+      data: { viewsCount: { increment: 1 } },
       include: {
         apartment: true,
         complainant: true,
