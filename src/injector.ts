@@ -10,7 +10,7 @@ import { createUserCommandService } from './application/command/services/user-co
 import { createUserCommandRepo } from './outbound/repos/command/user.command.repo';
 import { create } from 'node:domain';
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
-import { createApartmentCommandRepo } from './outbound/repos/command/apartment.command.repo';
+import { createApartmentCommandRepo } from './outbound/repos/command/apartment-command-repo';
 
 export const createInjector = () => {
   const config = loadConfig();
