@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Middlewares } from '../i-middelwares';
 import { catchHandler, validate } from './controller-util';
 import { UserQueryService } from '../../application/query/services/user-query-service';
@@ -10,27 +10,27 @@ import {
   viewAdministratorQuerySchema,
 } from '../requests/user-request';
 import { UserCommandService } from '../../application/command/services/user-command-service';
+import { createBaseController } from './base-controller';
 
 export const createUserController = (
   middlewares: Middlewares,
   userQueryService: UserQueryService,
   userCommandService: UserCommandService,
 ) => {
-  const path: string = '/api/v2/users';
-  const router = express.Router();
+  const { path, router } = createBaseController('/api/v2/users');
 
   // 슈퍼 관리자
   const createSuperAdmin = async (req: Request, res: Response) => {
     const body = validate(createSuperAdminBodySchema, req.body);
     const superAdmin = await userCommandService.createSuperAdmin(body);
-    return res.status(204);
+    return res.status(204).send();
   };
 
   // 관리자
   const createAdmin = async (req: Request, res: Response) => {
     const body = validate(createAdminBodySchema, req.body);
     const admin = await userCommandService.createAdmin(body);
-    return res.status(204);
+    return res.status(204).send();
   };
 
   const getAdministrators = async (req: Request, res: Response) => {
@@ -42,18 +42,19 @@ export const createUserController = (
   const updateAdmin = async (req: Request, res: Response) => {
     const body = validate(updateAdminBodySchema, req.body);
     const updatedAdmin = await userCommandService.updateAdmin(body);
-    return res.status(204);
+    return res.status(204).send();
   };
 
   const approveAllAdmins = async (req: Request, res: Response) => {
     const body = validate(approveAdminBodySchema, req.body);
     const result = await userCommandService.approveAllAdmins(body.joinStatus);
-    return res.status(204);
+    return res.status(204).send();
   };
+
   const approveAdmin = async (req: Request, res: Response) => {
     const body = validate(approveAdminBodySchema, req.body);
-    const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id);
-    return res.status(204);
+    const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id as string);
+    return res.status(204).send();
   };
 
   router.post('/super-admins', catchHandler(createSuperAdmin));

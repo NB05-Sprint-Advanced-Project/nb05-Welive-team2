@@ -12,6 +12,7 @@ import {
   updatePollReqParamsSchema,
   voteReqParamsSchema,
 } from '../requests/poll-request';
+import { createBaseController } from './base-controller';
 
 export const createPollController = (
   middlewares: Middlewares,
@@ -19,8 +20,7 @@ export const createPollController = (
   pollCommandService: PollCommandService,
   utils: IUtils,
 ) => {
-  const path: string = '/polls';
-  const router = express.Router();
+  const { path, router } = createBaseController('/api/v2/polls');
 
   const getPoll = async (req: Request, res: Response) => {
     const userId = 'test'; // 임시로 추가
