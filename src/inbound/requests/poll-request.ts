@@ -58,4 +58,6 @@ export const voteReqParamsSchema = z.object({
   optionId: z.string(),
 });
 
-export type voteDto = z.infer<typeof voteReqParamsSchema>;
+export type voteDto = z.infer<typeof voteReqParamsSchema> & {
+  userId: string;
+};

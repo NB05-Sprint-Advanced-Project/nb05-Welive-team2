@@ -7,13 +7,31 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
     const poll = await prismaClient.polls.findUnique({
       where: { id: pollId },
       include: {
-        options: true,
+        options: {
+          include: {
+            UserVoteOptions: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
       },
     });
     if (!poll) {
       return null;
     }
-    return poll;
+
+    return {
+      ...poll,
+      options: poll.options.map((opt) => {
+        return {
+          id: opt.id,
+          title: opt.title,
+          count: opt.UserVoteOptions.length,
+        };
+      }),
+    };
   };
 
   const create = async (props: PollProps): Promise<PollProps> => {
@@ -28,11 +46,28 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
         },
       },
       include: {
-        options: true,
+        options: {
+          include: {
+            UserVoteOptions: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return poll;
+    return {
+      ...poll,
+      options: poll.options.map((opt) => {
+        return {
+          id: opt.id,
+          title: opt.title,
+          count: 0,
+        };
+      }),
+    };
   };
 
   const update = async (props: PollProps): Promise<void> => {

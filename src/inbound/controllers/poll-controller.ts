@@ -56,8 +56,15 @@ export const createPollController = (
 
   const vote = async (req: Request, res: Response) => {
     const params = validate(voteReqParamsSchema, req.params);
-    await pollCommandService.vote({ ...params });
+    const userId = 'test'; // temp
+    await pollCommandService.vote({ ...params, userId });
     return res.json();
+  };
+
+  const cancle = async (req: Request, res: Response) => {
+    const params = validate(voteReqParamsSchema, req.params);
+    const userId = 'temp'; // temp
+    await pollCommandService.cancle({ ...params, userId });
   };
 
   router.get('/:pollId', catchHandler(getPoll));

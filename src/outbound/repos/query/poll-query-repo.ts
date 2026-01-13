@@ -7,7 +7,15 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     const poll = await prismaClient.polls.findUnique({
       where: { id: pollId },
       include: {
-        options: true,
+        options: {
+          include: {
+            UserVoteOptions: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
         author: true,
       },
     });
@@ -18,7 +26,7 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     let optionIdVotedByMe: string | null = null;
 
     for (const option of poll.options) {
-      if (option.userIds.includes(userId)) {
+      if (option.UserVoteOptions.includes({ userId })) {
         optionIdVotedByMe = option.id;
         break;
       }
@@ -41,7 +49,7 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
         return {
           id: opt.id,
           title: opt.title,
-          voteCount: opt.userIds.length,
+          voteCount: opt.UserVoteOptions.length,
         };
       }),
       optionIdVotedByMe: optionIdVotedByMe,

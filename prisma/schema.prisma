@@ -37,6 +37,7 @@ model User {
   Notices           Notices[]
   Notifications     Notifications[]
   Comments          Comments[]
+  UserVoteOptions   UserVoteOption[]
 
   @@index([email])
   @@index([joinedStatus])
@@ -148,7 +149,7 @@ model Options {
   pollId    String
   poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
-  userIds String[] // 이 항목에 투표한 사람. 처음 생성시 빈 배열
+  UserVoteOptions   UserVoteOption[]
 }
 
 model Polls {
@@ -218,4 +219,17 @@ model Notifications {
   content   String
   userId    String
   author    User     @relation(fields: [userId], references: [id])
+}
+
+model UserVoteOption {
+  createdAt DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  optionId String
+  option   Options @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, optionId])
+  @@index([optionId])
 }
