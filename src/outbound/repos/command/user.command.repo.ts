@@ -3,11 +3,7 @@ import { IUserCommandRepo } from '../../../application/ports/repos/command/i-use
 import { Status } from '../../../application/command/entities/user/base-user-entity';
 import { AdminProps } from '../../../application/command/entities/user/admin-account-entity';
 import { userInfo } from 'node:os';
-<<<<<<< HEAD
 import { Prisma } from '@prisma/client';
-=======
-import { Prisma } from '../../../generated/prisma';
->>>>>>> 1eef5f5 ([feat] Admin API)
 import { TechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
 
