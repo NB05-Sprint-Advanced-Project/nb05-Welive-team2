@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { eventSchema } from './common-schema';
+import { eventSchema } from './event-request';
 
 // get notice
 export const getNoticeReqParamsSchema = z.object({

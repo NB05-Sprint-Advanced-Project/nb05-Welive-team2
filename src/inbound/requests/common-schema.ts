@@ -10,11 +10,6 @@ export const updateOptionSchema = z.object({
   title: z.string(),
 });
 
-export const eventSchema = z.object({
-  startDate: z.date(),
-  endDate: z.date(),
-});
-
 export const emailSchema = z
   .string({ message: '이메일은 문자열이어야 합니다.' })
   .min(1, { message: '이메일은 필수 항목입니다.' })
