@@ -9,11 +9,11 @@ export type NoticeProps = {
   title: string;
   content: string;
   category: NoticeCategory;
-  isPinned: Boolean;
+  isPinned: boolean;
   viewCount: number;
   readonly apartmentId: string;
   readonly userId: string;
-  // comments: Comment[];
+  comments?: Comment[];
   event?: EventProps;
 };
 

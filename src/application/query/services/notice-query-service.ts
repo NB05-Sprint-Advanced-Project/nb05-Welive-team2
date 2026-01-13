@@ -1,5 +1,5 @@
 import { NoticeCategory } from '@prisma/client';
-import { NoticeView } from '../views/notice-view';
+import { NoticesView, NoticeView } from '../views/notice-view';
 import { INoticeQueryRepo } from '../../ports/repos/query/i-notice-query-repo';
 
 export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
@@ -13,7 +13,7 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
     return notice;
   };
 
-  const getAllNotice = async ({
+  const getAllNotices = async ({
     page,
     limit,
     searchKeyword,
@@ -23,12 +23,12 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
     limit: number;
     searchKeyword: string;
     category: NoticeCategory;
-  }): Promise<NoticeView[]> => {
+  }): Promise<NoticesView> => {
     const notices = await repo.findAll(page, limit, searchKeyword, category);
     return notices;
   };
 
-  return { getNotice, getAllNotice };
+  return { getNotice, getAllNotices };
 };
 
 export type NoticeQueryService = ReturnType<typeof createNoticeQueryService>;

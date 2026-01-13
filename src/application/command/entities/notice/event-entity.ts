@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 export type EventProps = {
   readonly id: string;
   startDate: Date;
-  endDtae: Date;
+  endDate: Date;
 };
 
 export const EventEntity = {
@@ -11,11 +11,11 @@ export const EventEntity = {
     return {
       id: randomUUID(),
       startDate: props.startDate,
-      endDtae: props.endDate,
+      endDate: props.endDate,
     } as EventProps;
   },
   updateDate: (event: EventProps, props: { startDate: Date; endDate: Date }) => {
     event.startDate = props.startDate;
-    event.endDtae = props.endDate;
+    event.endDate = props.endDate;
   },
 };

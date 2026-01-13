@@ -30,7 +30,7 @@ export const createNoticeController = (
 
   const getAllNotices = async (req: Request, res: Response) => {
     const params = validate(getAllNoticesReqParamsSchema, req.params);
-    const notices = await noticeQueryService.getAllNotice({ ...params });
+    const notices = await noticeQueryService.getAllNotices({ ...params });
     return res.json(notices);
   };
 

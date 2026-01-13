@@ -3,7 +3,6 @@ import { randomUUID } from 'crypto';
 export type OptionProps = {
   readonly id: string;
   title: string;
-  count: number;
   userIds: string[];
 };
 export const OptionEntity = {
@@ -20,11 +19,5 @@ export const OptionEntity = {
   },
   updateTitle: (option: OptionProps, title: string) => {
     option.title = title;
-  },
-  countInc: (option: OptionProps) => {
-    option.count++;
-  },
-  countDec: (option: OptionProps) => {
-    option.count--;
   },
 };

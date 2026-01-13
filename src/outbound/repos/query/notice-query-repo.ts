@@ -102,3 +102,5 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
 
   return { findById, findAll };
 };
+
+export type NoticeQueryRepo = ReturnType<typeof createNoticeQueryRepo>;

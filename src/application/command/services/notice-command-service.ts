@@ -25,6 +25,9 @@ export const createNoticeCommandService = (repo: INoticeCommandRepo) => {
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
     const { title, content, category, isPinned, event, noticeId } = dto;
     const foundNotice = await repo.findById(noticeId);
+    if (!foundNotice) {
+      throw new Error();
+    }
     await repo.update(
       NoticeEntity.update(foundNotice, { title, content, category, isPinned, event }),
     );
@@ -32,7 +35,7 @@ export const createNoticeCommandService = (repo: INoticeCommandRepo) => {
 
   const deleteNotice = async (dto: DeleteNoticeDto): Promise<void> => {
     const { noticeId } = dto;
-    await repo.delete(noticeId);
+    await repo.deleteNotice(noticeId);
   };
   return {
     createNotice,

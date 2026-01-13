@@ -27,6 +27,9 @@ export const createPollCommandService = (repo: IPollCommandRepo) => {
   const updatePoll = async (dto: UpdatePollDto): Promise<void> => {
     const { title, content, startDate, endDate, building, options, pollId } = dto;
     const foundPoll = await repo.findById(pollId);
+    if (!foundPoll) {
+      throw new Error();
+    }
     await repo.update(
       PollEntity.update(foundPoll, { title, content, startDate, endDate, building, options }),
     );
@@ -34,7 +37,7 @@ export const createPollCommandService = (repo: IPollCommandRepo) => {
 
   const deletePoll = async (dto: DeletePollDto): Promise<void> => {
     const { pollId } = dto;
-    await repo.delete(pollId);
+    await repo.deletePoll(pollId);
   };
 
   const vote = async (dto: voteDto) => {
