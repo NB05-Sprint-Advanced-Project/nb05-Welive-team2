@@ -28,16 +28,20 @@ export const createCommentController = (
   };
 
   const createComment = async (req: Request, res: Response) => {
+    /*
+   인증 미들웨어 추가 시 
+   const userId = req.user.userId;
+    */
     const { body } = validate(createCommentReqBodySchema, req.body);
-    const comment = await commentCommandService.createComment(body);
+    const comment = await commentCommandService.createComment(userId, { ...body });
 
     return res.status(201).json(comment);
   };
 
   const updateComment = async (req: Request, res: Response) => {
     const { params, body } = validate(updateCommentReqBodySchema, { ...req.params, ...req.body });
-    const comment = await commentCommandService.updateComment(params.commentId, body);
-    return res.status(200).json(comment);
+    await commentCommandService.updateComment(params.commentId, body);
+    return res.status(204).json();
   };
 
   const deleteComment = async (req: Request, res: Response) => {
