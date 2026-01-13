@@ -1,0 +1,114 @@
+import { PrismaClient } from '@prisma/client';
+import {
+  ComplaintListFilter,
+  IComplaintQueryRepo,
+} from '../../../application/ports/repos/query/i-complaint-query-repo';
+import { ComplaintView } from '../../../application/query/views/complaint-veiw';
+import { PageView } from '../../../shared/types/page-view';
+
+export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryRepo => {
+  const findById = async (complaintId: string): Promise<ComplaintView> => {
+    const complaint = await prisma.complaint.findUnique({
+      where: { id: complaintId },
+      include: {
+        apartment: true,
+        complainant: true,
+        _count: {
+          select: { comment: true },
+        },
+      },
+    });
+
+    if (!complaint) {
+      throw null;
+    }
+
+    const commentCount = complaint._count.comment;
+
+    return {
+      id: complaint.id,
+      createdAt: complaint.createdAt,
+      updatedAt: complaint.updatedAt,
+      title: complaint.title,
+      content: complaint.content,
+      status: complaint.status,
+      isPublic: complaint.isPublic,
+      viewsCount: complaint.viewsCount,
+      apartmentId: complaint.apartmentId,
+      complainant: {
+        id: complaint.complainant.id,
+        name: complaint.complainant.name,
+      },
+      commentCount,
+    };
+  };
+
+  const findAll = async (
+    apartmentId: number,
+    page: number,
+    limit: number,
+    filter: ComplaintListFilter,
+  ): Promise<PageView<ComplaintView>> => {
+    const skip = (page - 1) * limit;
+
+    const { status, isPublic, searchKeyword, building, unit } = filter;
+
+    const where: any = {
+      apartmentId: apartmentId,
+      status: status ?? undefined,
+      isPublic: isPublic ?? undefined,
+      building: building ?? undefined,
+      unit: unit ?? undefined,
+      ...(searchKeyword && {
+        OR: [
+          { title: { contains: searchKeyword, mode: 'insensitive' } },
+          { content: { contains: searchKeyword, mode: 'insensitive' } },
+          { complainant: { name: { contains: searchKeyword, mode: 'insensitive' } } },
+        ],
+      }),
+    };
+
+    const [complaints, totalCount] = await Promise.all([
+      prisma.complaint.findMany({
+        where,
+        include: {
+          complainant: true,
+          _count: { select: { comment: true } },
+        },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.complaint.count({ where }),
+    ]);
+
+    const data: ComplaintView[] = complaints.map((complaint) => ({
+      id: complaint.id,
+      createdAt: complaint.createdAt,
+      updatedAt: complaint.updatedAt,
+      title: complaint.title,
+      content: complaint.content,
+      status: complaint.status,
+      isPublic: complaint.isPublic,
+      viewsCount: complaint.viewsCount,
+      apartmentId: complaint.apartmentId,
+      complainant: {
+        id: complaint.complainant.id,
+        name: complaint.complainant.name,
+      },
+      commentCount: complaint._count.comment,
+    }));
+
+    return {
+      data,
+      totalCount,
+      page,
+      limit,
+      hasNext: totalCount > page * limit,
+    };
+  };
+  return {
+    findById,
+    findAll,
+  };
+};

@@ -11,7 +11,7 @@ export interface ComplaintView {
   viewsCount: number;
   apartmentId: string;
 
-  complaint: {
+  complainant: {
     id: string;
     name: string;
   };
