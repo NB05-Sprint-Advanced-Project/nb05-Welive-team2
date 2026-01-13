@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
+  engineType = "binary"
 }
 
 datasource db {
@@ -14,36 +8,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
-  id           String   @id
-  username     String   @unique
-  name         String
-  email        String   @unique
-  contact      String   @unique
-  avatarUrl    String?
-  password     String
-  role         String
-  joinedStatus String
-  refreshToken String?
-  createdAt    DateTime
-  updatedAt    DateTime
-
+  id                String              @id
+  username          String              @unique
+  name              String
+  email             String              @unique
+  contact           String              @unique
+  avatarUrl         String?
+  password          String
+  role              String
+  joinedStatus      String
+  refreshToken      String?
+  createdAt         DateTime
+  updatedAt         DateTime
   Address           Address?
-  UserApartmentLink UserApartmentLink[]
+  Comments          Comments[]
   Complaints        Complaints[]
-  Polls             Polls[]
   Notices           Notices[]
   Notifications     Notifications[]
-  Comments          Comments[]
+  Polls             Polls[]
+  UserApartmentLink UserApartmentLink[]
 
-  @@index([email])
   @@index([joinedStatus])
 }
 
 model Apartment {
-  id                    String   @id
+  id                    String              @id
   name                  String
   address               String
   description           String
@@ -54,30 +44,17 @@ model Apartment {
   unitCountPerFloor     Int
   createdAt             DateTime
   updatedAt             DateTime
-
-  UserApartmentLink UserApartmentLink[]
-  complaints        Complaints[]
-  polls             Polls[]
-  notices           Notices[]
+  complaints            Complaints[]
+  notices               Notices[]
+  polls                 Polls[]
+  UserApartmentLink     UserApartmentLink[]
 }
-
-// todo: article include tag
 
 model UserApartmentLink {
   userId      String
   apartmentId String
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
-  // 1. 아파트만 cascasde할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (롯데캐슬 아파트 사라짐)
-  // 사람 2,3 => 내가 살던 롯데캐슬아파트 어디감??
-
-  // 2. 유저를 cascade할때
-  // 사람1,2,3 => 롯데캐슬아파트
-  // 사람1 => 롯데캐슬 아파트 개별로 => 나옴 (사람1 사라짐)
-  // 사람2,3 => 롯데캐슬아파트 계속 존재  
+  apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, apartmentId])
   @@index([apartmentId])
@@ -88,68 +65,51 @@ model Address {
   isHouseHolder Boolean
   unit          Int
   building      Int
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
-
 model Comments {
-  id        String   @id
-  createdAt DateTime
-  updatedAt DateTime
-  content   String
-
-  userId String
-  author User   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
+  id          String      @id
+  createdAt   DateTime
+  updatedAt   DateTime
+  content     String
+  userId      String
   complaintId String?
+  noticeId    String?
   complaint   Complaints? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
-
-  noticeId String?
-  notice   Notices? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  notice      Notices?    @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  author      User        @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([complaintId])
   @@index([noticeId])
 }
 
 model Complaints {
-  id         String          @id
-  createdAt  DateTime
-  updatedAt  DateTime
-  title      String
-  content    String
-  status     ComplaintStatus
-  isPublic   Boolean
-  viewsCount Int
-
+  id          String          @id
+  createdAt   DateTime
+  updatedAt   DateTime
+  title       String
+  content     String
+  status      ComplaintStatus
+  isPublic    Boolean
+  viewsCount  Int
   apartmentId String
-  apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
-
   userId      String
-  complainant User   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  comments Comments[]
+  comments    Comments[]
+  apartment   Apartment       @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+  complainant User            @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([apartmentId])
   @@index([userId])
 }
 
-enum ComplaintStatus {
-  PENDING
-  IN_PROGRESS
-  RESOLVED
-  REJECTED
-}
-
 model Options {
-  id        String @id
+  id        String   @id
   title     String
-  voteCount Int    @default(0)
+  voteCount Int      @default(0)
   pollId    String
-  poll      Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
-
-  userIds String[] // 이 항목에 투표한 사람.
+  userIds   String[]
+  poll      Polls    @relation(fields: [pollId], references: [id], onDelete: Cascade)
 }
 
 model Polls {
@@ -162,27 +122,19 @@ model Polls {
   startDate   DateTime
   endDate     DateTime
   apartmentId String
-  apartment   Apartment  @relation(fields: [apartmentId], references: [id])
   building    Int
   userId      String
+  options     Options[]
+  apartment   Apartment  @relation(fields: [apartmentId], references: [id])
   author      User       @relation(fields: [userId], references: [id])
-
-  options Options[]
-}
-
-enum PollStatus {
-  IN_PROGRESS
-  PENDING
-  CLOSED
 }
 
 model Events {
   id        String   @id
   startDate DateTime
   endDate   DateTime
-
-  noticeId String  @unique // 1:1 관계를 위해 @unique가 필수입니다.
-  notice   Notices @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  noticeId  String   @unique
+  notice    Notices  @relation(fields: [noticeId], references: [id], onDelete: Cascade)
 }
 
 model Notices {
@@ -195,21 +147,11 @@ model Notices {
   isPinned    Boolean
   viewCount   Int
   apartmentId String
-  apartment   Apartment      @relation(fields: [apartmentId], references: [id])
   userId      String
-  author      User           @relation(fields: [userId], references: [id])
   comment     Comments[]
-
-  event Events?
-}
-
-enum NoticeCategory {
-  MAINTENCE
-  URGENT
-  COMMUNITY
-  VOTING
-  BOARD_MEETING
-  ETC
+  event       Events?
+  apartment   Apartment      @relation(fields: [apartmentId], references: [id])
+  author      User           @relation(fields: [userId], references: [id])
 }
 
 model Notifications {
@@ -219,4 +161,26 @@ model Notifications {
   content   String
   userId    String
   author    User     @relation(fields: [userId], references: [id])
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+enum PollStatus {
+  IN_PROGRESS
+  PENDING
+  CLOSED
+}
+
+enum NoticeCategory {
+  MAINTENCE
+  URGENT
+  COMMUNITY
+  VOTING
+  BOARD_MEETING
+  ETC
 }

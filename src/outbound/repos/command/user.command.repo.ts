@@ -3,7 +3,7 @@ import { IUserCommandRepo } from '../../../application/ports/repos/command/i-use
 import { Status } from '../../../application/command/entities/user/base-user-entity';
 import { AdminProps } from '../../../application/command/entities/user/admin-account-entity';
 import { userInfo } from 'node:os';
-import { Prisma } from '../../../generated/prisma';
+import { Prisma } from '@prisma/client';
 import { TechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
 
@@ -41,18 +41,19 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
         if (err.code === 'P2002') {
           const modelName = (err.meta as any)?.modelName;
           const target = (err.meta as any)?.target;
-          if (modelName === 'User' && target?.includes('email')) {
+          if (modelName === 'User' && target.includes('email')) {
+            //
             throw TechnicalException({
               type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
             });
           }
-          if (modelName === 'User' && target?.includes('username')) {
+          if (modelName === 'User' && target.includes('username')) {
             throw TechnicalException({
               type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
               error: err,
             });
           }
-          if (modelName === 'User' && target?.includes('contact')) {
+          if (modelName === 'User' && target.includes('contact')) {
             throw TechnicalException({
               type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
               error: err,
