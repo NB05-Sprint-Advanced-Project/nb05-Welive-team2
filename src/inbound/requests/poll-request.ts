@@ -19,8 +19,8 @@ export const getAllPollsReqParamsSchema = z.object({
 export const createPollReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
   apartmentId: z.string(),
   building: z.int(),
   options: z.array(createOptionSchema),
@@ -36,8 +36,8 @@ export const updatePollReqParamsSchema = z.object({
 export const updatePollReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
   building: z.int(),
   options: z.array(updateOptionSchema),
 });

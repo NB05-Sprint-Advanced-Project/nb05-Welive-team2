@@ -58,12 +58,13 @@ export const createInjector = () => {
 
   const pollQuerService = createPollQueryService(pollQueryRepository);
   const pollCommandService = createPollCommandService(
+    unitOfwork,
     pollCommandRepository,
     userVoteOptionCommandRepository,
   );
 
   const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
-  const noticeCommandService = createNoticeCommandService(noticeCommandRepository);
+  const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
 
   // Controller
   const userController = createUserController(middlewares, userCommandService, userQueryService);
