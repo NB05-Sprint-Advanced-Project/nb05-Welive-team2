@@ -11,7 +11,7 @@ import { UserVoteOptionEntity } from '../entities/user-vote-option-entity';
 
 export const createPollCommandService = (
   pollCommandRepo: IPollCommandRepo,
-  userVoteCoptionCommandRepo: IUserVoteOptionCommandRepo,
+  userVoteOptionCommandRepo: IUserVoteOptionCommandRepo,
 ) => {
   const createPoll = async (dto: CreatePollDto): Promise<PollProps> => {
     const { title, content, startDate, endDate, apartmentId, building, options } = dto;
@@ -48,12 +48,12 @@ export const createPollCommandService = (
   // 여기
   const vote = async (dto: voteDto): Promise<void> => {
     const { pollId, optionId, userId } = dto;
-    await userVoteCoptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
+    await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
   };
 
   const cancle = async (dto: voteDto): Promise<void> => {
     const { pollId, optionId, userId } = dto;
-    await userVoteCoptionCommandRepo.cancle(optionId, userId);
+    await userVoteOptionCommandRepo.cancle(optionId, userId);
   };
   return {
     createPoll,

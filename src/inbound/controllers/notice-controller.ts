@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import { Middlewares } from '../i-middelwares';
 import { NoticeCommandService } from '../../application/command/services/notice-command-service';
 import { NoticeQueryService } from '../../application/query/services/notice-query-service';
-import { IUtils } from '../../shared/i-utils';
 import { catchHandler, validate } from './controller-util';
 import {
   createNoticeReqBodySchema,
@@ -17,7 +16,6 @@ export const createNoticeController = (
   middlewares: Middlewares,
   noticeQueryService: NoticeQueryService,
   noticeCommandService: NoticeCommandService,
-  utils: IUtils,
 ) => {
   const path: string = '/notices';
   const router = express.Router();

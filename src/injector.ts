@@ -7,10 +7,20 @@ import { createUserController } from './inbound/controllers/user-controller';
 import { createUserQueryService } from './application/query/services/user-query-service';
 import { createUserCommandService } from './application/command/services/user-command-service';
 import { createUserCommandRepo } from './outbound/repos/command/user-command-repo';
-import { create } from 'node:domain';
 import { createBcryptHashManager } from './outbound/managers/bcrypt-hash-manager';
 import { createApartmentCommandRepo } from './outbound/repos/command/apartment-command-repo';
 import { createUnitOfWork } from './outbound/unit-of-work';
+import { createPollQueryRepo } from './outbound/repos/query/poll-query-repo';
+import { createPollCommandRepo } from './outbound/repos/command/poll-command-repo';
+import { createNoticeQueryRepo } from './outbound/repos/query/notice-query-repo';
+import { createNoticeCommandRepo } from './outbound/repos/command/notice-command-repo';
+import { createPollQueryService } from './application/query/services/poll-query-service';
+import { createPollCommandService } from './application/command/services/poll-command-service';
+import { createUserVoteOptionCommandRepo } from './outbound/repos/command/user-vote-option-command-repo';
+import { createNoticeQueryService } from './application/query/services/notice-query-service';
+import { createNoticeCommandService } from './application/command/services/notice-command-service';
+import { createPollController } from './inbound/controllers/poll-controller';
+import { createNoticeController } from './inbound/controllers/notice-controller';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
@@ -30,6 +40,13 @@ export const createInjector = () => {
   const userCommandRepo = createUserCommandRepo(prisma);
   const apartmentCommandRepo = createApartmentCommandRepo(prisma);
 
+  const pollQueryRepository = createPollQueryRepo(prisma);
+  const pollCommandRepository = createPollCommandRepo(prisma);
+  const userVoteOptionCommandRepository = createUserVoteOptionCommandRepo(prisma);
+
+  const noticeQueryRepository = createNoticeQueryRepo(prisma);
+  const noticeCommandRepository = createNoticeCommandRepo(prisma);
+
   // Service
   const userQueryService = createUserQueryService(userQueryRepository);
   const userCommandService = createUserCommandService(
@@ -39,12 +56,29 @@ export const createInjector = () => {
     apartmentCommandRepo,
   );
 
+  const pollQuerService = createPollQueryService(pollQueryRepository);
+  const pollCommandService = createPollCommandService(
+    pollCommandRepository,
+    userVoteOptionCommandRepository,
+  );
+
+  const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
+  const noticeCommandService = createNoticeCommandService(noticeCommandRepository);
+
   // Controller
   const userController = createUserController(middlewares, userCommandService, userQueryService);
+  const pollController = createPollController(middlewares, pollQuerService, pollCommandService);
+  const noticeController = createNoticeController(
+    middlewares,
+    noticeQueryService,
+    noticeCommandService,
+  );
 
   const controllers = {
     // authController,
     userController,
+    pollController,
+    noticeController,
   };
 
   // Server

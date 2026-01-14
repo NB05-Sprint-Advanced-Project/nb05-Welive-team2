@@ -1,6 +1,6 @@
 import { NoticeProps } from '../../../application/command/entities/notice/notice-entity';
-import { BasePrismaClient } from '../../../application/ports/i-repos';
 import { INoticeCommandRepo } from '../../../application/ports/repos/command/i-notice-command-repo';
+import { BasePrismaClient } from './base-command-repo';
 
 export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INoticeCommandRepo => {
   const findById = async (noticeId: string): Promise<NoticeProps | null> => {

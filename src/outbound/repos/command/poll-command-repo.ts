@@ -1,6 +1,6 @@
 import { PollProps } from '../../../application/command/entities/poll/poll-entity';
-import { BasePrismaClient } from '../../../application/ports/i-repos';
 import { IPollCommandRepo } from '../../../application/ports/repos/command/i-poll-command-repo';
+import { BasePrismaClient } from './base-command-repo';
 
 export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollCommandRepo => {
   const findById = async (pollId: string): Promise<PollProps | null> => {

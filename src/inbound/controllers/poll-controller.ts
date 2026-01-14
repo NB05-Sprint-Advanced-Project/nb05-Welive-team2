@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { PollCommandService } from '../../application/command/services/poll-command-service';
 import { PollQueryService } from '../../application/query/services/poll-query-service';
-import { IUtils } from '../../shared/i-utils';
 import { Middlewares } from '../i-middelwares';
 import { catchHandler, validate } from './controller-util';
 import {
@@ -17,7 +16,6 @@ export const createPollController = (
   middlewares: Middlewares,
   pollQueryService: PollQueryService,
   pollCommandService: PollCommandService,
-  utils: IUtils,
 ) => {
   const path: string = '/polls';
   const router = express.Router();
