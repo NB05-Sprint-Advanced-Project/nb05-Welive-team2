@@ -86,7 +86,7 @@ model UserApartmentLink {
 
 model Address {
   userId        String  @id
-  isHouseHolder Boolean
+  isHouseholder Boolean
   unit          Int
   building      Int
 

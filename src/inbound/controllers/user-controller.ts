@@ -35,7 +35,7 @@ export const createUserController = (
   // 관리자
   const createAdmin = async (req: Request, res: Response) => {
     const body = validate(createAdminBodySchema, req.body);
-    const admin = await userCommandService.createAdmin(body);
+    await userCommandService.createAdmin(body);
     return res.status(204);
   };
 
@@ -69,12 +69,12 @@ export const createUserController = (
 
   const approveAllAdmins = async (req: Request, res: Response) => {
     const body = validate(approveAdminBodySchema, req.body);
-    const result = await userCommandService.approveAllAdmins(body.joinStatus);
+    // const result = await userCommandService.approveAllAdmins(body.joinStatus);
     return res.status(204);
   };
   const approveAdmin = async (req: Request, res: Response) => {
     const body = validate(approveAdminBodySchema, req.body);
-    const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id);
+    // const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id);
     return res.status(204);
   };
 
@@ -95,26 +95,26 @@ export const createUserController = (
   };
 
   // 다건
-  const updateResidentAccountJoinStatuses = async (req: Request, res: Response) => {
-    const reqDto = validate(updateResidentAccountJoinedStatusesSchema, req.body);
-    await userCommandService.updateResidentAccountJoinStatuses(reqDto);
+  // const updateResidentAccountJoinStatuses = async (req: Request, res: Response) => {
+  //   const reqDto = validate(updateResidentAccountJoinedStatusesSchema, req.body);
+  //   await userCommandService.updateResidentAccountJoinStatuses(reqDto);
 
-    return res.sendStatus(204);
-  };
+  //   return res.sendStatus(204);
+  // };
 
-  // 단건
-  const updateResidentAccountJoinStatus = async (req: Request, res: Response) => {
-    const reqDto = validate(updateResidentAccountJoinedStatusSchema, req.body);
-    await userCommandService.updateResidentAccountJoinStatus(reqDto);
+  // // 단건
+  // const updateResidentAccountJoinStatus = async (req: Request, res: Response) => {
+  //   const reqDto = validate(updateResidentAccountJoinedStatusSchema, req.body);
+  //   await userCommandService.updateResidentAccountJoinStatus(reqDto);
 
-    return res.sendStatus(204);
-  };
+  //   return res.sendStatus(204);
+  // };
 
-  const deleteResidentAccounts = async (req: Request, res: Response) => {
-    await userCommandService.deleteResidentAccounts();
+  // const deleteResidentAccounts = async (req: Request, res: Response) => {
+  //   await userCommandService.deleteResidentAccounts();
 
-    return res.sendStatus(204);
-  };
+  //   return res.sendStatus(204);
+  // };
 
   // routers
   // 공통 routers
@@ -134,9 +134,9 @@ export const createUserController = (
   // 입주민 계정
   router.post('/residents', catchHandler(signUpResidentAccount));
   router.get('/residents', catchHandler(getResidentAccounts));
-  router.patch('/residents/join-status', catchHandler(updateResidentAccountJoinStatuses));
-  router.patch('/residents/:id/join-status', catchHandler(updateResidentAccountJoinStatus));
-  router.delete('/residents/rejected', catchHandler(deleteResidentAccounts));
+  // router.patch('/residents/join-status', catchHandler(updateResidentAccountJoinStatuses));
+  // router.patch('/residents/:id/join-status', catchHandler(updateResidentAccountJoinStatus));
+  // router.delete('/residents/rejected', catchHandler(deleteResidentAccounts));
 
   return { path, router };
 };

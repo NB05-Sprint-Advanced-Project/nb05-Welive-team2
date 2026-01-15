@@ -6,7 +6,6 @@ import {
   UpdateAvatarUrlReqDto,
   UpdatePasswordReqDto,
 } from '../../../inbound/requests/user-request';
-import { AdminDto, SuperAdminDto } from '../../../inbound/responses/admin-response';
 import { createBusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exceptioins/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
@@ -18,6 +17,7 @@ import { IUserCommandRepo } from '../../ports/repos/command/i-user-command-repo'
 import { ApartmentEntity } from '../entities/apartment/apartment-entity';
 import { AdminAccountEntity } from '../entities/user/admin-account-entity';
 import { BaseUserEntity, Role, Status } from '../entities/user/base-user-entity';
+import { ResidentAccountEntity } from '../entities/user/resident-account-entity';
 import { UserApartmentLinkVO } from '../entities/user/user-apartment-link-vo';
 
 export const createUserCommandService = (
@@ -27,7 +27,7 @@ export const createUserCommandService = (
   apartmentRepo: IApartmentCommandRepo,
 ) => {
   // 관리자
-  const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<SuperAdminDto> => {
+  const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
     const userEntity = await AdminAccountEntity.create({
       username: dto.username,
       password: dto.password,
@@ -39,14 +39,7 @@ export const createUserCommandService = (
     });
 
     try {
-      const superAdmin = await userCommandRepo.createAdmin(userEntity);
-      return {
-        username: superAdmin.username,
-        email: superAdmin.email,
-        contact: superAdmin.contact,
-        name: superAdmin.name,
-        password: superAdmin.password,
-      };
+      await userCommandRepo.create(userEntity);
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
@@ -63,7 +56,7 @@ export const createUserCommandService = (
     }
   };
 
-  const createAdmin = async (dto: CreateAdminDto): Promise<AdminDto> => {
+  const createAdmin = async (dto: CreateAdminDto): Promise<void> => {
     // 1. 아파트 생성
     const apartmentEntity = ApartmentEntity.create({
       name: dto.adminOf.name,
@@ -85,32 +78,13 @@ export const createUserCommandService = (
       contact: dto.contact,
       name: dto.name,
       password: dto.password,
-      userApartmentLink: [UserApartmentLinkVO.create({ apartmentId: apartment.id })],
+      userApartmentLink: [UserApartmentLinkVO.create(apartment.id)],
       role: Role.ADMIN,
       hashManager: hashManager,
     });
 
     try {
-      const user = await userCommandRepo.createAdmin(userEntity);
-      return {
-        username: user.username,
-        email: user.email,
-        contact: user.contact,
-        name: user.name,
-        password: user.password,
-        adminOf: [
-          {
-            name: apartment.name,
-            address: apartment.address,
-            description: apartment.description,
-            officeNumber: apartment.officeNumber,
-            buildingNumberFrom: apartment.buildingNumberFrom,
-            buildingNumberTo: apartment.buildingNumberTo,
-            floorCountPerBuilding: apartment.floorCountPerBuilding,
-            unitCountPerFloor: apartment.unitCountPerFloor,
-          },
-        ],
-      };
+      await userCommandRepo.create(userEntity);
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
@@ -127,9 +101,9 @@ export const createUserCommandService = (
     }
   };
 
-  const updateAdmin = async (dto: UpdateAdminDto): Promise<AdminDto> => {
+  const updateAdmin = async (dto: UpdateAdminDto): Promise<void> => {
     // 1. 특정 Admin 계정 가져오기
-    const foundUser = await userCommandRepo.findAdminById(dto.adminId, Role.ADMIN);
+    const foundUser = await userCommandRepo.findAdminUserById(dto.adminId);
 
     if (!foundUser) {
       throw createBusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
@@ -163,26 +137,7 @@ export const createUserCommandService = (
     const updatedApartment = await apartmentRepo.update(updatedApartmentEntity);
 
     try {
-      const updatedUser = await userCommandRepo.updateAdmin(updatedUserEntity);
-      return {
-        username: updatedUser.username,
-        email: updatedUser.email,
-        contact: updatedUser.contact,
-        name: updatedUser.name,
-        password: updatedUser.password,
-        adminOf: [
-          {
-            name: updatedApartment.name,
-            address: updatedApartment.address,
-            description: updatedApartment.description,
-            officeNumber: updatedApartment.officeNumber,
-            buildingNumberFrom: updatedApartment.buildingNumberFrom,
-            buildingNumberTo: updatedApartment.buildingNumberTo,
-            floorCountPerBuilding: updatedApartment.floorCountPerBuilding,
-            unitCountPerFloor: updatedApartment.unitCountPerFloor,
-          },
-        ],
-      };
+      await userCommandRepo.update(updatedUserEntity);
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
@@ -194,19 +149,24 @@ export const createUserCommandService = (
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
           throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
+        if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+          throw createBusinessException({ type: BusinessExceptionType.CONCURRENT_MODIFICATION });
+        }
         throw err;
       }
       throw err;
     }
   };
 
-  const approveAllAdmins = async (status: string) => {
-    return userCommandRepo.approveAllAdmin(status);
-  };
+  // const updateAdminsJoinedStatus = async (status: string) => {
+  //   const user = await userCommandRepo.findAdminUserByRole()
+  //   AdminAccountEntity.
+  //   return userCommandRepo.approveAllAdmin(status);
+  // };
 
-  const approveAdmin = async (status: string, adminId: string) => {
-    return userCommandRepo.approveAdmin(status, adminId);
-  };
+  // const approveAdmin = async (status: string, adminId: string) => {
+  //   return userCommandRepo.approveAdmin(status, adminId);
+  // };
 
   // 입주민 계정
   const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {};
@@ -217,7 +177,8 @@ export const createUserCommandService = (
   const updateAvatarUrl = async (dto: UpdateAvatarUrlReqDto): Promise<void> => {
     uow.doWork(async () => {
       try {
-        const user = await userCommandRepo.findUserById(dto.userId);
+        const user = await userCommandRepo.findBaseUserById(dto.userId);
+
         if (!user) {
           throw createBusinessException({
             type: BusinessExceptionType.USER_NOT_FOUND,
@@ -232,24 +193,55 @@ export const createUserCommandService = (
               type: BusinessExceptionType.CONCURRENT_MODIFICATION,
             });
           }
-          if (err.type === TechnicalExceptionType.ROW_NOT_FOUND) {
-            throw createBusinessException({
-              type: BusinessExceptionType.USER_NOT_FOUND,
-            });
-          }
         }
       }
     });
   };
 
-  const updatePassword = async (dto: UpdatePasswordReqDto) => {};
+  const updatePassword = async (dto: UpdatePasswordReqDto): Promise<void> => {
+    uow.doWork(async () => {
+      const user = await userCommandRepo.findJoinedUserById(dto.userId);
+
+      if (!user) {
+        throw createBusinessException({
+          type: BusinessExceptionType.USER_NOT_FOUND,
+        });
+      }
+
+      // 입력한 현재 비번과 DB 비번 불일치하는지 비교
+      if (!(await BaseUserEntity.isPasswordMatch(user.password, dto.password, hashManager))) {
+        throw createBusinessException({
+          type: BusinessExceptionType.INCORRECT_PASSWORD,
+        });
+      }
+
+      // 입력한 새 비번과 DB 비번 일치하는지 비교
+      if (await BaseUserEntity.isPasswordMatch(user.password, dto.newpassword, hashManager)) {
+        throw createBusinessException({
+          type: BusinessExceptionType.CORRECT_PASSWORD,
+        });
+      }
+
+      if (user.role === Role.ADMIN || user.role === Role.SUPERADMIN) {
+        await userCommandRepo.updatePassword(
+          await AdminAccountEntity.updatePassword(user, dto.newpassword, hashManager),
+        );
+      }
+
+      if (user.role === Role.RESIDENT) {
+        await userCommandRepo.updatePassword(
+          await ResidentAccountEntity.updatePassword(user, dto.newpassword, hashManager),
+        );
+      }
+    });
+  };
 
   return {
     createSuperAdmin,
     createAdmin,
     updateAdmin,
-    approveAllAdmins,
-    approveAdmin,
+    // approveAllAdmins,
+    // approveAdmin,
     createResidentAccount,
     updateAvatarUrl,
     updatePassword,

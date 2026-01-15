@@ -7,10 +7,11 @@ import { UserApartmentLinkProps } from './user-apartment-link-vo';
 export type ResidentAccountProps = {
   readonly username: string;
   readonly password: string;
-  readonly joinedStatus: Status;
+  readonly role: Role.RESIDENT;
+  readonly joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
   readonly refreshToken?: string;
 
-  readonly residentAddress: ResidentAddressProps;
+  readonly address: ResidentAddressProps;
 } & BaseUserProps;
 
 export const ResidentAccountEntity = {
@@ -20,9 +21,9 @@ export const ResidentAccountEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role;
+    role: Role.RESIDENT;
     hashManager: IHashManager;
-    residentAddress: ResidentAddressProps;
+    address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
   }): Promise<ResidentAccountProps> => {
     const { hashManager, ...rest } = props;
@@ -48,13 +49,13 @@ export const ResidentAccountEntity = {
     email: string;
     contact: string;
     avatarUrl?: string;
-    role: Role;
-    joinedStatus: Status;
+    role: Role.RESIDENT;
+    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
     refreshToken?: string;
     version: number;
     createdAt: Date;
     updatedAt: Date;
-    residentAddress: ResidentAddressProps;
+    address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
   }): ResidentAccountProps => {
     return {
@@ -62,7 +63,6 @@ export const ResidentAccountEntity = {
     };
   },
 
-  // API 명세서에서 기존 데이터 + 수정할 데이터를 합쳐서 와서 각각 컬럼에 Optional를 안 줌
   update: (props: {
     user: ResidentAccountProps; // DB에 저장된 데이터
     name: string;
@@ -70,26 +70,26 @@ export const ResidentAccountEntity = {
     contact: string;
     residentAddress?: ResidentAddressProps;
   }): ResidentAccountProps => {
-    const { name, email, contact, residentAddress, ...rest } = props.user;
-
     return {
-      ...rest,
+      ...props.user,
       name: props.name,
       email: props.email,
       contact: props.contact,
-      residentAddress: residentAddress,
+      address: props.residentAddress!,
+      version: props.user.version + 1,
+      updatedAt: new Date(),
     };
   },
 
-  updateJoinedStatus: (props: {
-    user: ResidentAccountProps;
-    joinedStatus: Status;
-  }): ResidentAccountProps => {
-    const { user, joinedStatus } = props;
-
+  updateJoinedStatus: (
+    user: ResidentAccountProps,
+    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED,
+  ): ResidentAccountProps => {
     return {
       ...user,
       joinedStatus: joinedStatus,
+      version: user.version + 1,
+      updatedAt: new Date(),
     };
   },
 
@@ -103,6 +103,8 @@ export const ResidentAccountEntity = {
     return {
       ...user,
       password: hashedPassword,
+      version: user.version + 1,
+      updatedAt: new Date(),
     };
   },
 
@@ -115,6 +117,8 @@ export const ResidentAccountEntity = {
     return {
       ...user,
       refreshToken: hashedRefreshToken,
+      version: user.version + 1,
+      updatedAt: new Date(),
     };
   },
 };

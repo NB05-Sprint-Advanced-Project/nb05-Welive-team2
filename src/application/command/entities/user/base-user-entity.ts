@@ -6,13 +6,13 @@ export enum Status {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
+  NOT_JOINED = 'NOT_JOINED',
 }
 
 export enum Role {
   SUPERADMIN = 'SUPERADMIN',
   ADMIN = 'ADMIN',
   RESIDENT = 'RESIDENT',
-  NOTJOINEDRESIDENT = 'NOTJOINEDRESIDENT',
 }
 
 export type BaseUserProps = {
@@ -21,17 +21,12 @@ export type BaseUserProps = {
   readonly email: string;
   readonly contact: string; // 전화번호
   readonly avatarUrl?: string; // 프로필 사진 url
-  readonly role: Role;
   readonly version: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 
   readonly userApartmentLink?: UserApartmentLinkProps[];
 };
-
-export type NotJoinedResidentProps = {
-  readonly residentAddress: ResidentAddressProps;
-} & BaseUserProps;
 
 export const BaseUserEntity = {
   restore: (props: {
@@ -55,6 +50,8 @@ export const BaseUserEntity = {
     return {
       ...user,
       avatarUrl: newAvatarUrl,
+      version: user.version + 1,
+      updatedAt: new Date(),
     };
   },
 

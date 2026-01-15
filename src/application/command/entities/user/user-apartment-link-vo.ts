@@ -3,15 +3,15 @@ export type UserApartmentLinkProps = {
 };
 
 export const UserApartmentLinkVO = {
-  create: (props: { apartmentId: string }): UserApartmentLinkProps => {
+  create: (apartmentId: string): UserApartmentLinkProps => {
     return {
-      ...props,
+      apartmentId,
     };
   },
 
-  restore: (props: { apartmentId: string }): UserApartmentLinkProps => {
+  restore: (apartmentId: string): UserApartmentLinkProps => {
     return {
-      ...props,
+      apartmentId,
     };
   },
 };

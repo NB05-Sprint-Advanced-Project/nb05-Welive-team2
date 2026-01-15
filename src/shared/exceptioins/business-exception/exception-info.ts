@@ -1,5 +1,5 @@
 export enum BusinessExceptionType {
-  APARTMENT_NOT_FOUND ,
+  APARTMENT_NOT_FOUND,
   EMAIL_ALREADY_IN_USE,
   USERNAME_ALREADY_IN_USE,
   CONTACT_ALREADY_IN_USE,
@@ -14,6 +14,8 @@ export enum BusinessExceptionType {
   COMPLAINT_NOT_FOUND,
   USER_NOT_FOUND,
   CONCURRENT_MODIFICATION,
+  INCORRECT_PASSWORD,
+  CORRECT_PASSWORD,
 }
 
 export const BusinessExceptionTable: Record<
@@ -91,4 +93,12 @@ export const BusinessExceptionTable: Record<
   },
 
   // 기타
+  [BusinessExceptionType.INCORRECT_PASSWORD]: {
+    statusCode: 401,
+    message: '비밀번호가 틀렸습니다.',
+  },
+  [BusinessExceptionType.CORRECT_PASSWORD]: {
+    statusCode: 401,
+    message: '비밀번호가 일치합니다.',
+  },
 };

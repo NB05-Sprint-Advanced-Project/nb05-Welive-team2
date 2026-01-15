@@ -1,21 +1,24 @@
 import { randomUUID } from 'crypto';
-import { Role, BaseUserProps } from './base-user-entity';
+import { Role, BaseUserProps, Status } from './base-user-entity';
 import { ResidentAddressProps } from './resident-address-vo';
 import { UserApartmentLinkProps } from './user-apartment-link-vo';
 
-export type ResidentProps = {
-  readonly residentAddress: ResidentAddressProps;
+export type NotJoinedResidentProps = {
+  readonly role: Role.RESIDENT;
+  readonly joinedStatus: Status.NOT_JOINED;
+  readonly address: ResidentAddressProps;
 } & BaseUserProps;
 
-export const ResidentEntity = {
+export const NotJoinedResidentEntity = {
   create: (props: {
     name: string;
     email: string;
     contact: string;
-    role: Role;
-    residentAddress: ResidentAddressProps;
+    role: Role.RESIDENT;
+    joinedStatus: Status.NOT_JOINED;
+    address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): ResidentProps => {
+  }): NotJoinedResidentProps => {
     const now = new Date();
 
     return {
@@ -32,34 +35,34 @@ export const ResidentEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role;
+    role: Role.RESIDENT;
+    joinedStatus: Status.NOT_JOINED;
     createdAt: Date;
     updatedAt: Date;
     version: number;
-    residentAddress: ResidentAddressProps;
+    address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
-  }): ResidentProps => {
+  }): NotJoinedResidentProps => {
     return {
       ...props,
     };
   },
 
-  // API 명세서에서 기존 데이터 + 수정할 데이터를 합쳐서 와서 각각 컬럼에 Optional를 안 줌
   update: (props: {
-    user: ResidentProps; // DB에 저장된 데이터
+    user: NotJoinedResidentProps; // DB에 저장된 데이터
     name: string;
     email: string;
     contact: string;
     residentAddress?: ResidentAddressProps;
-  }): ResidentProps => {
-    const { name, email, contact, residentAddress, ...rest } = props.user;
-
+  }): NotJoinedResidentProps => {
     return {
-      ...rest,
+      ...props.user,
       name: props.name,
       email: props.email,
       contact: props.contact,
-      residentAddress: residentAddress,
+      address: props.residentAddress!,
+      version: props.user.version + 1,
+      updatedAt: new Date(),
     };
   },
 };
