@@ -1,17 +1,12 @@
 import { BusinessExceptionTable, BusinessExceptionType } from './exception-info';
 
-/* example
-throw BusinessException(props:{type: BusinessExceptionType.NOT_FOUND})
-
-*/
-
 export type BusinessException = Error & {
   type: BusinessExceptionType;
   statusCode: number;
   error?: Error;
 };
 
-export const createBusinessException = (props: {
+export const BusinessException = (props: {
   type: BusinessExceptionType;
   error?: Error;
   message?: string;
