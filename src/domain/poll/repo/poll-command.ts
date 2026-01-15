@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { PollProps } from '../entity/poll';
 import { IPollCommandRepo } from '../interface/i-poll-command-repo';
 import { asyncContextStorage } from '../../../utils/async-context-storage-util';
-import { BasePrismaClient } from '../../../utils/base-command-repo';
+import { BasePrismaClient } from '../../../shared/base-command-repo';
 
 export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollCommandRepo => {
   const getPrisma = () => asyncContextStorage.get() ?? prismaClient;

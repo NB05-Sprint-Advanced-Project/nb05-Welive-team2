@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { TxPrismaClient } from './base-command-repo';
+import { TxPrismaClient } from '../shared/base-command-repo';
 
 const storage = new AsyncLocalStorage<TxPrismaClient>();
 

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
-import { BasePrismaClient } from '../../../utils/base-command-repo';
+import { BasePrismaClient } from '../../../shared/base-command-repo';
 import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 import { NoticeProps } from '../entity/notice';
 
