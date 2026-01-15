@@ -1,10 +1,5 @@
 import { TechnicalExceptionTable, TechnicalExceptionType } from './exception-info';
 
-/* example
-throw TechnicalException(TechnicalExceptionType.DATABASE_ERROR)
-throw TechnicalException(TechnicalExceptionType.DATABASE_ERROR, err as Error, { query: 'SELECT ...' })
-*/
-
 export type TechnicalException = Error & {
   type: TechnicalExceptionType;
   error?: Error;

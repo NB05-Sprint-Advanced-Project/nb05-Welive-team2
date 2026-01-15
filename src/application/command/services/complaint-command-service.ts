@@ -1,3 +1,7 @@
+import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
+import { isTechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
+import { BusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exceptioins/business-exception/exception-info';
 import { IComplaintCommandRepo } from '../../ports/repos/command/i-complaint-command-repo';
 import { ComplaintEntity, ComplaintStatus } from '../entities/complaint-entity';
 
@@ -6,36 +10,76 @@ export const createComplaintCommandService = (complaintRepo: IComplaintCommandRe
     userId: string,
     args: { title: string; content: string; isPublic: boolean; apartmentId: string },
   ) => {
-    const { title, content, isPublic, apartmentId } = args;
+    try {
+      const { title, content, isPublic, apartmentId } = args;
 
-    const entity = ComplaintEntity.create({
-      title,
-      content,
-      isPublic,
-      apartmentId,
-      userId: userId,
-    });
+      const entity = ComplaintEntity.create({
+        title,
+        content,
+        isPublic,
+        apartmentId,
+        userId: userId,
+      });
 
-    return await complaintRepo.create(entity);
+      return await complaintRepo.create(entity);
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.FOREIGN_KEY_VIOLATION) {
+          throw BusinessException({
+            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+          });
+        }
+      }
+    }
   };
 
   const updateComplaint = async (
     complaintId: string,
     complaint: { title: string; content: string; isPublic: boolean },
   ) => {
-    const beforeContext = await complaintRepo.findById(complaintId);
-    const entity = ComplaintEntity.update(beforeContext, complaint);
-    await complaintRepo.update(entity);
+    try {
+      const beforeContext = await complaintRepo.findById(complaintId);
+      const entity = ComplaintEntity.update(beforeContext, complaint);
+      await complaintRepo.update(entity);
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
+          throw BusinessException({
+            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+          });
+        }
+      }
+    }
   };
 
   const deleteComplaint = async (complaintId: string) => {
-    await complaintRepo.remove(complaintId);
+    try {
+      await complaintRepo.delete(complaintId);
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
+          throw BusinessException({
+            type: BusinessExceptionType.DELETED,
+          });
+        }
+      }
+    }
   };
 
   const updateComplaintStatus = async (complaintId: string, status: ComplaintStatus) => {
-    const beforeContext = await complaintRepo.findById(complaintId);
-    const entity = ComplaintEntity.updateStatus(beforeContext, { status });
-    await complaintRepo.updateStatus(entity);
+    try {
+      const beforeContext = await complaintRepo.findById(complaintId);
+      const entity = ComplaintEntity.updateStatus(beforeContext, { status });
+      await complaintRepo.updateStatus(entity);
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
+          throw BusinessException({
+            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+          });
+        }
+      }
+    }
   };
 
   return { createComplaint, updateComplaint, deleteComplaint, updateComplaintStatus };

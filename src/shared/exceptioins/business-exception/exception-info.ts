@@ -1,5 +1,5 @@
 export enum BusinessExceptionType {
-  APARTMENT_NOT_FOUND ,
+  APARTMENT_NOT_FOUND,
   EMAIL_ALREADY_IN_USE,
   USERNAME_ALREADY_IN_USE,
   CONTACT_ALREADY_IN_USE,
@@ -14,6 +14,8 @@ export enum BusinessExceptionType {
   COMPLAINT_NOT_FOUND,
   USER_NOT_FOUND,
   CONCURRENT_MODIFICATION,
+  REQ_INFO_INVALID_PLEASE_RETRY,
+  DELETED,
 }
 
 export const BusinessExceptionTable: Record<
@@ -31,6 +33,14 @@ export const BusinessExceptionTable: Record<
   },
   [BusinessExceptionType.VALIDATION_ERROR]: {
     statusCode: 422,
+  },
+  [BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY]: {
+    statusCode: 404,
+    message: '요청하신 정보가 유효하지 않습니다. 확인 후 다시 시도해 주세요.',
+  },
+  [BusinessExceptionType.DELETED]: {
+    statusCode: 204,
+    message: '삭제되었습니다.',
   },
 
   // 형식 오류
@@ -76,7 +86,6 @@ export const BusinessExceptionTable: Record<
     statusCode: 409,
     message: '다른 변경이 감지되었습니다. 다시 시도해주세요.',
   },
-
   [BusinessExceptionType.EMAIL_ALREADY_IN_USE]: {
     statusCode: 409,
     message: '이미 사용중인 이메일입니다.',
