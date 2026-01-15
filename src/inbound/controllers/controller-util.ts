@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { z } from 'zod';
-import { createBusinessException } from '../../shared/exceptioins/business-exception/business-exception';
+import { BusinessException } from '../../shared/exceptioins/business-exception/business-exception';
 import { BusinessExceptionType } from '../../shared/exceptioins/business-exception/exception-info';
 
 export const validate = <T extends z.ZodType>(schema: T, data: unknown) => {
   const parsedDate = schema.safeParse(data);
   if (!parsedDate.success) {
-    throw createBusinessException({
+    throw BusinessException({
       type: BusinessExceptionType.INVALID_INPUT,
       message: parsedDate.error.issues[0].message,
     });

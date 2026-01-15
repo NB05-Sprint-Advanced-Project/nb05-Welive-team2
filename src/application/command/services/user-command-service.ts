@@ -6,7 +6,7 @@ import {
   UpdateAvatarUrlReqDto,
   UpdatePasswordReqDto,
 } from '../../../inbound/requests/user-request';
-import { createBusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
+import { BusinessException } from '../../../shared/exceptioins/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exceptioins/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exceptioins/technical-exception/exception-info';
 import { isTechnicalException } from '../../../shared/exceptioins/technical-exception/technical-exception';
@@ -43,13 +43,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -88,13 +88,13 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
       }
       throw err;
@@ -106,7 +106,7 @@ export const createUserCommandService = (
     const foundUser = await userCommandRepo.findAdminUserById(dto.adminId);
 
     if (!foundUser) {
-      throw createBusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
+      throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
     }
 
     // 2. 유저 정보 수정
@@ -124,7 +124,7 @@ export const createUserCommandService = (
 
     // 4. 아파트 정보 수정
     if (!foundApartment) {
-      throw createBusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
+      throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
     }
     const updatedApartmentEntity = ApartmentEntity.update({
       apartment: foundApartment,
@@ -141,16 +141,16 @@ export const createUserCommandService = (
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
-          throw createBusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
-          throw createBusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
-          throw createBusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
         }
         if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
-          throw createBusinessException({ type: BusinessExceptionType.CONCURRENT_MODIFICATION });
+          throw BusinessException({ type: BusinessExceptionType.CONCURRENT_MODIFICATION });
         }
         throw err;
       }
@@ -180,7 +180,7 @@ export const createUserCommandService = (
         const user = await userCommandRepo.findBaseUserById(dto.userId);
 
         if (!user) {
-          throw createBusinessException({
+          throw BusinessException({
             type: BusinessExceptionType.USER_NOT_FOUND,
           });
         }
@@ -189,7 +189,7 @@ export const createUserCommandService = (
       } catch (err) {
         if (isTechnicalException(err)) {
           if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
-            throw createBusinessException({
+            throw BusinessException({
               type: BusinessExceptionType.CONCURRENT_MODIFICATION,
             });
           }
@@ -203,21 +203,21 @@ export const createUserCommandService = (
       const user = await userCommandRepo.findJoinedUserById(dto.userId);
 
       if (!user) {
-        throw createBusinessException({
+        throw BusinessException({
           type: BusinessExceptionType.USER_NOT_FOUND,
         });
       }
 
       // 입력한 현재 비번과 DB 비번 불일치하는지 비교
       if (!(await BaseUserEntity.isPasswordMatch(user.password, dto.password, hashManager))) {
-        throw createBusinessException({
+        throw BusinessException({
           type: BusinessExceptionType.INCORRECT_PASSWORD,
         });
       }
 
       // 입력한 새 비번과 DB 비번 일치하는지 비교
       if (await BaseUserEntity.isPasswordMatch(user.password, dto.newpassword, hashManager)) {
-        throw createBusinessException({
+        throw BusinessException({
           type: BusinessExceptionType.CORRECT_PASSWORD,
         });
       }

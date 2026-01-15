@@ -9,7 +9,7 @@ const envSchema = z.object({
   TOKEN_SECRET: z.string().min(10, '토큰 시크릿은 최소 10자 이상입니다.'),
   ACCESS_TOKEN_EXPIRES_IN: z.enum(['15m', '1h']).default('15m'),
   REFRESH_TOKEN_EXPIRES_IN: z.enum(['7d']).default('7d'),
-  CLIENT_DOMAIN: z.url(),
+  CLIENT_DOMAIN: z.string(),
   JSON_LIMIT: z.string(),
   MAX_RETRIES: z.coerce.number(),
   OPTIMISTIC_LOCK_RETRY_DELAY_MS: z.coerce.number(),

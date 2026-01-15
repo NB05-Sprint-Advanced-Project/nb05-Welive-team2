@@ -34,9 +34,9 @@ export const createComplaintController = (
     const apartmentId = req.user.apartmentId;
     */
     const { params } = validate(getAllConplaintsReqParamsSchema, req.params);
-    const complaints = await complaintQueryService.getAllComplaints(apartmentId, params);
+    // const complaints = await complaintQueryService.getAllComplaints(apartmentId, params);
 
-    return res.status(200).json(complaints);
+    // return res.status(200).json(complaints);
   };
 
   const createComplaint = async (req: Request, res: Response) => {
@@ -45,16 +45,16 @@ export const createComplaintController = (
    const userId = req.user.userId;
    */
     const { body } = validate(createComplaintReqBodySchema, req.body);
-    const entity = await complaintCommandService.createComplaint(userId, body);
-    const complaint = ComplaintMapper.toResponse(entity);
+    // const entity = await complaintCommandService.createComplaint(userId, body);
+    // const complaint = ComplaintMapper.toResponse(entity);
 
-    return res.status(201).json(complaint);
+    // return res.status(201).json(complaint);
   };
 
   const updateComplaint = async (req: Request, res: Response) => {
     const { params, body } = validate(updateComplaintReqBodySchema, { ...req.params, ...req.body });
 
-    await complaintCommandService.updateComplaint(params.complaintId, body);
+    // await complaintCommandService.updateComplaint(params.complaintId, body);
 
     return res.status(204).json();
   };

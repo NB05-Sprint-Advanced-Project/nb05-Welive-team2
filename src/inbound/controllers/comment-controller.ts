@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { IUtils } from '../../shared/i-utils';
 import { Middlewares } from '../i-middelwares';
 import {
   createCommentReqBodySchema,
@@ -15,7 +14,6 @@ export const createCommentController = (
   middlewares: Middlewares,
   commentQueryService: CommentQueryService,
   commentCommandService: CommentCommandService,
-  utils: IUtils,
 ) => {
   const path: string = '/comments';
   const router = express.Router();
@@ -33,9 +31,9 @@ export const createCommentController = (
    const userId = req.user.userId;
     */
     const { body } = validate(createCommentReqBodySchema, req.body);
-    const comment = await commentCommandService.createComment(userId, { ...body });
+    // const comment = await commentCommandService.createComment(userId, { ...body });
 
-    return res.status(201).json(comment);
+    // return res.status(201).json(comment);
   };
 
   const updateComment = async (req: Request, res: Response) => {
