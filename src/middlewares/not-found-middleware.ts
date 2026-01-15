@@ -1,0 +1,11 @@
+import { NextFunction, Request, Response } from 'express';
+import { BusinessException } from '../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
+
+export const createNotFoundMiddleware = () => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    next(BusinessException({ type: BusinessExceptionType.NOT_FOUND }));
+  };
+};
+
+export type NotFoundMiddleware = ReturnType<typeof createNotFoundMiddleware>;
