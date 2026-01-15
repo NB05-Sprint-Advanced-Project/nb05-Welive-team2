@@ -1,42 +1,85 @@
+import { Prisma } from '@prisma/client';
 import { PollProps } from '../../../application/command/entities/poll/poll-entity';
 import { IPollCommandRepo } from '../../../application/ports/repos/command/i-poll-command-repo';
+import { asyncContextStorage } from '../../../shared/utils/async-context-strage-util';
 import { BasePrismaClient } from './base-command-repo';
 
 export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollCommandRepo => {
-  const findById = async (pollId: string): Promise<PollProps | null> => {
-    const poll = await prismaClient.polls.findUnique({
-      where: { id: pollId },
-      include: {
-        options: {
-          include: {
-            UserVoteOptions: {
-              select: {
-                userId: true,
+  const getPrisma = () => asyncContextStorage.get() ?? prismaClient;
+
+  const findById = async (
+    pollId: string,
+    pessimisticLock?: 'share' | 'exclusive',
+  ): Promise<PollProps | null> => {
+    const prisma = getPrisma();
+
+    if (!pessimisticLock) {
+      const poll = await prisma.polls.findUnique({
+        where: { id: pollId },
+        include: {
+          options: {
+            include: {
+              UserVoteOptions: {
+                select: {
+                  userId: true,
+                },
               },
             },
           },
         },
-      },
-    });
-    if (!poll) {
-      return null;
-    }
+      });
+      if (!poll) {
+        return null;
+      }
 
-    return {
-      ...poll,
-      options: poll.options.map((opt) => {
-        return {
-          id: opt.id,
-          title: opt.title,
-          count: opt.UserVoteOptions.length,
-        };
-      }),
-    };
+      return {
+        ...poll,
+        options: poll.options.map((opt) => {
+          return {
+            id: opt.id,
+            title: opt.title,
+            count: opt.UserVoteOptions.length,
+          };
+        }),
+      };
+    } else {
+      const lockSql = pessimisticLock === 'share' ? Prisma.sql`FOR SHARE` : Prisma.sql`FOR UPDATE`;
+
+      const polls = await prisma.$queryRaw<any[]>(Prisma.sql`
+        SELECT
+          p.*,
+          o.id as option_id,
+          o.title as option_title,
+          (SELECT COUNT(*) FROM "UserVoteOption" uvo WHERE uvo."optionId" = o.id)::int AS option_count
+          FROM "Polls" p
+          LEFT JOIN "Options" o ON o."pollId" = p.id
+          WHERE p.id = ${pollId}
+          ${lockSql}
+        `);
+      if (polls.length === 0) {
+        return null;
+      }
+      const { option_id, option_title, option_count, ...data } = polls[0];
+      return {
+        ...data,
+        options: polls
+          .filter((poll) => poll.option_id)
+          .map((opt) => {
+            return {
+              id: opt.opotion_id,
+              title: opt.opotion_title,
+              count: opt.opotion_count || 0,
+            };
+          }),
+      };
+    }
   };
 
   const create = async (props: PollProps): Promise<PollProps> => {
+    const prisma = getPrisma();
+
     const { options, ...data } = props;
-    const poll = await prismaClient.polls.create({
+    const poll = await prisma.polls.create({
       data: {
         ...data,
         options: {
@@ -71,8 +114,10 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
   };
 
   const update = async (props: PollProps): Promise<void> => {
+    const prisma = getPrisma();
+
     const { options, ...data } = props;
-    await prismaClient.polls.update({
+    await prisma.polls.update({
       where: { id: props.id },
       data: {
         ...data,
@@ -88,7 +133,9 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
   };
 
   const deletePoll = async (pollId: string): Promise<void> => {
-    await prismaClient.polls.delete({
+    const prisma = getPrisma();
+
+    await prisma.polls.delete({
       where: { id: pollId },
     });
     return;

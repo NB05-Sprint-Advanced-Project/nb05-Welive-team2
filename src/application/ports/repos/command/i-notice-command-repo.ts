@@ -1,8 +1,8 @@
 import { NoticeProps } from '../../../command/entities/notice/notice-entity';
 
 export interface INoticeCommandRepo {
-  findById(noticeId: string): Promise<NoticeProps | null>;
-  create(props: NoticeProps): Promise<NoticeProps>;
-  update(props: NoticeProps): Promise<void>;
-  deleteNotice(noticeId: string): Promise<void>;
+  findById(noticeId: string, pessimisticLock?: 'share' | 'exclusive'): Promise<NoticeProps | null>;
+  create(props: NoticeProps, pessimisticLock?: 'share' | 'exclusive'): Promise<NoticeProps>;
+  update(props: NoticeProps, pessimisticLock?: 'share' | 'exclusive'): Promise<void>;
+  deleteNotice(noticeId: string, pessimisticLock?: 'share' | 'exclusive'): Promise<void>;
 }

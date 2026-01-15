@@ -11,15 +11,9 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
   const createNotice = async (dto: CreateNoticeDto): Promise<NoticeProps> => {
     return await uow.doWork(
       async () => {
-        const { title, content, category, isPinned, apartmentId, event } = dto;
         return await repo.create(
           NoticeEntity.create({
-            title,
-            content,
-            category,
-            isPinned,
-            apartmentId,
-            event,
+            ...dto,
           }),
         );
       },
@@ -33,14 +27,12 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
     return await uow.doWork(
       async () => {
-        const { title, content, category, isPinned, event, noticeId } = dto;
-        const foundNotice = await repo.findById(noticeId);
+        const { noticeId, ...data } = dto;
+        const foundNotice = await repo.findById(noticeId, 'exclusive');
         if (!foundNotice) {
           throw new Error();
         }
-        await repo.update(
-          NoticeEntity.update(foundNotice, { title, content, category, isPinned, event }),
-        );
+        await repo.update(NoticeEntity.update(foundNotice, { ...data }));
       },
       {
         transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },

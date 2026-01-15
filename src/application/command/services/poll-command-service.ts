@@ -18,17 +18,9 @@ export const createPollCommandService = (
   const createPoll = async (dto: CreatePollDto): Promise<PollProps> => {
     return await uow.doWork(
       async () => {
-        const { title, content, startDate, endDate, apartmentId, building, options } = dto;
-
         return await pollCommandRepo.create(
           PollEntity.create({
-            title,
-            content,
-            startDate,
-            endDate,
-            apartmentId,
-            building,
-            options,
+            ...dto,
           }),
         );
       },
@@ -42,14 +34,12 @@ export const createPollCommandService = (
   const updatePoll = async (dto: UpdatePollDto): Promise<void> => {
     return await uow.doWork(
       async () => {
-        const { title, content, startDate, endDate, building, options, pollId } = dto;
-        const foundPoll = await pollCommandRepo.findById(pollId);
+        const { pollId, ...data } = dto;
+        const foundPoll = await pollCommandRepo.findById(pollId, 'exclusive');
         if (!foundPoll) {
           throw new Error();
         }
-        await pollCommandRepo.update(
-          PollEntity.update(foundPoll, { title, content, startDate, endDate, building, options }),
-        );
+        await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
       },
       {
         transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
@@ -71,7 +61,7 @@ export const createPollCommandService = (
   const vote = async (dto: voteDto): Promise<void> => {
     return await uow.doWork(
       async () => {
-        const { pollId, optionId, userId } = dto;
+        const { optionId, userId } = dto;
         await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
       },
       { transactionOptions: { useTransaction: false }, useOptimisticLock: true },
@@ -81,7 +71,7 @@ export const createPollCommandService = (
   const cancle = async (dto: voteDto): Promise<void> => {
     return await uow.doWork(
       async () => {
-        const { pollId, optionId, userId } = dto;
+        const { optionId, userId } = dto;
         await userVoteOptionCommandRepo.cancle(optionId, userId);
       },
       { transactionOptions: { useTransaction: false }, useOptimisticLock: false },
