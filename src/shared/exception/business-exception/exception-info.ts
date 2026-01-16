@@ -27,6 +27,8 @@ export enum BusinessExceptionType {
   DONT_MODIFY_COMPLAINT,
   INVALID_CREDENTIALS,
   TOKEN_EXPIRED,
+  INCORRECT_PASSWORD,
+  CORRECT_PASSWORD,
 }
 
 export const BusinessExceptionTable: Record<

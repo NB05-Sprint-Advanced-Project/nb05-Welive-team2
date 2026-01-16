@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import { getEnv } from '../../config';
 import { BusinessExceptionType } from '../exception/business-exception/exception-info';
 import { BusinessException } from '../exception/business-exception/business-exception';
-;
 
 export type TokenPayload = {
   userId: string;
