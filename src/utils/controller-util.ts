@@ -3,6 +3,12 @@ import { z } from 'zod';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 
+export const createBaseController = (basePath: string) => {
+  const path: string = basePath;
+  const router = require('express').Router();
+  return { path, router };
+};
+
 export const validate = <T extends z.ZodType>(schema: T, data: unknown) => {
   const parsedDate = schema.safeParse(data);
   if (!parsedDate.success) {

@@ -1,6 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { catchHandler, validate } from '../../utils/controller-util';
-import { ComplaintQueryService } from './service/complaint-query';
+import { Request, Response } from 'express';
+import { validate } from '../../../utils/controller-util';
 import {
   createComplaintReqBodySchema,
   deleteComplaintReqParamsSchema,
@@ -8,18 +7,16 @@ import {
   getComplaintReqParamsSchema,
   updateComplaintReqBodySchema,
   updateComplaintStatusReqBodySchema,
-} from './dto/complaint-request';
-import { ComplaintCommandService } from './service/complaint-command';
-import { Middlewares } from '../../shared/interface/i-middlewares';
+} from '../dto/complaint-request';
+import { ComplaintCommandService } from '../service/complaint-command';
+import { ComplaintQueryService } from '../service/complaint-query';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
 
-export const createComplaintController = (
+export const createComplaintHandlers = (
   middlewares: Middlewares,
   complaintQueryService: ComplaintQueryService,
   complaintCommandService: ComplaintCommandService,
 ) => {
-  const path: string = '/complaints';
-  const router = express.Router();
-
   const getComplaint = async (req: Request, res: Response) => {
     const { params } = validate(getComplaintReqParamsSchema, req.params);
     const complaint = await complaintQueryService.getComplaint(params.complaintId);
@@ -75,19 +72,13 @@ export const createComplaintController = (
     return res.status(204).json();
   };
 
-  router.get('/:complaintId', catchHandler(getComplaint));
-
-  router.get('/', catchHandler(getAllComplaints));
-
-  router.post('/', catchHandler(createComplaint));
-
-  router.patch('/:complaintId', catchHandler(updateComplaint));
-
-  router.delete('/:complaintId', catchHandler(deleteComplaint));
-
-  router.patch('/:complaintId/status', catchHandler(updateComplaintStatus));
-
-  return { path, router };
+  return {
+    getComplaint,
+    getAllComplaints,
+    createComplaint,
+    updateComplaint,
+    deleteComplaint,
+    updateComplaintStatus,
+  };
 };
-
-export type ComplaintController = ReturnType<typeof createComplaintController>;
+export type ComplaintHanders = ReturnType<typeof createComplaintHandlers>;

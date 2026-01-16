@@ -21,6 +21,16 @@ import { createNoticeController } from './domain/notice/controller/notice';
 import { createGlobalErrorMiddleware } from './middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
+import { createComplaintQueryRepo } from './domain/complaint/repo/complaint-query';
+import { createCommentQueryRepo } from './domain/comment/repo/comment-query';
+import { createCommentCommandRepo } from './domain/comment/repo/comment-command';
+import { createComplaintQueryService } from './domain/complaint/service/complaint-query';
+import { createComplaintCommandService } from './domain/complaint/service/complaint-command';
+import { createComplaintCommandRepo } from './domain/complaint/repo/complaint-command';
+import { createCommentQueryService } from './domain/comment/service/comment-query';
+import { createCommentCommandService } from './domain/comment/service/comment-command';
+import { createComplaintController } from './domain/complaint/controller/complaint-controller';
+import { createCommentController } from './domain/comment/controller/comment-controller';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
@@ -47,6 +57,12 @@ export const createInjector = () => {
   const noticeQueryRepository = createNoticeQueryRepo(prisma);
   const noticeCommandRepository = createNoticeCommandRepo(prisma);
 
+  const complaintQueryRepository = createComplaintQueryRepo(prisma);
+  const complaintCommandRepository = createComplaintCommandRepo(prisma);
+
+  const commentQueryRepository = createCommentQueryRepo(prisma);
+  const commentCommandRepository = createCommentCommandRepo(prisma);
+
   // Service
   const userQueryService = createUserQueryService(userQueryRepository);
   const userCommandService = createUserCommandService(
@@ -66,6 +82,15 @@ export const createInjector = () => {
   const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
   const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
 
+  const complaintQueryService = createComplaintQueryService(complaintQueryRepository);
+  const complaintCommandService = createComplaintCommandService(
+    unitOfwork,
+    complaintCommandRepository,
+  );
+
+  const commentQueryService = createCommentQueryService(commentQueryRepository);
+  const commentCommandService = createCommentCommandService(unitOfwork, commentCommandRepository);
+
   // Controller
   const userController = createUserController(middlewares, userCommandService, userQueryService);
   const pollController = createPollController(middlewares, pollQuerService, pollCommandService);
@@ -74,12 +99,24 @@ export const createInjector = () => {
     noticeQueryService,
     noticeCommandService,
   );
+  const complaintController = createComplaintController(
+    middlewares,
+    complaintQueryService,
+    complaintCommandService,
+  );
+  const commentController = createCommentController(
+    middlewares,
+    commentQueryService,
+    commentCommandService,
+  );
 
   const controllers = {
     // authController,
     userController,
     pollController,
     noticeController,
+    complaintController,
+    commentController,
   };
 
   // Server

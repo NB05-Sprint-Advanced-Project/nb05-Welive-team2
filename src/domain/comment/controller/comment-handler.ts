@@ -1,23 +1,20 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
+import { validate } from '../../../utils/controller-util';
 import {
   createCommentReqBodySchema,
   deleteCommentReqParamsSchema,
   getAllCommentsReqParamsSchema,
   updateCommentReqBodySchema,
-} from './dto/comment-request';
-import { catchHandler, validate } from '../../utils/controller-util';
-import { CommentQueryService } from './service/comment-query';
-import { CommentCommandService } from './service/comment-command';
-import { Middlewares } from '../../shared/interface/i-middlewares';
+} from '../dto/comment-request';
+import { CommentCommandService } from '../service/comment-command';
+import { CommentQueryService } from '../service/comment-query';
 
-export const createCommentController = (
+export const createCommentHandlers = (
   middlewares: Middlewares,
-  commentQueryService: CommentQueryService,
   commentCommandService: CommentCommandService,
+  commentQueryService: CommentQueryService,
 ) => {
-  const path: string = '/comments';
-  const router = express.Router();
-
   const getAllComments = async (req: Request, res: Response) => {
     const { params } = validate(getAllCommentsReqParamsSchema, req.params);
     const comments = await commentQueryService.getAllComments(params);
@@ -49,10 +46,7 @@ export const createCommentController = (
     return res.status(204).json();
   };
 
-  router.get('/', catchHandler(getAllComments));
-  router.post('/', catchHandler(createComment));
-  router.patch('/:commentId', catchHandler(updateComment));
-  router.delete('/:commentId', catchHandler(deleteComment));
-
-  return { path, router };
+  return { getAllComments, createComment, updateComment, deleteComment };
 };
+
+export type CommentHandlers = ReturnType<typeof createCommentHandlers>;
