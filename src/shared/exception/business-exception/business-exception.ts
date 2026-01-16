@@ -30,7 +30,7 @@ export const isBusinessException = (error: unknown): error is BusinessException 
   return (
     typeof maybe.statusCode === 'number' &&
     typeof maybe.message === 'string' &&
-    typeof maybe.type === 'string' &&
+    typeof maybe.type === 'number' &&
     BusinessExceptionTable[maybe.type as BusinessExceptionType] !== undefined
   );
 };

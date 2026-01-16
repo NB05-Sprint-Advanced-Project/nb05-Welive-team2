@@ -6,7 +6,6 @@ import { isTechnicalException } from '../shared/exception/technical-exception/te
 export const createGlobalErrorMiddleware = () => {
   return (err: any, req: Request, res: Response, next: NextFunction) => {
     const isDev = getEnv().NODE_ENV === 'development';
-
     if (isBusinessException(err)) {
       if (isDev) console.error(err);
       return res.status(err.statusCode).json({ message: err.message });

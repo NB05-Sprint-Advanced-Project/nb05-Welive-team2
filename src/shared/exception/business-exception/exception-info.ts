@@ -25,6 +25,8 @@ export enum BusinessExceptionType {
   DONT_MODIFY_RESOLVED,
   DONT_MODIFY_REJECTED,
   DONT_MODIFY_COMPLAINT,
+  INVALID_CREDENTIALS,
+  TOKEN_EXPIRED,
 }
 
 export const BusinessExceptionTable: Record<
@@ -32,6 +34,16 @@ export const BusinessExceptionTable: Record<
   { statusCode: number; message?: string }
 > = {
   // 공통
+  [BusinessExceptionType.INVALID_CREDENTIALS]: {
+    statusCode: 401,
+    message: '잘못된 인증 정보입니다.',
+  },
+
+  [BusinessExceptionType.TOKEN_EXPIRED]: {
+    statusCode: 401,
+    message: '토큰이 만료되었습니다.',
+  },
+
   [BusinessExceptionType.BAD_REQUEST]: {
     statusCode: 400,
     message: '요청이 올바르지 않습니다.',

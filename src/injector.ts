@@ -21,21 +21,25 @@ import { createNoticeController } from './domain/notice/controller/notice';
 import { createGlobalErrorMiddleware } from './middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
-import { createComplaintQueryRepo } from './domain/complaint/repo/complaint-query';
+import { TokenUtil } from './shared/utils/token-manager';
+import { createAuthController } from './domain/notice/controller/auth-controller';
+import { createAuthCommandService } from './application/command/services/auth-command-service';
 import { createCommentQueryRepo } from './domain/comment/repo/comment-query';
-import { createCommentCommandRepo } from './domain/comment/repo/comment-command';
-import { createComplaintQueryService } from './domain/complaint/service/complaint-query';
-import { createComplaintCommandService } from './domain/complaint/service/complaint-command';
-import { createComplaintCommandRepo } from './domain/complaint/repo/complaint-command';
-import { createCommentQueryService } from './domain/comment/service/comment-query';
-import { createCommentCommandService } from './domain/comment/service/comment-command';
-import { createComplaintController } from './domain/complaint/controller/complaint-controller';
 import { createCommentController } from './domain/comment/controller/comment-controller';
+import { createCommentCommandRepo } from './domain/comment/repo/comment-command';
+import { createCommentCommandService } from './domain/comment/service/comment-command';
+import { createCommentQueryService } from './domain/comment/service/comment-query';
+import { createComplaintController } from './domain/complaint/controller/complaint-controller';
+import { createComplaintCommandRepo } from './domain/complaint/repo/complaint-command';
+import { createComplaintQueryRepo } from './domain/complaint/repo/complaint-query';
+import { createComplaintCommandService } from './domain/complaint/service/complaint-command';
+import { createComplaintQueryService } from './domain/complaint/service/complaint-query';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
   //util
   const unitOfwork = createUnitOfWork(prisma);
+  const tokenManager = TokenUtil();
 
   // Middleware
   const middlewares = {
@@ -78,6 +82,7 @@ export const createInjector = () => {
     pollCommandRepository,
     userVoteOptionCommandRepository,
   );
+  const authCommandService = createAuthCommandService(userCommandRepo, hashManager, tokenManager);
 
   const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
   const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
@@ -110,8 +115,9 @@ export const createInjector = () => {
     commentCommandService,
   );
 
+  const authController = createAuthController(authCommandService);
   const controllers = {
-    // authController,
+    authController,
     userController,
     pollController,
     noticeController,

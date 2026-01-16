@@ -135,12 +135,12 @@ export type UpdateResidentAccountJoinedStatusReqDto = z.infer<
 export type UpdateResidentAccountJoinedStatusesReqDto = z.infer<
   typeof updateResidentAccountJoinedStatusesSchema
 >;
-export type UpdateResidentAccountAvatarUrlReqDto = z.infer<
-  typeof updateResidentAccountAvatarUrlSchema
->;
-export type UpdateResidentAccountPasswordReqDto = z.infer<
-  typeof updateResidentAccountPasswordSchema
->;
+// export type UpdateResidentAccountAvatarUrlReqDto = z.infer<
+//   typeof updateResidentAccountAvatarUrlSchema
+// >;
+// export type UpdateResidentAccountPasswordReqDto = z.infer<
+//   typeof updateResidentAccountPasswordSchema
+// >;
 export type DeleteResidentAccountReqDto = z.infer<typeof deleteResidentAccountSchema>;
 
 // 입주민(가입한 입주민 + 미가입한 입주민)

@@ -86,13 +86,13 @@ export const createUserController = (
   router.post('/super-admins', catchHandler(createSuperAdmin));
   router.post('/admins', catchHandler(createAdmin));
 
-  // 입주민 계정
-  const signUpResidentAccount = async (req: Request, res: Response) => {
-    const reqDto = validate(signUpResidentAccountSchema, req.body);
-    await userCommandService.createResidentAccount(reqDto);
+  // // 입주민 계정
+  // const signUpResidentAccount = async (req: Request, res: Response) => {
+  //   const reqDto = validate(signUpResidentAccountSchema, req.body);
+  //   await userCommandService.createResidentAccount(reqDto);
 
-    return res.sendStatus(204);
-  };
+  //   return res.sendStatus(204);
+  // };
 
   // const getResidentAccounts = async (req: Request, res: Response) => {
   //   const reqDto = validate(, req.body);
@@ -121,14 +121,14 @@ export const createUserController = (
   //   return res.sendStatus(204);
   // };
 
-  // routers
-  // 공통 routers
-  router.patch(
-    '/me/avatar',
-    //catchHandler(middlewares.multer.uploadS3),
-    catchHandler(updateAvatarUrl),
-  );
-  router.patch('me/password', catchHandler(updatePassword));
+  // // routers
+  // // 공통 routers
+  // router.patch(
+  //   '/me/avatar',
+  //   //catchHandler(middlewares.multer.uploadS3),
+  //   catchHandler(updateAvatarUrl),
+  // );
+  // router.patch('me/password', catchHandler(updatePassword));
 
   // 관리자 계정
   router.get('/admins', catchHandler(getAdministrators));
@@ -136,8 +136,8 @@ export const createUserController = (
   router.patch('/admins/join-status', catchHandler(updateAdminJoinedStatues));
   router.patch('/admins/:id/join-status', catchHandler(updateAdminJoinedStatus));
 
-  // 입주민 계정
-  router.post('/residents', catchHandler(signUpResidentAccount));
+  // // 입주민 계정
+  // router.post('/residents', catchHandler(signUpResidentAccount));
   // router.get('/residents', catchHandler(getResidentAccounts));
   // router.patch('/residents/join-status', catchHandler(updateResidentAccountJoinStatuses));
   // router.patch('/residents/:id/join-status', catchHandler(updateResidentAccountJoinStatus));

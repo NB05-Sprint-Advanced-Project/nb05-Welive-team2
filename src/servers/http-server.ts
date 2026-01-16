@@ -3,15 +3,22 @@ import http from 'http';
 import { Middlewares } from '../shared/interface/i-middlewares';
 import { Controllers } from '../shared/interface/i-controllers';
 import { getEnv } from '../config';
+import cors from 'cors';
 
 export const createHttpServer = (middlewares: Middlewares, controllers: Controllers) => {
   const app = express();
   const defaultHttpServer = http.createServer(app);
 
   // middlewares
+  app.use(
+    cors({
+      origin: getEnv().CLIENT_DOMAIN,
+      credentials: true,
+    }),
+  );
   app.use(express.json());
 
-  //controllers
+  // controllers
   for (const controllerKey in controllers) {
     const controller = controllers[controllerKey as keyof Controllers];
     app.use(controller.path, controller.router);
