@@ -1,9 +1,9 @@
 import { ComplaintProps } from '../complaint-entity';
 
 export interface IComplaintCommandRepo {
-  findById(complaintId: string): Promise<ComplaintProps>;
+  findById(complaintId: string): Promise<ComplaintProps | null>;
   create(entity: ComplaintProps): Promise<ComplaintProps>;
   update(entity: ComplaintProps): Promise<void>;
-  remove(complaintId: string): Promise<void>;
+  delete(complaintId: string): Promise<void>;
   updateStatus(entity: ComplaintProps): Promise<void>;
 }
