@@ -11,6 +11,7 @@ export type ComplaintProps = {
   createdAt: Date;
   updatedAt: Date;
   viewsCount: number;
+  version: number;
   apartmentId: string;
   userId: string;
 };
@@ -32,6 +33,7 @@ export const ComplaintEntity = {
       createdAt: now,
       updatedAt: now,
       viewsCount: 0,
+      version: 1,
     };
   },
   restore: (props: {
@@ -43,6 +45,7 @@ export const ComplaintEntity = {
     createdAt: Date;
     updatedAt: Date;
     viewsCount: number;
+    version: number;
     apartmentId: string;
     userId: string;
   }): ComplaintProps => {

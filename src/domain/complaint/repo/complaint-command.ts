@@ -43,12 +43,13 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
   const update = async (entity: ComplaintProps) => {
     try {
       await prisma.complaint.update({
-        where: { id: entity.id },
+        where: { id: entity.id, version: entity.version },
         data: {
           title: entity.title,
           content: entity.content,
           isPublic: entity.isPublic,
           updatedAt: entity.updatedAt,
+          version: { increment: 1 },
         },
       });
     } catch (err) {
@@ -96,10 +97,11 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
   const updateStatus = async (entity: ComplaintProps) => {
     try {
       await prisma.complaint.update({
-        where: { id: entity.id },
+        where: { id: entity.id, version: entity.version },
         data: {
           status: entity.status,
           updatedAt: entity.updatedAt,
+          version: { increment: 1 },
         },
       });
     } catch (err) {

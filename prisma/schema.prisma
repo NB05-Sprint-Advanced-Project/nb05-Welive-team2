@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
   // output   = "../src/generated/prisma"
 }
@@ -121,6 +121,7 @@ model Complaint {
   status     Complaintstatus
   isPublic   Boolean
   viewsCount Int
+  version    Int
 
   apartmentId String
   apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
