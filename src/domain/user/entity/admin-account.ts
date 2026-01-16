@@ -76,7 +76,7 @@ export const AdminAccountEntity = {
 
   updateJoinedStatus: (
     user: AdminAccountProps,
-    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED,
+    joinedStatus: Status.APPROVED | Status.REJECTED,
   ): AdminAccountProps => {
     return {
       ...user,

@@ -8,6 +8,8 @@ export enum TechnicalExceptionType {
   ROW_NOT_FOUND,
   UNEXPECTED_STATE,
   UNIQUE_VIOLATION,
+  UNIQUE_VIOLATION_ADDRESS,
+  UNKNOWN_ERROR,
 }
 
 export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
@@ -22,6 +24,9 @@ export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
     '닉네임 유니크 제약 조건 위반 에러가 발생했습니다',
   [TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT]:
     '연락처 유니크 제약 조건 위반 에러가 발생했습니다',
+  [TechnicalExceptionType.UNIQUE_VIOLATION_ADDRESS]:
+    '아파트 주소 유니크 제약 조건 위반 에러가 발생했습니다',
   [TechnicalExceptionType.ROW_NOT_FOUND]: '해당 행이 존재하지 않습니다.',
   [TechnicalExceptionType.UNEXPECTED_STATE]: '처리되지 않은 사용자 ROLE 역할 값이 감지되었습니다.',
+  [TechnicalExceptionType.UNKNOWN_ERROR]: '알 수 없는 기술적 에러입니다.',
 };

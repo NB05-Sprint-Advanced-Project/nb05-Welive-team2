@@ -46,7 +46,7 @@ model User {
 model Apartment {
   id                    String   @id
   name                  String
-  address               String
+  address               String   @unique
   description           String
   officeNumber          String
   buildingNumberFrom    Int

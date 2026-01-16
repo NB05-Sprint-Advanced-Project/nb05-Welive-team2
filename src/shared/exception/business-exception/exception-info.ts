@@ -16,6 +16,7 @@ export enum BusinessExceptionType {
   CONCURRENT_MODIFICATION,
   INCORRECT_PASSWORD,
   CORRECT_PASSWORD,
+  ADDRESS_ALREADY_IN_USE,
 }
 
 export const BusinessExceptionTable: Record<
@@ -90,6 +91,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.CONTACT_ALREADY_IN_USE]: {
     statusCode: 409,
     message: '이미 사용중인 연락처입니다.',
+  },
+  [BusinessExceptionType.ADDRESS_ALREADY_IN_USE]: {
+    statusCode: 409,
+    message: '이미 사용중인 아파트 주소입니다.',
   },
 
   // 기타

@@ -4,12 +4,13 @@ import {
   buildingSchema,
   contactSchema,
   emailSchema,
-  joinedStatusSchema,
+  updateJoinedStatusSchema,
   nameSchema,
   passwordSchema,
   unitSchema,
   userIdSchema,
   usernameSchema,
+  JoinedStatusSchema,
 } from './common-schema';
 import { Status } from '../entity/base-user';
 
@@ -19,7 +20,7 @@ export const viewAdministratorQuerySchema = z.object({
   page: z.number().default(1),
   limit: z.number().default(10),
   searchKeyword: z.string().default(''),
-  joinStatus: joinedStatusSchema.default(Status.PENDING),
+  joinStatus: JoinedStatusSchema.default(Status.PENDING),
 });
 
 export const createSuperAdminBodySchema = z.object({
@@ -48,8 +49,8 @@ export const createAdminBodySchema = z.object({
   }),
 });
 
-export const updateAdminBodySchema = z.object({
-  adminId: z.string(),
+export const updateAdminSchema = z.object({
+  adminId: userIdSchema,
   email: emailSchema,
   contact: contactSchema,
   name: nameSchema,
@@ -61,13 +62,20 @@ export const updateAdminBodySchema = z.object({
   }),
 });
 
-export const approveAdminBodySchema = z.object({
-  joinStatus: joinedStatusSchema,
+export const updateAdminjoinedStatusesSchema = z.object({
+  joinStatus: updateJoinedStatusSchema,
+});
+
+export const updateAdminjoinedStatusSchema = z.object({
+  id: userIdSchema,
+  joinStatus: updateJoinedStatusSchema,
 });
 
 export type CreateSuperAdminDto = z.infer<typeof createSuperAdminBodySchema>;
 export type CreateAdminDto = z.infer<typeof createAdminBodySchema>;
-export type UpdateAdminDto = z.infer<typeof updateAdminBodySchema>;
+export type UpdateAdminDto = z.infer<typeof updateAdminSchema>;
+export type UpdateAdminjoinedStatusesDto = z.infer<typeof updateAdminjoinedStatusesSchema>;
+export type UpdateAdminjoinedStatusDto = z.infer<typeof updateAdminjoinedStatusSchema>;
 
 // 입주민
 // 입주민 계정
@@ -97,12 +105,12 @@ export const updateResidentAccountSchema = z.object({
 // 단건
 export const updateResidentAccountJoinedStatusSchema = z.object({
   userId: userIdSchema,
-  joindeStatus: joinedStatusSchema,
+  joindeStatus: updateJoinedStatusSchema,
 });
 
 // 다건
 export const updateResidentAccountJoinedStatusesSchema = z.object({
-  joindeStatus: joinedStatusSchema,
+  joindeStatus: updateJoinedStatusSchema,
 });
 
 export const updateResidentAccountAvatarUrlSchema = z.object({

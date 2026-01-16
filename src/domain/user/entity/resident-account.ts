@@ -83,7 +83,7 @@ export const ResidentAccountEntity = {
 
   updateJoinedStatus: (
     user: ResidentAccountProps,
-    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED,
+    joinedStatus: Status.APPROVED | Status.REJECTED,
   ): ResidentAccountProps => {
     return {
       ...user,

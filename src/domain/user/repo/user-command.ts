@@ -31,19 +31,39 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     return user ? toAdminAccountEntity(user) : null;
   };
 
-  // const findAdminUserByRole = async (role: string): Promise<AdminAccountProps | null> => {
-  //   const users = await prisma.user.findMany({
-  //     where: {
-  //       role: {
-  //         in: [Role.ADMIN, Role.SUPERADMIN]
-  //       }
-  //     },
-  //     include: userInclude
-  //   });
+  const findPendingAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
+    const users = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [Role.ADMIN, Role.SUPERADMIN, Status.PENDING],
+        },
+      },
+      include: userInclude,
+    });
 
-  //   return {}
-  //   // return users ? users.map(user => toAdminAccountEntity(user)) : null;
-  // };
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users.map((user) => toAdminAccountEntity(user));
+  };
+
+  const findPendingResidentUsers = async (): Promise<ResidentAccountProps[] | null> => {
+    const users = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [Role.RESIDENT, Status.PENDING],
+        },
+      },
+      include: userInclude,
+    });
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users.map((user) => toResidentAccountEntity(user));
+  };
 
   const findResidentUserById = async (
     id: string,
@@ -308,6 +328,8 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     findResidentUserById,
     findBaseUserById,
     findJoinedUserById,
+    findPendingAdminUsers,
+    findPendingResidentUsers,
     create,
     update,
     updateJoinedStatus,
