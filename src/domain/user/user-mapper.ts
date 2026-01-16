@@ -35,6 +35,24 @@ export const toCreateAdminAccountData = (entity: AdminAccountProps): Prisma.User
   };
 };
 
+export const toCreateSuperAdminAccountData = (
+  entity: AdminAccountProps,
+): Prisma.UserCreateInput => {
+  return {
+    id: entity.id,
+    username: entity.username,
+    password: entity.password,
+    name: entity.name,
+    email: entity.email,
+    contact: entity.contact,
+    role: entity.role,
+    joinedStatus: entity.joinedStatus,
+    version: entity.version,
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
+  };
+};
+
 export const toCreateResidentAccountData = (
   entity: ResidentAccountProps,
 ): Prisma.UserCreateInput => {

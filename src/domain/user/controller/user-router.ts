@@ -15,9 +15,9 @@ export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
 
   // 관리자 계정
   router.get('/admins', catchHandler(handlers.getAdministrators));
-  router.put('/admins/:id', catchHandler(handlers.updateAdmin));
   router.patch('/admins/join-status', catchHandler(handlers.approveAllAdmins));
   router.patch('/admins/:id/join-status', catchHandler(handlers.approveAdmin));
+  router.patch('/admins/:adminId', catchHandler(handlers.updateAdmin));
 
   // 입주민 계정
   router.post('/residents', catchHandler(handlers.signUpResidentAccount));

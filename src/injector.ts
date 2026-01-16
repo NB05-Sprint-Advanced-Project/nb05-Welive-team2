@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { createUserQueryRepo } from './domain/user/repo/user-query';
-import { createUserController } from './domain/user/user-controller';
 import { createUserQueryService } from './domain/user/service/user-query';
 import { createUserCommandService } from './domain/user/service/user-command';
 import { createUserCommandRepo } from './domain/user/repo/user-command';
@@ -22,11 +21,10 @@ import { createGlobalErrorMiddleware } from './middlewares/global-error-middlewa
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
 import { TokenUtil } from './shared/utils/token-manager';
-import { createAuthController } from './domain/notice/controller/auth-controller';
-import { createAuthCommandService } from './application/command/services/auth-command-service';
-import { createCommentQueryRepo } from './domain/comment/repo/comment-query';
+import { createUserController } from './domain/user/controller/user-controller';
 import { createCommentController } from './domain/comment/controller/comment-controller';
 import { createCommentCommandRepo } from './domain/comment/repo/comment-command';
+import { createCommentQueryRepo } from './domain/comment/repo/comment-query';
 import { createCommentCommandService } from './domain/comment/service/comment-command';
 import { createCommentQueryService } from './domain/comment/service/comment-query';
 import { createComplaintController } from './domain/complaint/controller/complaint-controller';
@@ -82,7 +80,6 @@ export const createInjector = () => {
     pollCommandRepository,
     userVoteOptionCommandRepository,
   );
-  const authCommandService = createAuthCommandService(userCommandRepo, hashManager, tokenManager);
 
   const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
   const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
@@ -99,6 +96,7 @@ export const createInjector = () => {
   // Controller
   const userController = createUserController(middlewares, userCommandService, userQueryService);
   const pollController = createPollController(middlewares, pollQuerService, pollCommandService);
+
   const noticeController = createNoticeController(
     middlewares,
     noticeQueryService,
@@ -115,9 +113,7 @@ export const createInjector = () => {
     commentCommandService,
   );
 
-  const authController = createAuthController(authCommandService);
   const controllers = {
-    authController,
     userController,
     pollController,
     noticeController,

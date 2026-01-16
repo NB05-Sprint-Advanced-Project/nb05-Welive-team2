@@ -6,9 +6,10 @@ import {
   updateAvatarUrlSchema,
   updatePasswordSchema,
   viewAdministratorQuerySchema,
-  updateAdminBodySchema,
-  approveAdminBodySchema,
   signUpResidentAccountSchema,
+  updateAdminSchema,
+  updateAdminjoinedStatusesSchema,
+  updateAdminjoinedStatusSchema,
 } from '../dto/user-request';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
@@ -23,55 +24,62 @@ export const createUserHandlers = (
 
   // 슈퍼 관리자
   const createSuperAdmin = async (req: Request, res: Response) => {
-    const body = validate(createSuperAdminBodySchema, req.body);
-    const superAdmin = await userCommandService.createSuperAdmin(body);
+    const dto = validate(createSuperAdminBodySchema, req.body);
+    const superAdmin = await userCommandService.createSuperAdmin(dto);
     return res.status(204).send();
   };
 
   // 관리자
   const createAdmin = async (req: Request, res: Response) => {
-    const body = validate(createAdminBodySchema, req.body);
-    await userCommandService.createAdmin(body);
+    const dto = validate(createAdminBodySchema, req.body);
+    await userCommandService.createAdmin(dto);
     return res.status(204).send();
   };
 
   // 공통 controllers
   const updateAvatarUrl = async (req: Request, res: Response) => {
-    const reqDto = validate(updateAvatarUrlSchema, req.body);
-    await userCommandService.updateAvatarUrl(reqDto);
+    const dto = validate(updateAvatarUrlSchema, req.body);
+    await userCommandService.updateAvatarUrl(dto);
 
     return res.sendStatus(204);
   };
 
   const updatePassword = async (req: Request, res: Response) => {
-    const reqDto = validate(updatePasswordSchema, req.body);
-    await userCommandService.updatePassword(reqDto);
+    const dto = validate(updatePasswordSchema, req.body);
+    await userCommandService.updatePassword(dto);
 
     return res.sendStatus(204);
   };
 
   // 관리자 계정
   const getAdministrators = async (req: Request, res: Response) => {
-    const query = validate(viewAdministratorQuerySchema, req.query);
-    const admins = await userQueryService.getAdministrators(query);
+    const dto = validate(viewAdministratorQuerySchema, req.query);
+    const admins = await userQueryService.getAdministrators(dto);
     return res.status(200).json(admins);
   };
 
   const updateAdmin = async (req: Request, res: Response) => {
-    const body = validate(updateAdminBodySchema, req.body);
-    const updatedAdmin = await userCommandService.updateAdmin(body);
+    const dto = validate(updateAdminSchema, {
+      ...req.body,
+      ...req.params,
+    });
+    const updatedAdmin = await userCommandService.updateAdmin(dto);
     return res.status(204).send();
   };
 
   const approveAllAdmins = async (req: Request, res: Response) => {
-    const body = validate(approveAdminBodySchema, req.body);
-    // const result = await userCommandService.approveAllAdmins(body.joinStatus);
-    return res.status(204);
+    const dto = validate(updateAdminjoinedStatusesSchema, req.body);
+    const result = await userCommandService.updateAdminJoinedStatuses(dto);
+    return res.status(204).send();
   };
+
   const approveAdmin = async (req: Request, res: Response) => {
-    const body = validate(approveAdminBodySchema, req.body);
-    // const result = await userCommandService.approveAdmin(body.joinStatus, req.params.id);
-    return res.status(204);
+    const dto = validate(updateAdminjoinedStatusSchema, {
+      ...req.body,
+      ...req.params,
+    });
+    const result = await userCommandService.updateAdminJoinedStatus(dto);
+    return res.status(204).send();
   };
 
   // 입주민 계정

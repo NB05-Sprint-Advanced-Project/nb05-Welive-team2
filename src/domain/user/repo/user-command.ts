@@ -14,6 +14,7 @@ import {
   toAdminAccountEntity,
   toResidentAccountEntity,
   toUpdatePasswordData,
+  toCreateSuperAdminAccountData,
 } from '../user-mapper';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
@@ -111,8 +112,9 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
       const createUserData: Prisma.UserCreateInput = (() => {
         switch (entity.role) {
           case Role.ADMIN:
-          case Role.SUPERADMIN:
             return toCreateAdminAccountData(entity);
+          case Role.SUPERADMIN:
+            return toCreateSuperAdminAccountData(entity);
           case Role.RESIDENT:
             if (entity.joinedStatus === Status.NOT_JOINED) {
               return toCreateNotJoinedResidentData(entity);
@@ -173,7 +175,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
       await prisma.user.update({
         where: {
           id: entity.id,
-          version: entity.version - 1,
+          version: entity.version,
         },
         data: updateUserData,
       });

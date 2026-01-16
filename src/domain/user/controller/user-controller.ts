@@ -4,7 +4,7 @@ import { createBaseController } from '../../../utils/controller-util';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
 import { createUserHandlers } from './user-handler';
-import { registerUserRoutes } from './user-routes';
+import { registerUserRoutes } from './user-router';
 
 export const createUserController = (
   middlewares: Middlewares,
