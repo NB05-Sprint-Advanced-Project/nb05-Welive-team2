@@ -20,9 +20,12 @@ export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
   // 입주민 계정
   router.post('/residents', catchHandler(handlers.signUpResidentAccount));
   router.get('/residents', catchHandler(handlers.getResidentAccounts));
-  // router.patch('/residents/join-status', catchHandler(handlers.updateResidentAccountJoinStatuses));
-  // router.patch('/residents/:id/join-status', catchHandler(handlers.updateResidentAccountJoinStatus));
-  // router.delete('/residents/rejected', catchHandler(handlers.deleteResidentAccounts));
+  router.patch('/residents/join-status', catchHandler(handlers.updateResidentAccountJoinStatuses));
+  router.patch(
+    '/residents/:id/join-status',
+    catchHandler(handlers.updateResidentAccountJoinStatus),
+  );
+  router.delete('/residents/rejected', catchHandler(handlers.deleteResidentAccounts));
 
   router.patch(
     '/me/avatar',

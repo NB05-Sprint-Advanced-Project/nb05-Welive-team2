@@ -67,12 +67,12 @@ export const updateAdminSchema = z.object({
 });
 
 export const updateAdminsJoinStatusesSchema = z.object({
-  joinStatus: JoinedStatusSchema,
+  joinStatus: joinedStatusSchema,
 });
 
 export const updateAdminJoinStatusSchema = z.object({
   id: userIdSchema,
-  joinStatus: JoinedStatusSchema,
+  joinStatus: joinedStatusSchema,
 });
 
 export const deleteAdminSchema = z.object({

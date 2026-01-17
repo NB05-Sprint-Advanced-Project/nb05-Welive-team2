@@ -8,6 +8,8 @@ import {
   UpdateAdminjoinedStatusesDto,
   UpdateAvatarUrlReqDto,
   UpdatePasswordReqDto,
+  UpdateResidentAccountJoinedStatusesReqDto,
+  UpdateResidentAccountJoinedStatusReqDto,
 } from '../dto/user-request';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
@@ -25,6 +27,18 @@ import { ResidentAccountEntity } from '../entity/resident-account';
 import { UserApartmentLinkVO } from '../entity/vo/user-apartment-link';
 import { ApartmentEntity } from '../../apartment/entity/apartment-entity';
 import { IApartmentCommandRepo } from '../../apartment/interface/i-apartment-command';
+import {
+  toResidentAccountEntityFromDto,
+  toResidentEntityFromDto,
+  toUpdateNotJoinedEntityDataFromDto,
+  toUpdateResidentAccountEntityDataFromDto,
+} from '../user-mapper';
+import { NotJoinedResidentEntity } from '../entity/not-joined-resident';
+import {
+  CreateResidentReqDto,
+  UpdateResidentReqDto,
+  DeleteResidentReqDto,
+} from '../dto/resident-response';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -238,12 +252,130 @@ export const createUserCommandService = (
       return;
     }
 
-    await userCommandRepo.deleteUsers(users);
+    await userCommandRepo.deleteUsers();
   };
   // 입주민 계정
-  const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {};
+  const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {
+    try {
+      uow.doWork(async () => {
+        const resident = await userCommandRepo.findNotJoinedResidentByEmail(dto.email);
+
+        if (!resident) {
+          await userCommandRepo.create(await toResidentAccountEntityFromDto(dto, hashManager));
+        } else {
+          // 미가입했던 입주민이면 가입 상태를 Pending으로 승격
+          if (NotJoinedResidentEntity.isNotJoinedResident(dto, resident)) {
+            await userCommandRepo.update(
+              await ResidentAccountEntity.requestJoin(resident, dto, hashManager),
+            );
+          }
+        }
+      });
+    } catch (err) {
+      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+        throw BusinessException({
+          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+        });
+      }
+
+      throw err;
+    }
+  };
+
+  const updateResidentAccountJoinStatus = async (dto: UpdateResidentAccountJoinedStatusReqDto) => {
+    try {
+      uow.doWork(async () => {
+        const user = await userCommandRepo.findResidentAccountUserById(dto.userId);
+
+        if (!user) {
+          throw BusinessException({
+            type: BusinessExceptionType.USER_NOT_FOUND,
+          });
+        }
+
+        await userCommandRepo.updateJoinedStatus(
+          ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus),
+        );
+      });
+    } catch (err) {
+      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+        throw BusinessException({
+          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+        });
+      }
+
+      throw err;
+    }
+  };
+
+  const updateResidentAccountJoinStatuses = async (
+    dto: UpdateResidentAccountJoinedStatusesReqDto,
+  ) => {
+    try {
+      uow.doWork(async () => {
+        const users = await userCommandRepo.findPendingResidentUsers();
+
+        if (!users) {
+          throw BusinessException({
+            type: BusinessExceptionType.USER_NOT_FOUND,
+          });
+        }
+
+        await userCommandRepo.updateJoinedStatuses(
+          users.map((user) => ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
+        );
+      });
+    } catch (err) {
+      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+        throw BusinessException({
+          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+        });
+      }
+
+      throw err;
+    }
+  };
+
+  const deleteResidentAccounts = async (): Promise<void> => {
+    await userCommandRepo.deleteUsers();
+  };
 
   // 입주민(가입한 입주민 + 미가입한 입주민)
+  const createResident = async (dto: CreateResidentReqDto): Promise<void> => {
+    await userCommandRepo.create(toResidentEntityFromDto(dto));
+  };
+
+  const updateResident = async (dto: UpdateResidentReqDto): Promise<void> => {
+    try {
+      uow.doWork(async () => {
+        const user = await userCommandRepo.findResidentById(dto.id);
+
+        if (!user) {
+          throw BusinessException({
+            type: BusinessExceptionType.USER_NOT_FOUND,
+          });
+        }
+
+        if (user.joinedStatus === Status.NOT_JOINED) {
+          await userCommandRepo.update(toUpdateNotJoinedEntityDataFromDto(dto, user));
+        } else {
+          await userCommandRepo.update(toUpdateResidentAccountEntityDataFromDto(dto, user));
+        }
+      });
+    } catch (err) {
+      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+        throw BusinessException({
+          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+        });
+      }
+
+      throw err;
+    }
+  };
+
+  const deleteResident = async (dto: DeleteResidentReqDto): Promise<void> => {
+    await userCommandRepo.deleteUser(dto.id);
+  };
 
   // 기타
   const updateAvatarUrl = async (dto: UpdateAvatarUrlReqDto): Promise<void> => {
@@ -327,6 +459,12 @@ export const createUserCommandService = (
     deleteAdmin,
     deleteRejectedAdmins,
     createResidentAccount,
+    updateResidentAccountJoinStatus,
+    updateResidentAccountJoinStatuses,
+    deleteResidentAccounts,
+    createResident,
+    updateResident,
+    deleteResident,
     updateAvatarUrl,
     updatePassword,
   };

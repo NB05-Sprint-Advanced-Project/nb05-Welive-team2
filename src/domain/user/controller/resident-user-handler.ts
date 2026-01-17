@@ -1,24 +1,37 @@
-import { Middlewares } from '../../shared/interface/i-middlewares';
-import { catchHandler, validate } from '../../utils/controller-util';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
+import { validate } from '../../../utils/controller-util';
 import {
   createResidentSchema,
-  deleteResidentSchema,
-  getResidentSchema,
   getResidentsSchema,
+  getResidentSchema,
   updateResidentSchema,
-} from './dto/resident-response';
-import { UserCommandService } from './service/user-command';
-import { UserQueryService } from './service/user-query';
-import express, { Request, Response } from 'express';
+  deleteResidentSchema,
+} from '../dto/resident-response';
+import {
+  createSuperAdminSchema,
+  createAdminSchema,
+  updateAvatarUrlSchema,
+  updatePasswordSchema,
+  viewAdministratorSchema,
+  signUpResidentAccountSchema,
+  updateAdminSchema,
+  deleteAdminSchema,
+  updateAdminsJoinStatusesSchema,
+  updateAdminJoinStatusSchema,
+  getResidentAccountsSchema,
+  updateResidentAccountJoinedStatusesSchema,
+  updateResidentAccountJoinedStatusSchema,
+} from '../dto/user-request';
+import { UserCommandService } from '../service/user-command';
+import { UserQueryService } from '../service/user-query';
+import { Request, Response } from 'express';
+import { createUserHandlers } from './user-handler';
 
-export const createResidentController = (
+export const createResidentUserHandlers = (
   middlewares: Middlewares,
   userCommandService: UserCommandService,
   userQueryService: UserQueryService,
 ) => {
-  const path: string = '/api/v2/residents';
-  const router = express.Router();
-
   const createResident = async (req: Request, res: Response) => {
     const userId = '';
 
@@ -66,12 +79,13 @@ export const createResidentController = (
     return res.sendStatus(204);
   };
 
-  router.post('/', catchHandler(createResident));
-  router.get('/', catchHandler(getResidents));
-  router.get('/:id', catchHandler(getResident));
-  router.patch('/:id', catchHandler(updateResident));
-  router.delete('/:id', catchHandler(deleteResident));
-  router.get('/file/template');
-  router.post('/file/import');
-  router.get('/file/export');
+  return {
+    createResident,
+    getResidents,
+    getResident,
+    updateResident,
+    deleteResident,
+  };
 };
+
+export type ResidentUserHandlers = ReturnType<typeof createResidentUserHandlers>;

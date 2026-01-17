@@ -4,6 +4,10 @@ import { AdminAccountEntity, AdminAccountProps } from './entity/admin-account';
 import { Prisma } from '@prisma/client';
 import { ResidentAccountEntity, ResidentAccountProps } from './entity/resident-account';
 import { NotJoinedResidentEntity, NotJoinedResidentProps } from './entity/not-joined-resident';
+import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
+import { UpdateResidentReqDto, CreateResidentReqDto } from './dto/resident-response';
+import { SignUpResidentAccountReqDto } from './dto/user-request';
+import { ResidentAddressVO } from './entity/vo/resident-address';
 
 export const userInclude = Prisma.validator<Prisma.UserInclude>()({
   Address: true,
@@ -14,7 +18,7 @@ export type UserModel = Prisma.UserGetPayload<{
   include: typeof userInclude;
 }>;
 
-export const toCreateAdminAccountData = (entity: AdminAccountProps): Prisma.UserCreateInput => {
+export const toCreateAdminAccountDBData = (entity: AdminAccountProps): Prisma.UserCreateInput => {
   return {
     id: entity.id,
     username: entity.username,
@@ -35,7 +39,7 @@ export const toCreateAdminAccountData = (entity: AdminAccountProps): Prisma.User
   };
 };
 
-export const toCreateSuperAdminAccountData = (
+export const toCreateSuperAdminAccountDBData = (
   entity: AdminAccountProps,
 ): Prisma.UserCreateInput => {
   return {
@@ -53,7 +57,7 @@ export const toCreateSuperAdminAccountData = (
   };
 };
 
-export const toCreateResidentAccountData = (
+export const toCreateResidentAccountDBData = (
   entity: ResidentAccountProps,
 ): Prisma.UserCreateInput => {
   return {
@@ -79,7 +83,7 @@ export const toCreateResidentAccountData = (
   };
 };
 
-export const toCreateNotJoinedResidentData = (
+export const toCreateNotJoinedResidentDBData = (
   entity: NotJoinedResidentProps,
 ): Prisma.UserCreateInput => {
   return {
@@ -103,7 +107,7 @@ export const toCreateNotJoinedResidentData = (
   };
 };
 
-export const toUpdateAdminAccountData = (entity: AdminAccountProps): Prisma.UserUpdateInput => {
+export const toUpdateAdminAccountDBData = (entity: AdminAccountProps): Prisma.UserUpdateInput => {
   return {
     id: entity.id,
     name: entity.name,
@@ -114,8 +118,28 @@ export const toUpdateAdminAccountData = (entity: AdminAccountProps): Prisma.User
   };
 };
 
-export const toUpdateResidentData = (
-  entity: ResidentAccountProps | NotJoinedResidentProps,
+export const toUpdateResidentAccountDBData = (
+  entity: ResidentAccountProps,
+): Prisma.UserUpdateInput => {
+  return {
+    id: entity.id,
+    username: entity.username,
+    password: entity.password,
+    name: entity.name,
+    email: entity.email,
+    contact: entity.contact,
+    joinedStatus: entity.joinedStatus,
+    version: entity.version,
+    updatedAt: entity.updatedAt,
+    Address: {
+      delete: {},
+      create: { ...entity.address },
+    },
+  };
+};
+
+export const toUpdateNotJoinedResidentDBData = (
+  entity: NotJoinedResidentProps,
 ): Prisma.UserUpdateInput => {
   return {
     id: entity.id,
@@ -131,7 +155,7 @@ export const toUpdateResidentData = (
   };
 };
 
-export const toUpdateAvatarData = (entity: BaseUserProps): Prisma.UserUpdateInput => {
+export const toUpdateAvatarDBData = (entity: BaseUserProps): Prisma.UserUpdateInput => {
   return {
     avatarUrl: entity.avatarUrl!,
     version: entity.version,
@@ -139,7 +163,7 @@ export const toUpdateAvatarData = (entity: BaseUserProps): Prisma.UserUpdateInpu
   };
 };
 
-export const toUpdateJoinedStatusData = (
+export const toUpdateJoinedStatusDBData = (
   entity: AdminAccountProps | ResidentAccountProps | NotJoinedResidentProps,
 ): Prisma.UserUpdateInput => {
   return {
@@ -149,7 +173,7 @@ export const toUpdateJoinedStatusData = (
   };
 };
 
-export const toUpdatePasswordData = (
+export const toUpdatePasswordDBData = (
   entity: AdminAccountProps | ResidentAccountProps,
 ): Prisma.UserUpdateInput => {
   return {
@@ -157,6 +181,38 @@ export const toUpdatePasswordData = (
     version: entity.version,
     updatedAt: entity.updatedAt,
   };
+};
+
+export const toUpdateResidentAccountEntityDataFromDto = (
+  dto: UpdateResidentReqDto,
+  residentAccountUser: ResidentAccountProps,
+): ResidentAccountProps => {
+  return ResidentAccountEntity.update({
+    user: residentAccountUser,
+    name: dto.name,
+    contact: dto.contact,
+    residentAddress: ResidentAddressVO.create({
+      building: dto.building,
+      unit: dto.unit,
+      isHouseholder: dto.isHouseholder,
+    }),
+  });
+};
+
+export const toUpdateNotJoinedEntityDataFromDto = (
+  dto: UpdateResidentReqDto,
+  residentAccountUser: NotJoinedResidentProps,
+): NotJoinedResidentProps => {
+  return NotJoinedResidentEntity.update({
+    user: residentAccountUser,
+    name: dto.name,
+    contact: dto.contact,
+    residentAddress: ResidentAddressVO.create({
+      building: dto.building,
+      unit: dto.unit,
+      isHouseholder: dto.isHouseholder,
+    }),
+  });
 };
 
 export const toBaseUserEntity = (DBUserEntity: UserModel): BaseUserProps => {
@@ -196,7 +252,7 @@ export const toAdminAccountEntity = (DBUserEntity: UserModel): AdminAccountProps
   });
 };
 
-export const toResidentAccountEntity = (DBUserEntity: UserModel): ResidentAccountProps => {
+export const toResidentAccountEntityFromDB = (DBUserEntity: UserModel): ResidentAccountProps => {
   return ResidentAccountEntity.restore({
     id: DBUserEntity.id,
     username: DBUserEntity.username!,
@@ -221,7 +277,41 @@ export const toResidentAccountEntity = (DBUserEntity: UserModel): ResidentAccoun
   });
 };
 
-export const toNotJoindeResidentEntity = (DBUserEntity: UserModel): NotJoinedResidentProps => {
+export const toResidentAccountEntityFromDto = async (
+  dto: SignUpResidentAccountReqDto,
+  hashManager: IHashManager,
+): Promise<ResidentAccountProps> => {
+  return await ResidentAccountEntity.create({
+    username: dto.username!,
+    password: dto.password!,
+    name: dto.name,
+    email: dto.email,
+    contact: dto.contact,
+    userApartmentLink: [UserApartmentLinkVO.create(dto.resident.apartmentId)],
+    address: {
+      isHouseholder: true,
+      building: dto.resident.building,
+      unit: dto.resident.unit,
+    },
+    hashManager: hashManager,
+  });
+};
+
+export const toResidentEntityFromDto = (dto: CreateResidentReqDto): NotJoinedResidentProps => {
+  return NotJoinedResidentEntity.create({
+    name: dto.name,
+    email: dto.email,
+    contact: dto.contact,
+    address: {
+      isHouseholder: dto.isHouseholder,
+      building: dto.building,
+      unit: dto.unit,
+    },
+    userApartmentLink: [UserApartmentLinkVO.create(dto.apartmentId)],
+  });
+};
+
+export const toNotJoinedResidentEntity = (DBUserEntity: UserModel): NotJoinedResidentProps => {
   return NotJoinedResidentEntity.restore({
     id: DBUserEntity.id,
     name: DBUserEntity.name,

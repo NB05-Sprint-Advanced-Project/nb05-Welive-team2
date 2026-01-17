@@ -11,6 +11,9 @@ import {
   deleteAdminSchema,
   updateAdminsJoinStatusesSchema,
   updateAdminJoinStatusSchema,
+  getResidentAccountsSchema,
+  updateResidentAccountJoinedStatusesSchema,
+  updateResidentAccountJoinedStatusSchema,
 } from '../dto/user-request';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
@@ -98,8 +101,31 @@ export const createUserHandlers = (
   };
 
   const getResidentAccounts = async (req: Request, res: Response) => {
-    // const reqDto = validate(, req.body);
-    // const residentAccount = await userQueryService.
+    const reqDto = validate(getResidentAccountsSchema, req.body);
+
+    return res.json(await userQueryService.getResidentAccounts(reqDto));
+  };
+
+  //다건
+  const updateResidentAccountJoinStatuses = async (req: Request, res: Response) => {
+    const reqDto = validate(updateResidentAccountJoinedStatusesSchema, req.body);
+    await userCommandService.updateResidentAccountJoinStatuses(reqDto);
+
+    return res.sendStatus(204);
+  };
+
+  // 단건
+  const updateResidentAccountJoinStatus = async (req: Request, res: Response) => {
+    const reqDto = validate(updateResidentAccountJoinedStatusSchema, req.body);
+    await userCommandService.updateResidentAccountJoinStatus(reqDto);
+
+    return res.sendStatus(204);
+  };
+
+  const deleteResidentAccounts = async (req: Request, res: Response) => {
+    await userCommandService.deleteResidentAccounts();
+
+    return res.sendStatus(204);
   };
 
   return {
@@ -115,6 +141,9 @@ export const createUserHandlers = (
     deleteRejectedAdmins,
     signUpResidentAccount,
     getResidentAccounts,
+    updateResidentAccountJoinStatuses,
+    updateResidentAccountJoinStatus,
+    deleteResidentAccounts,
   };
 };
 
