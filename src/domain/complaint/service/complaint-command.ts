@@ -58,6 +58,11 @@ export const createComplaintCommandService = (
               type: BusinessExceptionType.FORBIDDEN,
             });
           }
+          if (beforeContext.status !== 'PENDING') {
+            throw BusinessException({
+              type: BusinessExceptionType.DONT_MODIFY_COMPLAINT,
+            });
+          }
 
           const entity = ComplaintEntity.update(beforeContext, complaint);
           await complaintRepo.update(entity);
@@ -133,8 +138,26 @@ export const createComplaintCommandService = (
           });
         }
 
-        const entity = ComplaintEntity.updateStatus(beforeContext, { status });
-        await complaintRepo.updateStatus(entity);
+        if (beforeContext.status === 'IN_PROGRESS' && status === 'PENDING') {
+          throw BusinessException({
+            type: BusinessExceptionType.DONT_MODIFY_PENDING,
+          });
+        }
+        if (beforeContext.status === 'RESOLVED' && status !== 'RESOLVED') {
+          throw BusinessException({
+            type: BusinessExceptionType.DONT_MODIFY_RESOLVED,
+          });
+        }
+        if (beforeContext.status === 'REJECTED' && status !== 'REJECTED') {
+          if (['PENDING', 'IN_PROGRESS', 'RESOLVED'].includes(status)) {
+            throw BusinessException({
+              type: BusinessExceptionType.DONT_MODIFY_REJECTED,
+            });
+          }
+
+          const entity = ComplaintEntity.updateStatus(beforeContext, { status });
+          await complaintRepo.updateStatus(entity);
+        }
       });
     } catch (err) {
       if (isTechnicalException(err)) {

@@ -21,6 +21,10 @@ export enum BusinessExceptionType {
   REQ_INFO_INVALID,
   COMMENTS_LIST_NOT_FOUND,
   FAIL_SAVE_COMMENT,
+  DONT_MODIFY_PENDING,
+  DONT_MODIFY_RESOLVED,
+  DONT_MODIFY_REJECTED,
+  DONT_MODIFY_COMPLAINT,
 }
 
 export const BusinessExceptionTable: Record<
@@ -52,6 +56,22 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.INVALID_INPUT]: {
     statusCode: 422,
     message: '입력값을 확인해 주세요.',
+  },
+  [BusinessExceptionType.DONT_MODIFY_PENDING]: {
+    statusCode: 409,
+    message: '처리 전으로 수정하실 수 없습니다.',
+  },
+  [BusinessExceptionType.DONT_MODIFY_RESOLVED]: {
+    statusCode: 409,
+    message: '이미 처리 완료된 민원입니다.',
+  },
+  [BusinessExceptionType.DONT_MODIFY_REJECTED]: {
+    statusCode: 409,
+    message: '이미 처리 불가된 민원입니다.',
+  },
+  [BusinessExceptionType.DONT_MODIFY_COMPLAINT]: {
+    statusCode: 409,
+    message: '관리자에게 민원이 접수되어 수정할 수 없습니다.',
   },
 
   // 존재 오류
