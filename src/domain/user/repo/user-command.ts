@@ -176,12 +176,10 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
         }
 
         throw TechnicalException({
-          type: TechnicalExceptionType.UNIQUE_VIOLATION,
+          type: TechnicalExceptionType.UNKNOWN_ERROR,
           error: err,
         });
       }
-
-      throw err;
     }
   };
 
