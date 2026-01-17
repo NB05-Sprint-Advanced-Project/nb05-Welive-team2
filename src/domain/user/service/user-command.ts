@@ -18,13 +18,13 @@ import {
 } from '../../../shared/exception/technical-exception/technical-exception';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
 import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
-import { IApartmentCommandRepo } from '../../apartment/i-apartment-command-repo';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
-import { ApartmentEntity } from '../../apartment/apartment-entity';
 import { AdminAccountEntity } from '../entity/admin-account';
 import { BaseUserEntity, Role, Status } from '../entity/base-user';
 import { ResidentAccountEntity } from '../entity/resident-account';
 import { UserApartmentLinkVO } from '../entity/vo/user-apartment-link';
+import { ApartmentEntity } from '../../apartment/entity/apartment-entity';
+import { IApartmentCommandRepo } from '../../apartment/interface/i-apartment-command';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -40,7 +40,7 @@ export const createUserCommandService = (
       name: dto.name,
       email: dto.email,
       contact: dto.contact,
-      role: Role.SUPERADMIN,
+      role: Role.SUPER_ADMIN,
       hashManager: hashManager,
     });
 
@@ -76,21 +76,32 @@ export const createUserCommandService = (
     });
 
     try {
-      const apartment = await apartmentRepo.create(apartmentEntity);
+      await uow.doWork(
+        async () => {
+          const apartment = await apartmentRepo.create(apartmentEntity);
 
-      // 2. 관리자 계정 생성
-      const userEntity = await AdminAccountEntity.create({
-        username: dto.username,
-        email: dto.email,
-        contact: dto.contact,
-        name: dto.name,
-        password: dto.password,
-        userApartmentLink: [UserApartmentLinkVO.create(apartment.id)],
-        role: Role.ADMIN,
-        hashManager: hashManager,
-      });
+          // 2. 관리자 계정 생성
+          const userEntity = await AdminAccountEntity.create({
+            username: dto.username,
+            email: dto.email,
+            contact: dto.contact,
+            name: dto.name,
+            password: dto.password,
+            userApartmentLink: [UserApartmentLinkVO.create(apartment.id)],
+            role: Role.ADMIN,
+            hashManager: hashManager,
+          });
 
-      await userCommandRepo.create(userEntity);
+          await userCommandRepo.create(userEntity);
+        },
+        {
+          transactionOptions: {
+            useTransaction: true,
+            isolationLevel: 'ReadCommitted',
+          },
+          useOptimisticLock: false,
+        },
+      );
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
@@ -284,7 +295,7 @@ export const createUserCommandService = (
           });
         }
 
-        if (user.role === Role.ADMIN || user.role === Role.SUPERADMIN) {
+        if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
           await userCommandRepo.updatePassword(
             await AdminAccountEntity.updatePassword(user, dto.newpassword, hashManager),
           );

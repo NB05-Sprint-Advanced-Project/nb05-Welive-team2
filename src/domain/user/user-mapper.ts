@@ -185,7 +185,7 @@ export const toAdminAccountEntity = (DBUserEntity: UserModel): AdminAccountProps
     email: DBUserEntity.email,
     contact: DBUserEntity.contact,
     avatarUrl: DBUserEntity.avatarUrl ?? undefined,
-    role: DBUserEntity.role as Role.SUPERADMIN | Role.ADMIN,
+    role: DBUserEntity.role as Role.SUPER_ADMIN | Role.ADMIN,
     joinedStatus: DBUserEntity.joinedStatus as Status.APPROVED | Status.PENDING | Status.REJECTED,
     version: DBUserEntity.version,
     createdAt: DBUserEntity.createdAt,

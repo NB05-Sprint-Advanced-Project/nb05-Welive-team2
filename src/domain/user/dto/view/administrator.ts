@@ -11,7 +11,7 @@ export interface AdministratorView {
       address: string;
       description: string;
       officeNumber: string;
-    }[];
+    };
   }[];
   totalCount: number;
   page: number;

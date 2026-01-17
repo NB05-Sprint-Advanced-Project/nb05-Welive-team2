@@ -10,7 +10,7 @@ export enum Status {
 }
 
 export enum Role {
-  SUPERADMIN = 'SUPERADMIN',
+  SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   RESIDENT = 'RESIDENT',
 }

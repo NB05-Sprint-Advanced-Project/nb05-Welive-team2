@@ -6,7 +6,7 @@ import { UserApartmentLinkProps } from './vo/user-apartment-link';
 export type AdminAccountProps = {
   readonly username: string;
   readonly password: string;
-  readonly role: Role.ADMIN | Role.SUPERADMIN;
+  readonly role: Role.ADMIN | Role.SUPER_ADMIN;
   readonly joinedStatus: Status;
   readonly refreshToken?: string;
 } & BaseUserProps;
@@ -18,7 +18,7 @@ export const AdminAccountEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role.ADMIN | Role.SUPERADMIN;
+    role: Role.ADMIN | Role.SUPER_ADMIN;
     hashManager: IHashManager;
     userApartmentLink?: UserApartmentLinkProps[];
   }): Promise<AdminAccountProps> => {
@@ -45,7 +45,7 @@ export const AdminAccountEntity = {
     email: string;
     contact: string;
     avatarUrl?: string;
-    role: Role.ADMIN | Role.SUPERADMIN;
+    role: Role.ADMIN | Role.SUPER_ADMIN;
     joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
     refreshToken?: string;
     version: number;

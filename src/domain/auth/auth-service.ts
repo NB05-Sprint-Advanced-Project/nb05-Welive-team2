@@ -4,21 +4,34 @@ import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
 import { ITokenUtil } from '../../shared/utils/token-manager';
 import { IUserQueryRepo } from '../user/interface/i-user-query-repo';
 import { UserCommandRepo } from '../user/repo/user-command';
+import { CookieTokenDTO, LoginDTO } from './dto/auth-request';
 
 export const createAuthService = (
   userQueryRepo: IUserQueryRepo,
   hashManager: IHashManager,
   tokenManager: ITokenUtil,
 ) => {
-  const login = async (username: string, password: string) => {
-    const user = await userQueryRepo.findByUsername(username);
+  const getCookieValue = (cookieHeader: string | undefined, name: string) => {
+    if (!cookieHeader) {
+      return undefined;
+    }
+    const cookies = cookieHeader.split(';').map((cookie) => cookie.trim());
+    const match = cookies.find((cookie) => cookie.startsWith(`${name}=`));
+    if (!match) {
+      return undefined;
+    }
+    return match.substring(name.length + 1);
+  };
+
+  const login = async (dto: LoginDTO) => {
+    const user = await userQueryRepo.findByUsername(dto.username);
     if (!user) {
       throw BusinessException({
         type: BusinessExceptionType.USER_NOT_FOUND,
       });
     }
 
-    if (!(await hashManager.compare(password, user.password))) {
+    if (!(await hashManager.compare(dto.password, user.password))) {
       throw BusinessException({
         type: BusinessExceptionType.INVALID_CREDENTIALS,
       });
@@ -32,18 +45,32 @@ export const createAuthService = (
       userId: user.id,
     });
 
-    return { user, accessToken, refreshToken };
+    const { password, ...userWithoutPassword } = user;
+    return { userWithoutPassword, accessToken, refreshToken };
   };
 
-  const logout = async (token: string) => {
-    // logout logic
+  const refreshToken = async (dto: CookieTokenDTO) => {
+    const oldToken = getCookieValue(dto.cookie, 'refresh_token');
+    if (!oldToken) {
+      throw BusinessException({
+        type: BusinessExceptionType.BAD_REQUEST,
+      });
+    }
+
+    const payload = tokenManager.verifyToken({ token: oldToken });
+
+    const accessToken = tokenManager.generateAccessToken({
+      userId: payload.userId,
+    });
+
+    const refreshToken = tokenManager.generateRefreshToken({
+      userId: payload.userId,
+    });
+
+    return { accessToken, refreshToken };
   };
 
-  const refreshToken = async (oldToken: string) => {
-    return { token: 'new-sample-token' };
-  };
-
-  return { login, logout, refreshToken };
+  return { login, refreshToken };
 };
 
 export type AuthService = ReturnType<typeof createAuthService>;

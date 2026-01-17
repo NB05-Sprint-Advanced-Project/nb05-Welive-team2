@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
-import { Status } from '../entity/base-user';
+import { Role, Status } from '../entity/base-user';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   const findAllAdmins = async (
@@ -12,7 +12,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     const skip = (page - 1) * limit;
 
     const where = {
-      role: 'ADMIN',
+      role: Role.ADMIN,
       ...(searchKeyword && {
         OR: [{ username: { contains: searchKeyword } }, { email: { contains: searchKeyword } }],
       }),
@@ -33,6 +33,8 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       prisma.user.count({ where }),
     ]);
 
+    console.log('users:', users);
+
     return {
       data: users.map((user) => ({
         id: user.id,
@@ -46,7 +48,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
           address: link.apartment.address,
           description: link.apartment.description,
           officeNumber: link.apartment.officeNumber,
-        })),
+        }))[0],
       })),
       totalCount,
       page,

@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { BaseUserProps, Role, Status } from '../entity/base-user';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
 import {
@@ -21,8 +21,9 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { AdminAccountProps } from '../entity/admin-account';
 import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
+import { BasePrismaClient } from '../../../shared/base-command-repo';
 
-export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo => {
+export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRepo => {
   const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma.user.findUnique({
       where: { id },
@@ -36,7 +37,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     const users = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.ADMIN, Role.SUPERADMIN],
+          in: [Role.ADMIN, Role.SUPER_ADMIN],
         },
         joinedStatus: {
           equals: Status.PENDING,
@@ -56,7 +57,10 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     const users = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.ADMIN, Role.SUPERADMIN, Status.REJECTED],
+          in: [Role.ADMIN, Role.SUPER_ADMIN],
+        },
+        joinedStatus: {
+          equals: Status.REJECTED,
         },
       },
       include: userInclude,
@@ -116,7 +120,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
       return null;
     }
 
-    if (user.role === Role.ADMIN || user.role === Role.SUPERADMIN) {
+    if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
       return toAdminAccountEntity(user);
     }
 
@@ -133,7 +137,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
         switch (entity.role) {
           case Role.ADMIN:
             return toCreateAdminAccountData(entity);
-          case Role.SUPERADMIN:
+          case Role.SUPER_ADMIN:
             return toCreateSuperAdminAccountData(entity);
           case Role.RESIDENT:
             if (entity.joinedStatus === Status.NOT_JOINED) {
@@ -186,7 +190,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
       const updateUserData: Prisma.UserUpdateInput = (() => {
         switch (entity.role) {
           case Role.ADMIN:
-          case Role.SUPERADMIN:
+          case Role.SUPER_ADMIN:
             return toUpdateAdminAccountData(entity);
           case Role.RESIDENT:
             return toUpdateResidentData(entity);

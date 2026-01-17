@@ -1,9 +1,55 @@
 import { AuthService } from '../auth-service';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
+import { validate } from '../../../utils/controller-util';
+import { loginSchema, cookieTokenSchema } from '../dto/auth-request';
 
 export const createAuthHandlers = (authService: AuthService) => {
   const login = async (req: any, res: any) => {
-    const { username, password } = req.body;
-    const { user, accessToken, refreshToken } = await authService.login(username, password);
+    const dto = validate(loginSchema, req.body);
+
+    const { userWithoutPassword, accessToken, refreshToken } = await authService.login(dto);
+
+    // cookies 설정
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 15 * 60 * 1000, // 15분
+      path: '/',
+    });
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      path: '/',
+    });
+
+    return res.status(200).json(userWithoutPassword);
+  };
+
+  const logout = async (req: any, res: any) => {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+    return res.status(204).send();
+  };
+
+  const refreshToken = async (req: any, res: any) => {
+    const dto = validate(cookieTokenSchema, req.headers);
+
+    const { accessToken, refreshToken } = await authService.refreshToken(dto);
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
@@ -21,24 +67,6 @@ export const createAuthHandlers = (authService: AuthService) => {
       path: '/',
     });
 
-    return res.status(200).json(user);
-  };
-
-  const logout = async (req: any, res: any) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (token) {
-      await authService.logout(token);
-    }
-    return res.status(204).send();
-  };
-
-  const refreshToken = async (req: any, res: any) => {
-    // const oldToken = req.headers['authorization']?.split(' ')[1];
-    // if (!oldToken) {
-    //     return res.status(401).send();
-    // }
-    // const { token: newToken } = await authService.refreshToken(oldToken);
-    // res.setHeader("Authorization", `Bearer ${newToken}`);
     return res.status(204).send();
   };
 

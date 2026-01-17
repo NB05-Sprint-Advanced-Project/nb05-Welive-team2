@@ -4,7 +4,6 @@ import { createUserQueryService } from './domain/user/service/user-query';
 import { createUserCommandService } from './domain/user/service/user-command';
 import { createUserCommandRepo } from './domain/user/repo/user-command';
 import { createBcryptHashManager } from './managers/bcrypt-hash-manager';
-import { createApartmentCommandRepo } from './domain/apartment/apartment-command-repo';
 import { createUnitOfWork } from './managers/unit-of-work';
 import { createPollQueryRepo } from './domain/poll/repo/poll-query';
 import { createPollCommandRepo } from './domain/poll/repo/poll-command';
@@ -34,6 +33,10 @@ import { createComplaintCommandRepo } from './domain/complaint/repo/complaint-co
 import { createComplaintQueryRepo } from './domain/complaint/repo/complaint-query';
 import { createComplaintCommandService } from './domain/complaint/service/complaint-command';
 import { createComplaintQueryService } from './domain/complaint/service/complaint-query';
+import { createApartmentQueryRepo } from './domain/apartment/repo/apartment-query';
+import { createApartmentQueryService } from './domain/apartment/service/apartment-query';
+import { createApartmentCommandRepo } from './domain/apartment/repo/apartment-command';
+import { createApartmentController } from './domain/apartment/controller/apartment-controller';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
@@ -52,6 +55,8 @@ export const createInjector = () => {
   // Repository
   const userQueryRepository = createUserQueryRepo(prisma);
   const userCommandRepo = createUserCommandRepo(prisma);
+
+  const apartmentQueryRepo = createApartmentQueryRepo(prisma);
   const apartmentCommandRepo = createApartmentCommandRepo(prisma);
 
   const pollQueryRepository = createPollQueryRepo(prisma);
@@ -68,6 +73,8 @@ export const createInjector = () => {
   const commentCommandRepository = createCommentCommandRepo(prisma);
 
   // Service
+  const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo);
+
   const userQueryService = createUserQueryService(userQueryRepository);
   const userCommandService = createUserCommandService(
     unitOfwork,
@@ -117,6 +124,8 @@ export const createInjector = () => {
     commentCommandService,
   );
 
+  const apartmentController = createApartmentController(apartmentQueryService);
+
   const controllers = {
     authController,
     userController,
@@ -124,6 +133,7 @@ export const createInjector = () => {
     noticeController,
     complaintController,
     commentController,
+    apartmentController,
   };
 
   // Server

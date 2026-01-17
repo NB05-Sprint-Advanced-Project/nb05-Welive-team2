@@ -1,10 +1,11 @@
-import { Apartment, Prisma, PrismaClient } from '@prisma/client';
-import { IApartmentCommandRepo } from './i-apartment-command-repo';
-import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
-import { TechnicalException } from '../../shared/exception/technical-exception/technical-exception';
-import { ApartmentProps } from './apartment-entity';
+import { PrismaClient, Prisma, Apartment } from '@prisma/client';
+import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
+import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
+import { ApartmentProps } from '../entity/apartment-entity';
+import { IApartmentCommandRepo } from '../interface/i-apartment-command';
+import { BasePrismaClient } from '../../../shared/base-command-repo';
 
-export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentCommandRepo => {
+export const createApartmentCommandRepo = (prisma: BasePrismaClient): IApartmentCommandRepo => {
   const create = async (model: Apartment): Promise<Apartment> => {
     try {
       return await prisma.apartment.create({
