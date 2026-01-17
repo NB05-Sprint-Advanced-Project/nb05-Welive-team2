@@ -10,7 +10,7 @@ export interface IUserQueryRepo {
     page: number,
     limit: number,
     searchKeyword: string,
-    joinStatus: Status,
+    joinStatus?: Status,
   ): Promise<AdministratorView>;
 
   findByUsername(username: string): Promise<UserView | null>;

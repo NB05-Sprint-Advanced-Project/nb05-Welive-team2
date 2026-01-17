@@ -18,9 +18,21 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     const where = {
       role: Role.ADMIN,
       ...(searchKeyword && {
-        OR: [{ username: { contains: searchKeyword } }, { email: { contains: searchKeyword } }],
+        OR: [
+          { username: { contains: searchKeyword } },
+          { email: { contains: searchKeyword } },
+          {
+            UserApartmentLink: {
+              some: {
+                apartment: {
+                  name: { contains: searchKeyword },
+                },
+              },
+            },
+          },
+        ],
       }),
-      // ...(joinStatus && { joinedStatus: { equals: joinStatus } }),
+      ...(joinStatus && { joinedStatus: { equals: joinStatus } }),
     };
 
     const [users, totalCount] = await Promise.all([

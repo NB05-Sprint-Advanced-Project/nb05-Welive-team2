@@ -11,7 +11,7 @@ export const createUserQueryService = (userQueryRepo: IUserQueryRepo) => {
     page: number;
     limit: number;
     searchKeyword: string;
-    joinStatus: Status;
+    joinStatus?: Status;
   }) => {
     const administrators = await userQueryRepo.findAllAdmins(
       params.page,

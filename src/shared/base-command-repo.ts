@@ -5,8 +5,14 @@ export type TxPrismaClient = Prisma.TransactionClient;
 
 export type BasePrismaClient = PrismaClient | TxPrismaClient;
 
-export const BaseRepo = {
-  get: (): TxPrismaClient | undefined => {
-    return asyncContextStorage.get() ?? undefined;
-  },
+export const BaseRepo = (basePrisma: PrismaClient) => {
+  const prisma: TxPrismaClient | BasePrismaClient = asyncContextStorage.get() ?? basePrisma;
+
+  const getPrisma = () => {
+    return asyncContextStorage.get() ?? prisma;
+  };
+
+  return {
+    getPrisma,
+  };
 };

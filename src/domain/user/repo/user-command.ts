@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseUserProps, Role, Status } from '../entity/base-user';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
 import {
@@ -24,9 +24,10 @@ import { AdminAccountProps } from '../entity/admin-account';
 import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
+import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 
-export const createUserCommandRepo = (Baseprisma: BasePrismaClient): IUserCommandRepo => {
-  const prisma = BaseRepo.get() ?? Baseprisma;
+export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo => {
+  const { getPrisma } = BaseRepo(prisma);
 
   const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma.user.findUnique({
@@ -167,6 +168,8 @@ export const createUserCommandRepo = (Baseprisma: BasePrismaClient): IUserComman
   const create = async (
     entity: AdminAccountProps | ResidentAccountProps | NotJoinedResidentProps,
   ): Promise<void> => {
+    const prisma = getPrisma();
+
     try {
       // let보단 즉시 실행 함수(IIFE)함
       // 이유 - 반복적 if()문 사용으로 let으로 할당하는 것보다 깔끔하고 default로 할당 안 한 잡는 걸 안 해도 됨(컴파일 타임에서 잡아줌)
@@ -413,12 +416,11 @@ export const createUserCommandRepo = (Baseprisma: BasePrismaClient): IUserComman
     findResidentById,
     create,
     update,
+    updateAvatar,
     updateJoinedStatus,
     updateJoinedStatuses,
-    updateAvatar,
     updatePassword,
     deleteUser,
     deleteUsers,
   };
 };
-export type UserCommandRepo = ReturnType<typeof createUserCommandRepo>;

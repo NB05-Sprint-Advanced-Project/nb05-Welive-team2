@@ -16,7 +16,6 @@ import {
   residentSearchKeyword,
   residentAccountSearchKeyword,
 } from './common-schema';
-import { Status } from '../entity/base-user';
 
 // 관리자
 // 관리자 계정
@@ -24,7 +23,7 @@ export const viewAdministratorSchema = z.object({
   page: z.coerce.number().default(1),
   limit: z.coerce.number().default(10),
   searchKeyword: z.string().default(''),
-  joinStatus: joinedStatusSchema.default(Status.PENDING),
+  joinStatus: joinedStatusSchema.optional(),
 });
 
 export const createSuperAdminSchema = z.object({

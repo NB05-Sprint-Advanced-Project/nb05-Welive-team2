@@ -2,8 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { ApartmentProps } from '../entity/apartment-entity';
 import { ApartmentsView } from '../dto/view/apartments-view';
 import { ApartmentView } from '../dto/view/apartment-view';
+import { BasePrismaClient } from '../../../shared/base-command-repo';
 
-export const createApartmentQueryRepo = (prisma: PrismaClient) => {
+export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
   const findById = async (apartmentId: string): Promise<ApartmentView | null> => {
     const apartment = await prisma.apartment.findUnique({
       where: {

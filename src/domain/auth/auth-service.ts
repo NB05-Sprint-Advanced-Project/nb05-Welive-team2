@@ -3,7 +3,6 @@ import { BusinessExceptionType } from '../../shared/exception/business-exception
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
 import { ITokenUtil } from '../../shared/utils/token-manager';
 import { IUserQueryRepo } from '../user/interface/i-user-query-repo';
-import { UserCommandRepo } from '../user/repo/user-command';
 import { CookieTokenDTO, LoginDTO } from './dto/auth-request';
 
 export const createAuthService = (

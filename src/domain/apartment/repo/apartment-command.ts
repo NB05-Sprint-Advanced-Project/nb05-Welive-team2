@@ -3,10 +3,14 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { ApartmentProps } from '../entity/apartment-entity';
 import { IApartmentCommandRepo } from '../interface/i-apartment-command';
-import { BasePrismaClient } from '../../../shared/base-command-repo';
+import { BaseRepo } from '../../../shared/base-command-repo';
+import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 
-export const createApartmentCommandRepo = (prisma: BasePrismaClient): IApartmentCommandRepo => {
+export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentCommandRepo => {
+  const { getPrisma } = BaseRepo(prisma);
+
   const create = async (model: Apartment): Promise<Apartment> => {
+    const prisma = getPrisma();
     try {
       return await prisma.apartment.create({
         data: model,
