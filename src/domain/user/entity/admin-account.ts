@@ -70,16 +70,17 @@ export const AdminAccountEntity = {
       name: props.name,
       email: props.email,
       contact: props.contact,
-      version: props.user.version + 1,
       updatedAt: new Date(),
     };
   },
 
-  updateJoinedStatus: (user: AdminAccountProps, joinedStatus: Status): AdminAccountProps => {
+  updateJoinedStatus: (
+    user: AdminAccountProps,
+    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED,
+  ): AdminAccountProps => {
     return {
       ...user,
       joinedStatus: joinedStatus,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },
@@ -94,7 +95,6 @@ export const AdminAccountEntity = {
     return {
       ...user,
       password: hashedPassword,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },
@@ -108,7 +108,6 @@ export const AdminAccountEntity = {
     return {
       ...user,
       refreshToken: hashedRefreshToken,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },

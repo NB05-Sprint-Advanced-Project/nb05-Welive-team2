@@ -50,7 +50,6 @@ export const BaseUserEntity = {
     return {
       ...user,
       avatarUrl: newAvatarUrl,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },

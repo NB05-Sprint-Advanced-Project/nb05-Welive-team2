@@ -6,9 +6,7 @@ import { ResidentAccountProps } from '../entity/resident-account';
 export interface IUserCommandRepo {
   findAdminUserById: (id: string) => Promise<AdminAccountProps | null>;
 
-  findResidentUserById: (
-    id: string,
-  ) => Promise<ResidentAccountProps | NotJoinedResidentProps | null>;
+  findResidentAccountUserById: (id: string) => Promise<ResidentAccountProps | null>;
 
   findBaseUserById: (id: string) => Promise<BaseUserProps | null>;
 
@@ -19,6 +17,11 @@ export interface IUserCommandRepo {
   findRejectedAdminUsers: () => Promise<AdminAccountProps[] | null>;
 
   findPendingResidentUsers: () => Promise<ResidentAccountProps[] | null>;
+
+  findNotJoinedResidentByEmail: (email: string) => Promise<NotJoinedResidentProps | null>;
+
+  findResidentById: (id: string) => Promise<ResidentAccountProps | NotJoinedResidentProps | null>;
+
   /**
    *  @ throws UNIQUE_VIOLATION_EMAIL
    *  @ throws UNIQUE_VIOLATION_USERNAME
@@ -32,7 +35,9 @@ export interface IUserCommandRepo {
   /**
    *  @ throws OPTIMISTIC_LOCK_FAILED
    */
-  update: (entity: AdminAccountProps | NotJoinedResidentProps) => Promise<void>;
+  update: (
+    entity: AdminAccountProps | NotJoinedResidentProps | ResidentAccountProps,
+  ) => Promise<void>;
 
   /**
    *  @ throws OPTIMISTIC_LOCK_FAILED
@@ -65,5 +70,5 @@ export interface IUserCommandRepo {
 
   deleteUser: (id: string) => Promise<void>;
 
-  deleteUsers: (entities: AdminAccountProps[] | ResidentAccountProps[]) => Promise<void>;
+  deleteUsers: () => Promise<void>;
 }

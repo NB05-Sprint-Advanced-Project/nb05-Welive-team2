@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { Role, BaseUserProps, Status } from './base-user';
 import { ResidentAddressProps } from './vo/resident-address';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
+import { SignUpResidentAccountReqDto } from '../dto/user-request';
 
 export type NotJoinedResidentProps = {
   readonly role: Role.RESIDENT;
@@ -14,8 +15,6 @@ export const NotJoinedResidentEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role.RESIDENT;
-    joinedStatus: Status.NOT_JOINED;
     address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
   }): NotJoinedResidentProps => {
@@ -24,6 +23,8 @@ export const NotJoinedResidentEntity = {
     return {
       ...props,
       id: randomUUID(),
+      role: Role.RESIDENT,
+      joinedStatus: Status.NOT_JOINED,
       version: 1,
       createdAt: now,
       updatedAt: now,
@@ -51,18 +52,31 @@ export const NotJoinedResidentEntity = {
   update: (props: {
     user: NotJoinedResidentProps; // DB에 저장된 데이터
     name: string;
-    email: string;
     contact: string;
-    residentAddress?: ResidentAddressProps;
+    residentAddress: ResidentAddressProps;
   }): NotJoinedResidentProps => {
     return {
       ...props.user,
       name: props.name,
-      email: props.email,
       contact: props.contact,
       address: props.residentAddress!,
-      version: props.user.version + 1,
       updatedAt: new Date(),
     };
+  },
+
+  isNotJoinedResident: (
+    requestdto: SignUpResidentAccountReqDto,
+    DBuser: NotJoinedResidentProps,
+  ): boolean => {
+    return (
+      requestdto.email === DBuser.email &&
+      requestdto.name === DBuser.name &&
+      requestdto.contact === DBuser.contact &&
+      DBuser.userApartmentLink!.some(
+        (livingApt) => requestdto.resident.apartmentId === livingApt.apartmentId,
+      ) &&
+      requestdto.resident.building === DBuser.address.building &&
+      requestdto.resident.unit === DBuser.address.unit
+    );
   },
 };

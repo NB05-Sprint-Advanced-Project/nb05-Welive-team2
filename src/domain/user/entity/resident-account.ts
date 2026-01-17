@@ -3,6 +3,8 @@ import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
 import { Role, Status, BaseUserProps } from './base-user';
 import { ResidentAddressProps } from './vo/resident-address';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
+import { NotJoinedResidentProps } from './not-joined-resident';
+import { SignUpResidentAccountReqDto } from '../dto/user-request';
 
 export type ResidentAccountProps = {
   readonly username: string;
@@ -21,7 +23,6 @@ export const ResidentAccountEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role.RESIDENT;
     hashManager: IHashManager;
     address: ResidentAddressProps;
     userApartmentLink: UserApartmentLinkProps[];
@@ -33,6 +34,7 @@ export const ResidentAccountEntity = {
     return {
       ...rest,
       id: randomUUID(),
+      role: Role.RESIDENT,
       joinedStatus: Status.PENDING,
       password: hashedPassword,
       version: 1,
@@ -66,29 +68,25 @@ export const ResidentAccountEntity = {
   update: (props: {
     user: ResidentAccountProps; // DB에 저장된 데이터
     name: string;
-    email: string;
     contact: string;
-    residentAddress?: ResidentAddressProps;
+    residentAddress: ResidentAddressProps;
   }): ResidentAccountProps => {
     return {
       ...props.user,
       name: props.name,
-      email: props.email,
       contact: props.contact,
       address: props.residentAddress!,
-      version: props.user.version + 1,
       updatedAt: new Date(),
     };
   },
 
   updateJoinedStatus: (
     user: ResidentAccountProps,
-    joinedStatus: Status.APPROVED | Status.REJECTED,
+    joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED,
   ): ResidentAccountProps => {
     return {
       ...user,
       joinedStatus: joinedStatus,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },
@@ -103,7 +101,6 @@ export const ResidentAccountEntity = {
     return {
       ...user,
       password: hashedPassword,
-      version: user.version + 1,
       updatedAt: new Date(),
     };
   },
@@ -117,7 +114,23 @@ export const ResidentAccountEntity = {
     return {
       ...user,
       refreshToken: hashedRefreshToken,
-      version: user.version + 1,
+      updatedAt: new Date(),
+    };
+  },
+
+  // 미가입 입주민을 가입 상태로 승격(NOT_JOINED → PENDING)
+  requestJoin: async (
+    notJoinedResident: NotJoinedResidentProps,
+    dto: SignUpResidentAccountReqDto,
+    hashManager: IHashManager,
+  ): Promise<ResidentAccountProps> => {
+    const hashedPassword = await hashManager.hash(dto.password);
+
+    return {
+      ...notJoinedResident,
+      username: dto.username,
+      password: hashedPassword,
+      joinedStatus: Status.PENDING,
       updatedAt: new Date(),
     };
   },

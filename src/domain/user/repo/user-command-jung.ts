@@ -1,29 +1,29 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseUserProps, Role, Status } from '../entity/base-user';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
 import {
   toBaseUserEntity,
-  toCreateAdminAccountData,
-  toCreateResidentAccountData,
-  toCreateNotJoinedResidentData,
-  toUpdateAdminAccountData,
-  toUpdateAvatarData,
-  toUpdateResidentData,
+  toCreateAdminAccountDBData,
+  toCreateResidentAccountDBData,
+  toCreateNotJoinedResidentDBData,
+  toUpdateAdminAccountDBData,
+  toUpdateAvatarDBData,
   userInclude,
-  toUpdateJoinedStatusData,
+  toUpdateJoinedStatusDBData,
   toAdminAccountEntity,
-  toResidentAccountEntity,
-  toUpdatePasswordData,
-  toCreateSuperAdminAccountData,
-} from '../user-mapper';
+  toNotJoinedResidentEntity,
+  toResidentAccountEntityFromDB,
+  toUpdatePasswordDBData,
+  toUpdateNotJoinedResidentDBData,
+  toUpdateResidentAccountDBData,
+} from '../user-mapper-jung';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { AdminAccountProps } from '../entity/admin-account';
 import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
-import { BasePrismaClient } from '../../../shared/base-command-repo';
 
-export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRepo => {
+export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo => {
   const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma.user.findUnique({
       where: { id },
@@ -37,30 +37,7 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
     const users = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.ADMIN, Role.SUPER_ADMIN],
-        },
-        joinedStatus: {
-          equals: Status.PENDING,
-        },
-      },
-      include: userInclude,
-    });
-
-    if (users.length === 0) {
-      return null;
-    }
-
-    return users.map((user) => toAdminAccountEntity(user));
-  };
-
-  const findRejectedAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
-    const users = await prisma.user.findMany({
-      where: {
-        role: {
-          in: [Role.ADMIN, Role.SUPER_ADMIN],
-        },
-        joinedStatus: {
-          equals: Status.REJECTED,
+          in: [Role.ADMIN, Role.SUPERADMIN, Status.PENDING],
         },
       },
       include: userInclude,
@@ -87,18 +64,16 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
       return null;
     }
 
-    return users.map((user) => toResidentAccountEntity(user));
+    return users.map((user) => toResidentAccountEntityFromDB(user));
   };
 
-  const findResidentUserById = async (
-    id: string,
-  ): Promise<ResidentAccountProps | NotJoinedResidentProps | null> => {
+  const findResidentAccountUserById = async (id: string): Promise<ResidentAccountProps | null> => {
     const user = await prisma.user.findUnique({
       where: { id },
       include: userInclude,
     });
 
-    return user ? toResidentAccountEntity(user) : null;
+    return user ? toResidentAccountEntityFromDB(user) : null;
   };
 
   const findBaseUserById = async (id: string): Promise<BaseUserProps | null> => {
@@ -120,11 +95,46 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
       return null;
     }
 
-    if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
+    if (user.role === Role.ADMIN || user.role === Role.SUPERADMIN) {
       return toAdminAccountEntity(user);
     }
 
-    return toResidentAccountEntity(user);
+    return toResidentAccountEntityFromDB(user);
+  };
+
+  const findNotJoinedResidentByEmail = async (
+    email: string,
+  ): Promise<NotJoinedResidentProps | null> => {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+        joinedStatus: Status.NOT_JOINED,
+      },
+      include: userInclude,
+    });
+
+    return user ? toNotJoinedResidentEntity(user) : null;
+  };
+
+  const findResidentById = async (
+    id: string,
+  ): Promise<NotJoinedResidentProps | ResidentAccountProps | null> => {
+    const residentUser = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      include: userInclude,
+    });
+
+    if (!residentUser) {
+      return null;
+    }
+
+    if (residentUser.joinedStatus === Status.NOT_JOINED) {
+      return toNotJoinedResidentEntity(residentUser);
+    }
+
+    return toResidentAccountEntityFromDB(residentUser);
   };
 
   const create = async (
@@ -136,14 +146,13 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
       const createUserData: Prisma.UserCreateInput = (() => {
         switch (entity.role) {
           case Role.ADMIN:
-            return toCreateAdminAccountData(entity);
-          case Role.SUPER_ADMIN:
-            return toCreateSuperAdminAccountData(entity);
+          case Role.SUPERADMIN:
+            return toCreateAdminAccountDBData(entity);
           case Role.RESIDENT:
             if (entity.joinedStatus === Status.NOT_JOINED) {
-              return toCreateNotJoinedResidentData(entity);
+              return toCreateNotJoinedResidentDBData(entity);
             } else {
-              return toCreateResidentAccountData(entity);
+              return toCreateResidentAccountDBData(entity);
             }
         }
       })();
@@ -153,82 +162,33 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
         include: userInclude,
       });
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        const target = (err.meta as any)?.target;
-        if (target?.includes('email')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
-          });
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          const target = (err.meta as any)?.target;
+          if (target?.includes('email')) {
+            throw TechnicalException({
+              type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
+            });
+          }
+
+          if (target?.includes('username')) {
+            throw TechnicalException({
+              type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+              error: err,
+            });
+          }
+
+          if (target?.includes('contact')) {
+            throw TechnicalException({
+              type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+              error: err,
+            });
+          }
         }
 
-        if (target?.includes('username')) {
+        if (err.code === 'P2025') {
           throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
-            error: err,
-          });
-        }
-
-        if (target?.includes('contact')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
-            error: err,
-          });
-        }
-
-        throw TechnicalException({
-          type: TechnicalExceptionType.UNKNOWN_ERROR,
-          error: err,
-        });
-      }
-    }
-  };
-
-  const update = async (
-    entity: AdminAccountProps | NotJoinedResidentProps | ResidentAccountProps,
-  ): Promise<void> => {
-    try {
-      const updateUserData: Prisma.UserUpdateInput = (() => {
-        switch (entity.role) {
-          case Role.ADMIN:
-          case Role.SUPER_ADMIN:
-            return toUpdateAdminAccountData(entity);
-          case Role.RESIDENT:
-            return toUpdateResidentData(entity);
-        }
-      })();
-      await prisma.user.update({
-        where: {
-          id: entity.id,
-          version: entity.version,
-        },
-        data: updateUserData,
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw TechnicalException({
-          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
-          error: err,
-        });
-      }
-
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        const target = (err.meta as any)?.target;
-        if (target?.includes('email')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
-          });
-        }
-
-        if (target?.includes('username')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
-            error: err,
-          });
-        }
-
-        if (target?.includes('contact')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+            type: TechnicalExceptionType.USER_NOT_FOUND,
             error: err,
           });
         }
@@ -243,14 +203,84 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
     }
   };
 
+  const update = async (
+    entity: AdminAccountProps | NotJoinedResidentProps | ResidentAccountProps,
+  ): Promise<void> => {
+    try {
+      const updateUserData: Prisma.UserUpdateInput = (() => {
+        switch (entity.role) {
+          case Role.ADMIN:
+          case Role.SUPERADMIN:
+            return toUpdateAdminAccountDBData(entity);
+          case Role.RESIDENT:
+            if (entity.joinedStatus === Status.NOT_JOINED) {
+              return toUpdateNotJoinedResidentDBData(entity);
+            } else {
+              return toUpdateResidentAccountDBData(entity);
+            }
+        }
+      })();
+      await prisma.user.update({
+        where: {
+          id: entity.id,
+          version: entity.version,
+        },
+        data: {
+          ...updateUserData,
+          version: { increment: 1 },
+        },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw TechnicalException({
+          type: TechnicalExceptionType.USER_NOT_FOUND,
+          error: err,
+        });
+      }
+
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        const target = (err.meta as any)?.target;
+        if (target?.includes('email')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
+          });
+        }
+
+        if (target?.includes('username')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+            error: err,
+          });
+        }
+
+        if (target?.includes('contact')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+            error: err,
+          });
+        }
+
+        throw TechnicalException({
+          type: TechnicalExceptionType.UNIQUE_VIOLATION,
+          error: err,
+        });
+      }
+
+      throw err;
+    }
+  };
+
   const updateAvatar = async (entity: BaseUserProps): Promise<void> => {
     try {
       await prisma.user.update({
         where: {
           id: entity.id,
-          version: entity.version - 1,
+          version: entity.version,
         },
-        data: toUpdateAvatarData(entity),
+        data: {
+          ...toUpdateAvatarDBData(entity),
+          version: { increment: 1 },
+        },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
@@ -270,9 +300,12 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
       await prisma.user.update({
         where: {
           id: entity.id,
-          version: entity.version - 1,
+          version: entity.version,
         },
-        data: toUpdateJoinedStatusData(entity),
+        data: {
+          ...toUpdateJoinedStatusDBData(entity),
+          version: { increment: 1 },
+        },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
@@ -294,9 +327,12 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
     await prisma.user.updateMany({
       where: {
         id: { in: entityIds },
-        version: entities[0].version - 1, // baseVersion
+        version: entities[0].version, // baseVersion
       },
-      data: toUpdateJoinedStatusData(entities[0]), //baseUpdateData
+      data: {
+        ...toUpdateJoinedStatusDBData(entities[0]),
+        version: { increment: 1 },
+      }, //baseUpdateData
     });
   };
 
@@ -307,9 +343,12 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
       await prisma.user.update({
         where: {
           id: entity.id,
-          version: entity.version - 1,
+          version: entity.version,
         },
-        data: toUpdatePasswordData,
+        data: {
+          ...toUpdatePasswordDBData,
+          version: { increment: 1 },
+        },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
@@ -337,26 +376,23 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
     }
   };
 
-  const deleteUsers = async (
-    entities: AdminAccountProps[] | ResidentAccountProps[],
-  ): Promise<void> => {
-    const entityIds = entities.map((entity) => entity.id);
-
+  const deleteUsers = async (): Promise<void> => {
     await prisma.user.deleteMany({
       where: {
-        id: { in: entityIds },
+        joinedStatus: Status.REJECTED,
       },
     });
   };
 
   return {
     findAdminUserById,
-    findResidentAccountUserById: findResidentUserById,
+    findResidentAccountUserById,
     findBaseUserById,
     findJoinedUserById,
     findPendingAdminUsers,
-    findRejectedAdminUsers,
     findPendingResidentUsers,
+    findNotJoinedResidentByEmail,
+    findResidentById,
     create,
     update,
     updateJoinedStatus,
@@ -367,4 +403,5 @@ export const createUserCommandRepo = (prisma: BasePrismaClient): IUserCommandRep
     deleteUsers,
   };
 };
-export type UserCommandRepo = ReturnType<typeof createUserCommandRepo>;
+
+export type UserCommandRepoJung = ReturnType<typeof createUserCommandRepo>;

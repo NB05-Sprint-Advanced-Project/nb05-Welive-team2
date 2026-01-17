@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { Role, Status } from '../entity/base-user';
+import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
+import { userInclude } from '../user-mapper';
+import { GetResidentsReqDto } from '../dto/resident-response';
+import { GetResidentAccountsReqDto } from '../dto/user-request';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   const findAllAdmins = async (
@@ -94,8 +98,169 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
+  const findNotJoinedResidentByEmail = async (
+    email: string,
+    userId: string,
+  ): Promise<ResidentView | null> => {
+    const notJoinedResident = await prisma.user.findUnique({
+      where: { email },
+      include: userInclude,
+    });
+
+    if (!notJoinedResident) {
+      return null;
+    }
+
+    return {
+      id: notJoinedResident.id,
+      userId: userId,
+      email: notJoinedResident.email,
+      contact: notJoinedResident.contact,
+      name: notJoinedResident.name,
+      building: notJoinedResident.Address!.building,
+      unit: notJoinedResident.Address!.unit,
+      isHouseholder: notJoinedResident.Address!.isHouseholder,
+      createdAt: notJoinedResident.createdAt,
+    };
+  };
+
+  const findResidentById = async (id: string, userId: string): Promise<ResidentView | null> => {
+    const resident = await prisma.user.findUnique({
+      where: { id },
+      include: userInclude,
+    });
+
+    if (!resident) {
+      return null;
+    }
+
+    return {
+      id: resident.id,
+      userId: userId,
+      email: resident.email,
+      contact: resident.contact,
+      name: resident.name,
+      building: resident.Address!.building,
+      unit: resident.Address!.unit,
+      isHouseholder: resident.Address!.isHouseholder,
+      createdAt: resident.createdAt,
+    };
+  };
+
+  const findResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
+    const joinedStatus =
+      dto.isRegistered === undefined
+        ? { in: [Status.NOT_JOINED, Status.APPROVED] }
+        : dto.isRegistered
+          ? Status.APPROVED
+          : Status.NOT_JOINED;
+
+    const where = {
+      joinedStatus,
+      ...(dto.building !== undefined && { building: dto.building }),
+      ...(dto.unit !== undefined && { unit: dto.unit }),
+      ...(dto.isHouseholder !== undefined && { isHouseholder: dto.isHouseholder }),
+      ...(dto.searchKeyword && {
+        OR: [
+          { name: { contains: dto.searchKeyword } },
+          { contact: { contains: dto.searchKeyword } },
+          { email: { contains: dto.searchKeyword } },
+        ],
+      }),
+    };
+
+    const [residents, totalCount] = await prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        skip: (dto.page - 1) * dto.limit,
+        take: dto.limit,
+        include: userInclude,
+      }),
+      prisma.user.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: residents.map((resident) => ({
+        id: resident.id,
+        userId: dto.userId,
+        email: resident.email,
+        contact: resident.contact,
+        name: resident.name,
+        building: resident.Address!.building,
+        unit: resident.Address!.unit,
+        isHouseholder: resident.Address!.isHouseholder,
+        createdAt: resident.createdAt,
+      })),
+      totalCount: totalCount,
+      page: dto.page,
+      limit: dto.limit,
+      hasNext: dto.page * dto.limit < totalCount,
+    };
+  };
+
+  const findResidentAccounts = async (
+    dto: GetResidentAccountsReqDto,
+  ): Promise<ResidentAccountView> => {
+    const joinedStatus =
+      dto.joinStatus === undefined
+        ? { in: [Status.PENDING, Status.APPROVED, Status.REJECTED] }
+        : dto.joinStatus === Status.APPROVED
+          ? Status.APPROVED
+          : dto.joinStatus === Status.PENDING
+            ? Status.PENDING
+            : Status.REJECTED;
+
+    const where = {
+      joinedStatus,
+      ...(dto.building !== undefined && { building: dto.building }),
+      ...(dto.unit !== undefined && { unit: dto.unit }),
+      ...(dto.searchKeyword && {
+        OR: [{ name: { contains: dto.searchKeyword } }, { email: { contains: dto.searchKeyword } }],
+      }),
+    };
+
+    const [residentAccounts, totalCount] = await prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        skip: (dto.page - 1) * dto.limit,
+        take: dto.limit,
+        include: userInclude,
+      }),
+      prisma.user.count({
+        where,
+      }),
+    ]);
+
+    return {
+      data: residentAccounts.map((residentAccount) => ({
+        id: residentAccount.id,
+        email: residentAccount.email,
+        contact: residentAccount.contact,
+        name: residentAccount.name,
+        joinStatus: residentAccount.joinedStatus as
+          | Status.APPROVED
+          | Status.PENDING
+          | Status.REJECTED,
+        resident: {
+          id: residentAccount.id,
+          building: residentAccount.Address!.building,
+          unit: residentAccount.Address!.unit,
+        },
+      })),
+      totalCount: totalCount,
+      page: dto.page,
+      limit: dto.limit,
+      hasNext: dto.page * dto.limit < totalCount,
+    };
+  };
   return {
     findAllAdmins,
     findByUsername,
+    findNotJoinedResidentByEmail,
+    findResidentById,
+    findResidents,
+    findResidentAccounts,
   };
 };

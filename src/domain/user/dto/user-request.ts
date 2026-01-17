@@ -10,7 +10,11 @@ import {
   unitSchema,
   userIdSchema,
   usernameSchema,
-  JoinedStatusSchema,
+  joinedStatusSchema,
+  pageSchema,
+  limitSchema,
+  residentSearchKeyword,
+  residentAccountSearchKeyword,
 } from './common-schema';
 import { Status } from '../entity/base-user';
 
@@ -20,7 +24,7 @@ export const viewAdministratorSchema = z.object({
   page: z.coerce.number().default(1),
   limit: z.coerce.number().default(10),
   searchKeyword: z.string().default(''),
-  joinStatus: JoinedStatusSchema.default(Status.PENDING),
+  joinStatus: joinedStatusSchema.default(Status.PENDING),
 });
 
 export const createSuperAdminSchema = z.object({
@@ -82,7 +86,6 @@ export type UpdateAdminjoinedStatusesDto = z.infer<typeof updateAdminsJoinStatus
 export type UpdateAdminjoinedStatusDto = z.infer<typeof updateAdminJoinStatusSchema>;
 export type DeleteAdminDto = z.infer<typeof deleteAdminSchema>;
 
-// 입주민
 // 입주민 계정
 export const signUpResidentAccountSchema = z.object({
   username: emailSchema,
@@ -97,25 +100,15 @@ export const signUpResidentAccountSchema = z.object({
   }),
 });
 
-export const updateResidentAccountSchema = z.object({
-  userId: userIdSchema,
-  name: nameSchema,
-  email: emailSchema,
-  contact: contactSchema,
-  building: buildingSchema,
-  unit: unitSchema,
-  isHouseholder: z.boolean(),
-});
-
 // 단건
 export const updateResidentAccountJoinedStatusSchema = z.object({
   userId: userIdSchema,
-  joindeStatus: updateJoinedStatusSchema,
+  joinStatus: updateJoinedStatusSchema,
 });
 
 // 다건
 export const updateResidentAccountJoinedStatusesSchema = z.object({
-  joindeStatus: updateJoinedStatusSchema,
+  joinStatus: updateJoinedStatusSchema,
 });
 
 export const updateResidentAccountAvatarUrlSchema = z.object({
@@ -132,8 +125,16 @@ const deleteResidentAccountSchema = z.object({
   id: z.string(), // 입주민 계정 id
 });
 
+export const getResidentAccountsSchema = z.object({
+  page: pageSchema,
+  limit: limitSchema,
+  searchKeyword: residentAccountSearchKeyword,
+  joinStatus: joinedStatusSchema,
+  building: buildingSchema,
+  unit: unitSchema,
+});
+
 export type SignUpResidentAccountReqDto = z.infer<typeof signUpResidentAccountSchema>;
-export type UpdateResidentAccountReqDto = z.infer<typeof updateResidentAccountSchema>;
 export type UpdateResidentAccountJoinedStatusReqDto = z.infer<
   typeof updateResidentAccountJoinedStatusSchema
 >;
@@ -147,36 +148,7 @@ export type UpdateResidentAccountJoinedStatusesReqDto = z.infer<
 //   typeof updateResidentAccountPasswordSchema
 // >;
 export type DeleteResidentAccountReqDto = z.infer<typeof deleteResidentAccountSchema>;
-
-// 입주민(가입한 입주민 + 미가입한 입주민)
-const createResidentSchema = z.object({
-  apartmentId: z.string(),
-  name: nameSchema,
-  email: emailSchema,
-  contact: contactSchema,
-  building: buildingSchema,
-  unit: unitSchema,
-  isHouseHolder: z.boolean,
-});
-
-const updateResidentSchema = z.object({
-  userId: userIdSchema,
-  name: nameSchema,
-  email: emailSchema,
-  contact: contactSchema,
-  building: buildingSchema,
-  unit: unitSchema,
-  isHouseholder: z.boolean(),
-});
-
-const deleteResidentSchema = z.object({
-  userId: userIdSchema,
-  id: z.string(),
-});
-
-export type CreateResidentReqDto = z.infer<typeof createResidentSchema>;
-export type UpdateResidentReqDto = z.infer<typeof updateResidentSchema>;
-export type DeleteResidentReqDto = z.infer<typeof deleteResidentSchema>;
+export type GetResidentAccountsReqDto = z.infer<typeof getResidentAccountsSchema>;
 
 // 기타
 export const updateAvatarUrlSchema = z.object({
