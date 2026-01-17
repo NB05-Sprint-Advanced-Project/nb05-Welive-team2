@@ -9,7 +9,6 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
     const complaint = await prisma.complaint.findUnique({
       where: { id: complaintId },
     });
-
     return complaint ? complaint : null;
   };
 
@@ -28,7 +27,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
           const fieldName = (err.meta as any)?.field_name;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
-          if (targetConstraints.some((c) => fieldName.include(c))) {
+          if (targetConstraints.some((c) => fieldName.includes(c))) {
             throw TechnicalException({
               type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
               meta: err.meta,
@@ -64,7 +63,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
           const fieldName = (err.meta as any)?.field_name;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
-          if (targetConstraints.some((c) => fieldName.include(c))) {
+          if (targetConstraints.some((c) => fieldName.includes(c))) {
             throw TechnicalException({
               type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
               meta: err.meta,
@@ -111,6 +110,17 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
             type: TechnicalExceptionType.RECORD_NOT_FOUND,
             meta: err.meta,
           });
+        }
+        if (err.code === 'P2003') {
+          const fieldName = (err.meta as any)?.field_name;
+          const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
+
+          if (targetConstraints.some((c) => fieldName.includes(c))) {
+            throw TechnicalException({
+              type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
+              meta: err.meta,
+            });
+          }
         }
       }
       throw err;

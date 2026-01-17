@@ -15,8 +15,12 @@ export enum BusinessExceptionType {
   USER_NOT_FOUND,
   CONCURRENT_MODIFICATION,
   ADDRESS_ALREADY_IN_USE,
-  REQ_INFO_INVALID_PLEASE_RETRY,
   DELETED,
+  COMPLAINTS_LIST_NOT_FOUND,
+  FAIL_SAVE_COMPALINT,
+  REQ_INFO_INVALID,
+  COMMENTS_LIST_NOT_FOUND,
+  FAIL_SAVE_COMMENT,
 }
 
 export const BusinessExceptionTable: Record<
@@ -35,9 +39,9 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.VALIDATION_ERROR]: {
     statusCode: 422,
   },
-  [BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY]: {
+  [BusinessExceptionType.REQ_INFO_INVALID]: {
     statusCode: 404,
-    message: '요청하신 정보가 유효하지 않습니다. 확인 후 다시 시도해 주세요.',
+    message: '요청하신 정보가 유효하지 않습니다. 확인 후 다시 시도해주세요',
   },
   [BusinessExceptionType.DELETED]: {
     statusCode: 204,
@@ -58,6 +62,14 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.COMPLAINT_NOT_FOUND]: {
     statusCode: 404,
     message: '민원을 찾을 수 없습니다.',
+  },
+  [BusinessExceptionType.COMPLAINTS_LIST_NOT_FOUND]: {
+    statusCode: 404,
+    message: '민원 목록을 불러올 수 없습니다.',
+  },
+  [BusinessExceptionType.COMMENTS_LIST_NOT_FOUND]: {
+    statusCode: 404,
+    message: '댓글 목록을 불러올 수 없습니다.',
   },
   [BusinessExceptionType.USER_NOT_FOUND]: {
     statusCode: 404,
@@ -105,4 +117,12 @@ export const BusinessExceptionTable: Record<
   },
 
   // 기타
+  [BusinessExceptionType.FAIL_SAVE_COMPALINT]: {
+    statusCode: 409,
+    message: '민원을 저장하지 못했습니다.',
+  },
+  [BusinessExceptionType.FAIL_SAVE_COMMENT]: {
+    statusCode: 409,
+    message: '댓글을 저장하지 못했습니다.',
+  },
 };

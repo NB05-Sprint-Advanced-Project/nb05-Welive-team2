@@ -48,26 +48,38 @@ export const createComplaintHandlers = (
   };
 
   const updateComplaint = async (req: Request, res: Response) => {
+    /*
+  인증 미들웨어 추가 시 
+  const userId = req.user.userId;
+  */
     const { params, body } = validate(updateComplaintReqBodySchema, { ...req.params, ...req.body });
 
-    // await complaintCommandService.updateComplaint(params.complaintId, body);
+    // await complaintCommandService.updateComplaint(userId, params.complaintId, body);
 
     return res.status(204).json();
   };
 
   const deleteComplaint = async (req: Request, res: Response) => {
+    /*
+  인증 미들웨어 추가 시 
+  const userId = req.user.userId;
+  */
     const { params } = validate(deleteComplaintReqParamsSchema, req.params);
-    await complaintCommandService.deleteComplaint(params.complaintId);
+    // await complaintCommandService.deleteComplaint(userId, params.complaintId);
 
     return res.status(204).json();
   };
 
   const updateComplaintStatus = async (req: Request, res: Response) => {
+    /*
+  인증 미들웨어 추가 시 
+  const requesterRole = req.role?;
+  */
     const { params, body } = validate(updateComplaintStatusReqBodySchema, {
       ...req.params,
       ...req.body,
     });
-    await complaintCommandService.updateComplaintStatus(params.complaintId, body.status);
+    // await complaintCommandService.updateComplaintStatus(requesterRole, params.complaintId, body.status);
 
     return res.status(204).json();
   };

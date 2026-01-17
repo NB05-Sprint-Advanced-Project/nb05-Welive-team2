@@ -30,39 +30,75 @@ export const createComplaintCommandService = (
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.FOREIGN_KEY_VIOLATION) {
           throw BusinessException({
-            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+            type: BusinessExceptionType.FAIL_SAVE_COMPALINT,
           });
         }
       }
+      throw err;
     }
   };
 
   const updateComplaint = async (
+    userId: string,
     complaintId: string,
     complaint: { title: string; content: string; isPublic: boolean },
   ) => {
     try {
-      const beforeContext = await complaintRepo.findById(complaintId);
+      await uow.doWork(
+        async () => {
+          const beforeContext = await complaintRepo.findById(complaintId);
 
-      if (!beforeContext) {
-        throw null;
-      }
+          if (!beforeContext) {
+            throw BusinessException({
+              type: BusinessExceptionType.REQ_INFO_INVALID,
+            });
+          }
+          if (beforeContext.userId !== userId) {
+            throw BusinessException({
+              type: BusinessExceptionType.FORBIDDEN,
+            });
+          }
 
-      const entity = ComplaintEntity.update(beforeContext, complaint);
-      await complaintRepo.update(entity);
+          const entity = ComplaintEntity.update(beforeContext, complaint);
+          await complaintRepo.update(entity);
+        },
+        {
+          transactionOptions: { useTransaction: false },
+          useOptimisticLock: true,
+        },
+      );
     } catch (err) {
       if (isTechnicalException(err)) {
-        if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
+        if (
+          [
+            TechnicalExceptionType.RECORD_NOT_FOUND,
+            TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
+          ].includes(err.type)
+        ) {
           throw BusinessException({
-            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+            type: BusinessExceptionType.FAIL_SAVE_COMPALINT,
           });
         }
       }
+      throw err;
     }
   };
 
-  const deleteComplaint = async (complaintId: string) => {
+  const deleteComplaint = async (userId: string, complaintId: string) => {
     try {
+      const beforeContext = await complaintRepo.findById(complaintId);
+
+      if (!beforeContext) {
+        throw BusinessException({
+          type: BusinessExceptionType.REQ_INFO_INVALID,
+        });
+      }
+      if (beforeContext.userId !== userId) {
+        throw BusinessException({
+          type: BusinessExceptionType.FORBIDDEN,
+        });
+      }
+
       await complaintRepo.delete(complaintId);
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -72,27 +108,48 @@ export const createComplaintCommandService = (
           });
         }
       }
+      throw err;
     }
   };
 
-  const updateComplaintStatus = async (complaintId: string, status: ComplaintStatus) => {
+  const updateComplaintStatus = async (
+    requesterRole: string,
+    complaintId: string,
+    status: ComplaintStatus,
+  ) => {
     try {
-      const beforeContext = await complaintRepo.findById(complaintId);
+      await uow.doWork(async () => {
+        if (requesterRole !== 'ADMIN') {
+          throw BusinessException({
+            type: BusinessExceptionType.FORBIDDEN,
+          });
+        }
 
-      if (!beforeContext) {
-        throw null;
-      }
+        const beforeContext = await complaintRepo.findById(complaintId);
 
-      const entity = ComplaintEntity.updateStatus(beforeContext, { status });
-      await complaintRepo.updateStatus(entity);
+        if (!beforeContext) {
+          throw BusinessException({
+            type: BusinessExceptionType.REQ_INFO_INVALID,
+          });
+        }
+
+        const entity = ComplaintEntity.updateStatus(beforeContext, { status });
+        await complaintRepo.updateStatus(entity);
+      });
     } catch (err) {
       if (isTechnicalException(err)) {
-        if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
+        if (
+          [
+            TechnicalExceptionType.RECORD_NOT_FOUND,
+            TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
+          ].includes(err.type)
+        ) {
           throw BusinessException({
-            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+            type: BusinessExceptionType.FAIL_SAVE_COMPALINT,
           });
         }
       }
+      throw err;
     }
   };
 

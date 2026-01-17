@@ -34,14 +34,22 @@ export const createCommentHandlers = (
   };
 
   const updateComment = async (req: Request, res: Response) => {
+    /*
+   인증 미들웨어 추가 시 
+   const userId = req.user.userId;
+    */
     const { params, body } = validate(updateCommentReqBodySchema, { ...req.params, ...req.body });
-    await commentCommandService.updateComment(params.commentId, body);
+    // await commentCommandService.updateComment(userId, params.commentId, body);
     return res.status(204).json();
   };
 
   const deleteComment = async (req: Request, res: Response) => {
+    /*
+   인증 미들웨어 추가 시 
+   const userId = req.user.userId;
+    */
     const { params } = validate(deleteCommentReqParamsSchema, req.params);
-    await commentCommandService.deleteComment(params.commentId);
+    // await commentCommandService.deleteComment(userId, params.commentId);
 
     return res.status(204).json();
   };

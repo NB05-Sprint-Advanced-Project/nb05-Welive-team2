@@ -28,7 +28,7 @@ export const createCommentQueryService = (repo: ICommentQueryRepo) => {
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
-          throw BusinessException({ type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY });
+          throw BusinessException({ type: BusinessExceptionType.COMMENTS_LIST_NOT_FOUND });
         }
       }
       throw err;

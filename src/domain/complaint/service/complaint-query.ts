@@ -21,7 +21,7 @@ export const createComplaintQueryService = (compliantRepo: IComplaintQueryRepo) 
           ].includes(err.type)
         ) {
           throw BusinessException({
-            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+            type: BusinessExceptionType.COMPLAINT_NOT_FOUND,
           });
         }
       }
@@ -42,7 +42,7 @@ export const createComplaintQueryService = (compliantRepo: IComplaintQueryRepo) 
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.FOREIGN_KEY_VIOLATION) {
           throw BusinessException({
-            type: BusinessExceptionType.REQ_INFO_INVALID_PLEASE_RETRY,
+            type: BusinessExceptionType.COMPLAINTS_LIST_NOT_FOUND,
           });
         }
       }
