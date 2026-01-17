@@ -25,25 +25,26 @@ export enum BusinessExceptionType {
   DONT_MODIFY_RESOLVED,
   DONT_MODIFY_REJECTED,
   DONT_MODIFY_COMPLAINT,
-  INVALID_CREDENTIALS,
+  INCORRECT_PASSWORD,
+  CORRECT_PASSWORD,
   TOKEN_EXPIRED,
+  INVALID_CREDENTIALS,
 }
 
 export const BusinessExceptionTable: Record<
   BusinessExceptionType,
   { statusCode: number; message?: string }
 > = {
-  // 공통
   [BusinessExceptionType.INVALID_CREDENTIALS]: {
     statusCode: 401,
-    message: '잘못된 인증 정보입니다.',
+    message: '비밀번호가 올바르지 않습니다.',
   },
-
   [BusinessExceptionType.TOKEN_EXPIRED]: {
     statusCode: 401,
     message: '토큰이 만료되었습니다.',
   },
 
+  // 공통
   [BusinessExceptionType.BAD_REQUEST]: {
     statusCode: 400,
     message: '요청이 올바르지 않습니다.',
@@ -69,6 +70,16 @@ export const BusinessExceptionTable: Record<
     statusCode: 422,
     message: '입력값을 확인해 주세요.',
   },
+
+  [BusinessExceptionType.INCORRECT_PASSWORD]: {
+    statusCode: 401,
+    message: '비밀번호가 올바르지 않습니다.',
+  },
+  [BusinessExceptionType.CORRECT_PASSWORD]: {
+    statusCode: 200,
+    message: '비밀번호가 올바릅니다.',
+  },
+
   [BusinessExceptionType.DONT_MODIFY_PENDING]: {
     statusCode: 409,
     message: '처리 전으로 수정하실 수 없습니다.',
