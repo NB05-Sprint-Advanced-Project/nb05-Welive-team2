@@ -55,7 +55,47 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
+  const findByUsername = async (username: string) => {
+    const user = await prisma.user.findUnique({
+      where: { username },
+      include: {
+        UserApartmentLink: {
+          include: { apartment: true },
+        },
+        Address: true,
+      },
+    });
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username || '',
+      password: user.password || '',
+      email: user.email,
+      contact: user.contact,
+      name: user.name,
+      role: user.role,
+      avatar: user.avatarUrl || '',
+      joinStatus: user.joinedStatus,
+      isActive: true as const,
+      adminOf: {
+        id: user.UserApartmentLink[0]?.apartment.id || '',
+        name: user.UserApartmentLink[0]?.apartment.name || '',
+      },
+      resident: {
+        id: user.id,
+        apartmentId: user.UserApartmentLink[0]?.apartment.id || '',
+        building: user.Address?.building || 0,
+        unit: user.Address?.unit || 0,
+        isHouseholder: user.Address?.isHouseholder || false,
+      },
+    };
+  };
+
   return {
     findAllAdmins,
+    findByUsername,
   };
 };

@@ -15,9 +15,11 @@ export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
 
   // 관리자 계정
   router.get('/admins', catchHandler(handlers.getAdministrators));
-  router.patch('/admins/join-status', catchHandler(handlers.approveAllAdmins));
-  router.patch('/admins/:id/join-status', catchHandler(handlers.approveAdmin));
+  router.patch('/admins/join-status', catchHandler(handlers.updateAdminsJoinStatuses));
+  router.patch('/admins/:id/join-status', catchHandler(handlers.updateAdminJoinStatus));
   router.patch('/admins/:adminId', catchHandler(handlers.updateAdmin));
+  router.delete('/admins/:adminId', catchHandler(handlers.deleteAdmin));
+  router.delete('/admins/rejected', catchHandler(handlers.deleteRejectedAdmins));
 
   // 입주민 계정
   router.post('/residents', catchHandler(handlers.signUpResidentAccount));

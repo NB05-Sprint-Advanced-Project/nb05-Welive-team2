@@ -16,14 +16,14 @@ import { Status } from '../entity/base-user';
 
 // 관리자
 // 관리자 계정
-export const viewAdministratorQuerySchema = z.object({
+export const viewAdministratorSchema = z.object({
   page: z.number().default(1),
   limit: z.number().default(10),
   searchKeyword: z.string().default(''),
   joinStatus: JoinedStatusSchema.default(Status.PENDING),
 });
 
-export const createSuperAdminBodySchema = z.object({
+export const createSuperAdminSchema = z.object({
   username: usernameSchema,
   email: emailSchema,
   contact: contactSchema,
@@ -31,7 +31,7 @@ export const createSuperAdminBodySchema = z.object({
   password: passwordSchema,
 });
 
-export const createAdminBodySchema = z.object({
+export const createAdminSchema = z.object({
   username: usernameSchema,
   email: emailSchema,
   contact: contactSchema,
@@ -62,20 +62,25 @@ export const updateAdminSchema = z.object({
   }),
 });
 
-export const updateAdminjoinedStatusesSchema = z.object({
-  joinStatus: updateJoinedStatusSchema,
+export const updateAdminsJoinStatusesSchema = z.object({
+  joinStatus: JoinedStatusSchema,
 });
 
-export const updateAdminjoinedStatusSchema = z.object({
+export const updateAdminJoinStatusSchema = z.object({
   id: userIdSchema,
-  joinStatus: updateJoinedStatusSchema,
+  joinStatus: JoinedStatusSchema,
 });
 
-export type CreateSuperAdminDto = z.infer<typeof createSuperAdminBodySchema>;
-export type CreateAdminDto = z.infer<typeof createAdminBodySchema>;
+export const deleteAdminSchema = z.object({
+  adminId: userIdSchema,
+});
+
+export type CreateSuperAdminDto = z.infer<typeof createSuperAdminSchema>;
+export type CreateAdminDto = z.infer<typeof createAdminSchema>;
 export type UpdateAdminDto = z.infer<typeof updateAdminSchema>;
-export type UpdateAdminjoinedStatusesDto = z.infer<typeof updateAdminjoinedStatusesSchema>;
-export type UpdateAdminjoinedStatusDto = z.infer<typeof updateAdminjoinedStatusSchema>;
+export type UpdateAdminjoinedStatusesDto = z.infer<typeof updateAdminsJoinStatusesSchema>;
+export type UpdateAdminjoinedStatusDto = z.infer<typeof updateAdminJoinStatusSchema>;
+export type DeleteAdminDto = z.infer<typeof deleteAdminSchema>;
 
 // 입주민
 // 입주민 계정

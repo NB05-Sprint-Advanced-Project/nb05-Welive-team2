@@ -22,6 +22,8 @@ import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
 import { TokenUtil } from './shared/utils/token-manager';
 import { createUserController } from './domain/user/controller/user-controller';
+import { createAuthController } from './domain/auth/controller/auth-controller';
+import { createAuthService } from './domain/auth/auth-service';
 import { createCommentController } from './domain/comment/controller/comment-controller';
 import { createCommentCommandRepo } from './domain/comment/repo/comment-command';
 import { createCommentQueryRepo } from './domain/comment/repo/comment-query';
@@ -92,8 +94,10 @@ export const createInjector = () => {
 
   const commentQueryService = createCommentQueryService(commentQueryRepository);
   const commentCommandService = createCommentCommandService(unitOfwork, commentCommandRepository);
+  const authService = createAuthService(userQueryRepository, hashManager, tokenManager);
 
   // Controller
+  const authController = createAuthController(authService);
   const userController = createUserController(middlewares, userCommandService, userQueryService);
   const pollController = createPollController(middlewares, pollQuerService, pollCommandService);
 
@@ -114,6 +118,7 @@ export const createInjector = () => {
   );
 
   const controllers = {
+    authController,
     userController,
     pollController,
     noticeController,

@@ -1,4 +1,3 @@
-import express, { Request, Response } from 'express';
 import { Middlewares } from '../../../shared/interface/i-middlewares';
 import { createBaseController } from '../../../utils/controller-util';
 import { UserCommandService } from '../service/user-command';

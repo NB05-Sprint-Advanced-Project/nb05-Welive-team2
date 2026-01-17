@@ -36,7 +36,27 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     const users = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.ADMIN, Role.SUPERADMIN, Status.PENDING],
+          in: [Role.ADMIN, Role.SUPERADMIN],
+        },
+        joinedStatus: {
+          equals: Status.PENDING,
+        },
+      },
+      include: userInclude,
+    });
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users.map((user) => toAdminAccountEntity(user));
+  };
+
+  const findRejectedAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
+    const users = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [Role.ADMIN, Role.SUPERADMIN, Status.REJECTED],
         },
       },
       include: userInclude,
@@ -331,6 +351,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     findBaseUserById,
     findJoinedUserById,
     findPendingAdminUsers,
+    findRejectedAdminUsers,
     findPendingResidentUsers,
     create,
     update,

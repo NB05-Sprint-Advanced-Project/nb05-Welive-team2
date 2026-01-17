@@ -16,6 +16,8 @@ export interface IUserCommandRepo {
 
   findPendingAdminUsers: () => Promise<AdminAccountProps[] | null>;
 
+  findRejectedAdminUsers: () => Promise<AdminAccountProps[] | null>;
+
   findPendingResidentUsers: () => Promise<ResidentAccountProps[] | null>;
   /**
    *  @ throws UNIQUE_VIOLATION_EMAIL

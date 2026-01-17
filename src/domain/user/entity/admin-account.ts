@@ -7,7 +7,7 @@ export type AdminAccountProps = {
   readonly username: string;
   readonly password: string;
   readonly role: Role.ADMIN | Role.SUPERADMIN;
-  readonly joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
+  readonly joinedStatus: Status;
   readonly refreshToken?: string;
 } & BaseUserProps;
 
@@ -75,10 +75,7 @@ export const AdminAccountEntity = {
     };
   },
 
-  updateJoinedStatus: (
-    user: AdminAccountProps,
-    joinedStatus: Status.APPROVED | Status.REJECTED,
-  ): AdminAccountProps => {
+  updateJoinedStatus: (user: AdminAccountProps, joinedStatus: Status): AdminAccountProps => {
     return {
       ...user,
       joinedStatus: joinedStatus,

@@ -57,7 +57,9 @@ export const updateJoinedStatusSchema = z
   .enum(['APPROVED', 'REJECTED'])
   .transform((v) => (v === 'APPROVED' ? Status.APPROVED : Status.REJECTED));
 
-export const JoinedStatusSchema = z.enum(Status);
+export const JoinedStatusSchema = z.enum(Status, {
+  message: `가입 상태는 ${Object.values(Status).join(', ')} 중 하나여야 합니다.`,
+});
 
 // 인증 payload로 받은 userId, 존재 여부는 인증 미들웨어에서 검증됨
 export const userIdSchema = z.string({ message: '유저 ID는 문자열이어야 합니다.' });

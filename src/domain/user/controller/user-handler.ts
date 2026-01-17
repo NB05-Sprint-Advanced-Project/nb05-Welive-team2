@@ -1,15 +1,16 @@
 import { Middlewares } from '../../../shared/interface/i-middlewares';
 import { validate } from '../../../utils/controller-util';
 import {
-  createSuperAdminBodySchema,
-  createAdminBodySchema,
+  createSuperAdminSchema,
+  createAdminSchema,
   updateAvatarUrlSchema,
   updatePasswordSchema,
-  viewAdministratorQuerySchema,
+  viewAdministratorSchema,
   signUpResidentAccountSchema,
   updateAdminSchema,
-  updateAdminjoinedStatusesSchema,
-  updateAdminjoinedStatusSchema,
+  deleteAdminSchema,
+  updateAdminsJoinStatusesSchema,
+  updateAdminJoinStatusSchema,
 } from '../dto/user-request';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
@@ -20,40 +21,22 @@ export const createUserHandlers = (
   userCommandService: UserCommandService,
   userQueryService: UserQueryService,
 ) => {
-  // controllers
-
   // 슈퍼 관리자
   const createSuperAdmin = async (req: Request, res: Response) => {
-    const dto = validate(createSuperAdminBodySchema, req.body);
+    const dto = validate(createSuperAdminSchema, req.body);
     const superAdmin = await userCommandService.createSuperAdmin(dto);
     return res.status(204).send();
   };
 
   // 관리자
   const createAdmin = async (req: Request, res: Response) => {
-    const dto = validate(createAdminBodySchema, req.body);
+    const dto = validate(createAdminSchema, req.body);
     await userCommandService.createAdmin(dto);
     return res.status(204).send();
   };
 
-  // 공통 controllers
-  const updateAvatarUrl = async (req: Request, res: Response) => {
-    const dto = validate(updateAvatarUrlSchema, req.body);
-    await userCommandService.updateAvatarUrl(dto);
-
-    return res.sendStatus(204);
-  };
-
-  const updatePassword = async (req: Request, res: Response) => {
-    const dto = validate(updatePasswordSchema, req.body);
-    await userCommandService.updatePassword(dto);
-
-    return res.sendStatus(204);
-  };
-
-  // 관리자 계정
   const getAdministrators = async (req: Request, res: Response) => {
-    const dto = validate(viewAdministratorQuerySchema, req.query);
+    const dto = validate(viewAdministratorSchema, req.query);
     const admins = await userQueryService.getAdministrators(dto);
     return res.status(200).json(admins);
   };
@@ -67,19 +50,43 @@ export const createUserHandlers = (
     return res.status(204).send();
   };
 
-  const approveAllAdmins = async (req: Request, res: Response) => {
-    const dto = validate(updateAdminjoinedStatusesSchema, req.body);
+  const updateAdminsJoinStatuses = async (req: Request, res: Response) => {
+    const dto = validate(updateAdminsJoinStatusesSchema, req.body);
     const result = await userCommandService.updateAdminJoinedStatuses(dto);
     return res.status(204).send();
   };
 
-  const approveAdmin = async (req: Request, res: Response) => {
-    const dto = validate(updateAdminjoinedStatusSchema, {
+  const updateAdminJoinStatus = async (req: Request, res: Response) => {
+    const dto = validate(updateAdminJoinStatusSchema, {
       ...req.body,
       ...req.params,
     });
     const result = await userCommandService.updateAdminJoinedStatus(dto);
     return res.status(204).send();
+  };
+
+  const deleteAdmin = async (req: Request, res: Response) => {
+    const dto = validate(deleteAdminSchema, req.params);
+    await userCommandService.deleteAdmin(dto);
+    return res.status(204).send();
+  };
+
+  const deleteRejectedAdmins = async (req: Request, res: Response) => {
+    await userCommandService.deleteRejectedAdmins();
+    return res.status(204).send();
+  };
+
+  // 공통 controllers
+  const updateAvatarUrl = async (req: Request, res: Response) => {
+    const dto = validate(updateAvatarUrlSchema, req.body);
+    await userCommandService.updateAvatarUrl(dto);
+    return res.sendStatus(204);
+  };
+
+  const updatePassword = async (req: Request, res: Response) => {
+    const dto = validate(updatePasswordSchema, req.body);
+    await userCommandService.updatePassword(dto);
+    return res.sendStatus(204);
   };
 
   // 입주민 계정
@@ -102,8 +109,10 @@ export const createUserHandlers = (
     updatePassword,
     getAdministrators,
     updateAdmin,
-    approveAllAdmins,
-    approveAdmin,
+    updateAdminsJoinStatuses,
+    updateAdminJoinStatus,
+    deleteAdmin,
+    deleteRejectedAdmins,
     signUpResidentAccount,
     getResidentAccounts,
   };

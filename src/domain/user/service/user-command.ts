@@ -1,6 +1,7 @@
 import {
   CreateAdminDto,
   CreateSuperAdminDto,
+  DeleteAdminDto,
   SignUpResidentAccountReqDto,
   UpdateAdminDto,
   UpdateAdminjoinedStatusDto,
@@ -144,7 +145,6 @@ export const createUserCommandService = (
 
     try {
       await apartmentRepo.update(updatedApartmentEntity);
-
       await userCommandRepo.update(updatedUserEntity);
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -175,19 +175,17 @@ export const createUserCommandService = (
 
   const updateAdminJoinedStatuses = async (dto: UpdateAdminjoinedStatusesDto): Promise<void> => {
     try {
-      uow.doWork(async () => {
-        const users = await userCommandRepo.findPendingAdminUsers();
+      const users = await userCommandRepo.findPendingAdminUsers();
 
-        if (!users) {
-          throw BusinessException({
-            type: BusinessExceptionType.USER_NOT_FOUND,
-          });
-        }
+      if (!users) {
+        throw BusinessException({
+          type: BusinessExceptionType.USER_NOT_FOUND,
+        });
+      }
 
-        await userCommandRepo.updateJoinedStatuses(
-          users.map((user) => AdminAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
-        );
-      });
+      await userCommandRepo.updateJoinedStatuses(
+        users.map((user) => AdminAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
+      );
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
         throw BusinessException({
@@ -213,6 +211,24 @@ export const createUserCommandService = (
     );
   };
 
+  const deleteAdmin = async (dto: DeleteAdminDto): Promise<void> => {
+    const user = await userCommandRepo.findAdminUserById(dto.adminId);
+    if (!user) {
+      throw BusinessException({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+    }
+    await userCommandRepo.deleteUser(user.id);
+  };
+
+  const deleteRejectedAdmins = async (): Promise<void> => {
+    const users = await userCommandRepo.findRejectedAdminUsers();
+    if (!users) {
+      return;
+    }
+
+    await userCommandRepo.deleteUsers(users);
+  };
   // 입주민 계정
   const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {};
 
@@ -297,6 +313,8 @@ export const createUserCommandService = (
     updateAdmin,
     updateAdminJoinedStatuses,
     updateAdminJoinedStatus,
+    deleteAdmin,
+    deleteRejectedAdmins,
     createResidentAccount,
     updateAvatarUrl,
     updatePassword,
