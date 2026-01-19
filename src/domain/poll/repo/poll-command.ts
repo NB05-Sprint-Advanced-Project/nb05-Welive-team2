@@ -1,20 +1,18 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PollProps } from '../entity/poll';
 import { IPollCommandRepo } from '../interface/i-poll-command-repo';
 import { asyncContextStorage } from '../../../utils/async-context-storage-util';
-import { BasePrismaClient } from '../../../shared/base-command-repo';
+import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
 
-export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollCommandRepo => {
-  const getPrisma = () => asyncContextStorage.get() ?? prismaClient;
+export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandRepo => {
+  const { prisma } = BaseRepo(prismaClient);
 
   const findById = async (
     pollId: string,
     pessimisticLock?: 'share' | 'exclusive',
   ): Promise<PollProps | null> => {
-    const prisma = getPrisma();
-
     if (!pessimisticLock) {
-      const poll = await prisma.polls.findUnique({
+      const poll = await prisma().polls.findUnique({
         where: { id: pollId },
         include: {
           options: {
@@ -45,7 +43,7 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
     } else {
       const lockSql = pessimisticLock === 'share' ? Prisma.sql`FOR SHARE` : Prisma.sql`FOR UPDATE`;
 
-      const polls = await prisma.$queryRaw<any[]>(Prisma.sql`
+      const polls = await prisma().$queryRaw<any[]>(Prisma.sql`
         SELECT
           p.*,
           o.id as option_id,
@@ -76,10 +74,8 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
   };
 
   const create = async (props: PollProps): Promise<PollProps> => {
-    const prisma = getPrisma();
-
     const { options, ...data } = props;
-    const poll = await prisma.polls.create({
+    const poll = await prisma().polls.create({
       data: {
         ...data,
         options: {
@@ -114,11 +110,9 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
   };
 
   const update = async (props: PollProps): Promise<void> => {
-    const prisma = getPrisma();
-
     const { options, ...data } = props;
     try {
-      await prisma.polls.update({
+      await prisma().polls.update({
         where: { id: props.id, version: props.version },
         data: {
           ...data,
@@ -138,9 +132,7 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
   };
 
   const deletePoll = async (pollId: string): Promise<void> => {
-    const prisma = getPrisma();
-
-    await prisma.polls.delete({
+    await prisma().polls.delete({
       where: { id: pollId },
     });
     return;

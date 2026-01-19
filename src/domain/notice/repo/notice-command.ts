@@ -1,19 +1,18 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
-import { BasePrismaClient } from '../../../shared/base-command-repo';
+import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
 import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 import { NoticeProps } from '../entity/notice';
 
-export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INoticeCommandRepo => {
-  const getPrisma = () => asyncContextStorage.get() ?? prismaClient;
+export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeCommandRepo => {
+  const { prisma } = BaseRepo(prismaClient);
 
   const findById = async (
     noticeId: string,
     pessimisticLock?: 'share' | 'exclusive',
   ): Promise<NoticeProps | null> => {
-    const prisma = getPrisma();
     if (!pessimisticLock) {
-      const notice = await prisma.notices.findUnique({
+      const notice = await prisma().notices.findUnique({
         where: { id: noticeId },
         include: {
           event: true,
@@ -38,7 +37,7 @@ export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INotice
     } else {
       const lockSql = pessimisticLock === 'share' ? Prisma.sql`FOR SHARE` : Prisma.sql`FOR UPDATE`;
 
-      const notices = await prisma.$queryRaw<any[]>(Prisma.sql`
+      const notices = await prisma().$queryRaw<any[]>(Prisma.sql`
     SELECT
       n.*, 
       e.id            AS event_id,
@@ -67,10 +66,8 @@ export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INotice
   };
 
   const create = async (props: NoticeProps): Promise<NoticeProps> => {
-    const prisma = getPrisma();
-
     const { comments, event, ...data } = props;
-    const notice = await prisma.notices.create({
+    const notice = await prisma().notices.create({
       data: {
         ...data,
         event: event
@@ -98,11 +95,9 @@ export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INotice
   };
 
   const update = async (props: NoticeProps): Promise<void> => {
-    const prisma = getPrisma();
-
     const { comments, event, ...data } = props;
     try {
-      await prisma.notices.update({
+      await prisma().notices.update({
         where: { id: data.id, version: props.version },
         data: {
           ...data,
@@ -128,9 +123,7 @@ export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INotice
   };
 
   const deleteNotice = async (noticeId: string): Promise<void> => {
-    const prisma = getPrisma();
-
-    await prisma.notices.delete({
+    await prisma().notices.delete({
       where: { id: noticeId },
     });
     return;
