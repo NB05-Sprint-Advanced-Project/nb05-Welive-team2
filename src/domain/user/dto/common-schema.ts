@@ -49,9 +49,19 @@ export const buildingSchema = z
   .number({ message: '동(아파트 동)은 숫자이어야 합니다.' })
   .min(1, { message: '동(아파트 동)은 필수 항목입니다.' });
 
+export const buildingFilterSchema = z.coerce
+  .number({ message: '동(아파트 동)은 숫자이어야 합니다.' })
+  .min(1, { message: '동은 1 이상이어야 합니다.' })
+  .optional();
+
 export const unitSchema = z
   .number({ message: '호(아파트 호수)은 숫자이어야 합니다.' })
   .min(1, { message: '호(아파트 호수)은 필수 항목입니다.' });
+
+export const unitFilterSchema = z.coerce
+  .number({ message: '호(아파트 호수)은 숫자이어야 합니다.' })
+  .min(1, { message: '호(아파트 호수)은 1 이상이어야 합니다.' })
+  .optional();
 
 export const updateJoinedStatusSchema = z
   .enum(['APPROVED', 'REJECTED'])
@@ -61,6 +71,12 @@ export const joinedStatusSchema = z.enum([Status.APPROVED, Status.PENDING, Statu
   message: `가입 상태는 ${Object.values(Status).join(', ')} 중 하나여야 합니다.`,
 });
 
+export const joinedStatusFilterSchema = z
+  .enum([Status.APPROVED, Status.PENDING, Status.REJECTED], {
+    message: `가입 상태는 APPROVED, PENDING, REJECTED 중 하나여야 합니다.`,
+  })
+  .optional();
+
 // 인증 payload로 받은 userId, 존재 여부는 인증 미들웨어에서 검증됨
 export const userIdSchema = z.string({ message: '유저 ID는 문자열이어야 합니다.' });
 
@@ -68,6 +84,6 @@ export const pageSchema = z.coerce.number().min(1).default(1);
 
 export const limitSchema = z.coerce.number().min(1).max(20).default(20);
 
-export const residentSearchKeyword = z.enum(['name', 'contract', 'email']);
+export const residentSearchKeyword = z.enum(['name', 'contract', 'email']).optional();
 
-export const residentAccountSearchKeyword = z.enum(['name', 'email']);
+export const residentAccountSearchKeyword = z.enum(['name', 'email']).optional();

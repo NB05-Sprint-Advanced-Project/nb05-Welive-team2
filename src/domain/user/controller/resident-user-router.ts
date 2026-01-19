@@ -12,6 +12,4 @@ export const registerResidentUserRoutes = (router: Router, handlers: ResidentUse
   router.get('/file/template');
   router.post('/file/import');
   router.get('/file/export');
-
-  return { path, router };
 };

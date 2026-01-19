@@ -38,7 +38,7 @@ import {
   CreateResidentReqDto,
   UpdateResidentReqDto,
   DeleteResidentReqDto,
-} from '../dto/resident-response';
+} from '../dto/resident-user-response';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -269,7 +269,7 @@ export const createUserCommandService = (
   // 입주민 계정
   const createResidentAccount = async (dto: SignUpResidentAccountReqDto) => {
     try {
-      uow.doWork(async () => {
+      await uow.doWork(async () => {
         const resident = await userCommandRepo.findNotJoinedResidentByEmail(dto.email);
 
         if (!resident) {
@@ -284,20 +284,30 @@ export const createUserCommandService = (
         }
       });
     } catch (err) {
-      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
-        throw BusinessException({
-          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
-        });
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+          throw BusinessException({
+            type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+          });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME) {
+          throw BusinessException({ type: BusinessExceptionType.USERNAME_ALREADY_IN_USE });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+        }
       }
-
       throw err;
     }
   };
 
   const updateResidentAccountJoinStatus = async (dto: UpdateResidentAccountJoinedStatusReqDto) => {
     try {
-      uow.doWork(async () => {
-        const user = await userCommandRepo.findResidentAccountUserById(dto.userId);
+      await uow.doWork(async () => {
+        const user = await userCommandRepo.findResidentAccountUserById(dto.id);
 
         if (!user) {
           throw BusinessException({
@@ -324,7 +334,7 @@ export const createUserCommandService = (
     dto: UpdateResidentAccountJoinedStatusesReqDto,
   ) => {
     try {
-      uow.doWork(async () => {
+      await uow.doWork(async () => {
         const users = await userCommandRepo.findPendingResidentUsers();
 
         if (!users) {
@@ -354,12 +364,24 @@ export const createUserCommandService = (
 
   // 입주민(가입한 입주민 + 미가입한 입주민)
   const createResident = async (dto: CreateResidentReqDto): Promise<void> => {
-    await userCommandRepo.create(toResidentEntityFromDto(dto));
+    try {
+      await userCommandRepo.create(toResidentEntityFromDto(dto));
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+        }
+      }
+      throw err;
+    }
   };
 
   const updateResident = async (dto: UpdateResidentReqDto): Promise<void> => {
     try {
-      uow.doWork(async () => {
+      await uow.doWork(async () => {
         const user = await userCommandRepo.findResidentById(dto.id);
 
         if (!user) {
@@ -375,12 +397,19 @@ export const createUserCommandService = (
         }
       });
     } catch (err) {
-      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
-        throw BusinessException({
-          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
-        });
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+          throw BusinessException({
+            type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+          });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
+          throw BusinessException({ type: BusinessExceptionType.EMAIL_ALREADY_IN_USE });
+        }
+        if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT) {
+          throw BusinessException({ type: BusinessExceptionType.CONTACT_ALREADY_IN_USE });
+        }
       }
-
       throw err;
     }
   };
@@ -416,7 +445,7 @@ export const createUserCommandService = (
 
   const updatePassword = async (dto: UpdatePasswordReqDto): Promise<void> => {
     try {
-      uow.doWork(async () => {
+      await uow.doWork(async () => {
         const user = await userCommandRepo.findJoinedUserById(dto.userId);
 
         if (!user) {

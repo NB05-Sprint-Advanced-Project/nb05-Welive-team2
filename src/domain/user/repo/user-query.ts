@@ -3,7 +3,7 @@ import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { Role, Status } from '../entity/base-user';
 import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
 import { userInclude } from '../user-mapper';
-import { GetResidentsReqDto } from '../dto/resident-response';
+import { GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
@@ -169,8 +169,12 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
 
     const where = {
       joinedStatus,
-      ...(dto.building !== undefined && { building: dto.building }),
-      ...(dto.unit !== undefined && { unit: dto.unit }),
+      Address: {
+        is: {
+          ...(dto.building !== undefined && { building: dto.building }),
+          ...(dto.unit !== undefined && { unit: dto.unit }),
+        },
+      },
       ...(dto.isHouseholder !== undefined && { isHouseholder: dto.isHouseholder }),
       ...(dto.searchKeyword && {
         OR: [
@@ -226,8 +230,12 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
 
     const where = {
       joinedStatus,
-      ...(dto.building !== undefined && { building: dto.building }),
-      ...(dto.unit !== undefined && { unit: dto.unit }),
+      Address: {
+        is: {
+          ...(dto.building !== undefined && { building: dto.building }),
+          ...(dto.unit !== undefined && { unit: dto.unit }),
+        },
+      },
       ...(dto.searchKeyword && {
         OR: [{ name: { contains: dto.searchKeyword } }, { email: { contains: dto.searchKeyword } }],
       }),
@@ -267,6 +275,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       hasNext: dto.page * dto.limit < totalCount,
     };
   };
+
   return {
     findAllAdmins,
     findByUsername,

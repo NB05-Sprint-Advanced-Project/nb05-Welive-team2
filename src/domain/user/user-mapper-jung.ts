@@ -6,7 +6,7 @@ import { ResidentAccountEntity, ResidentAccountProps } from './entity/resident-a
 import { NotJoinedResidentEntity, NotJoinedResidentProps } from './entity/not-joined-resident';
 import { SignUpResidentAccountReqDto } from './dto/user-request';
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
-import { CreateResidentReqDto, UpdateResidentReqDto } from './dto/resident-response';
+import { CreateResidentReqDto, UpdateResidentReqDto } from './dto/resident-user-response';
 import { ResidentAddressVO } from './entity/vo/resident-address';
 
 export const userInclude = Prisma.validator<Prisma.UserInclude>()({

@@ -1,12 +1,12 @@
 import { Middlewares } from '../../shared/interface/i-middlewares';
 import { catchHandler, validate } from '../../utils/controller-util';
 import {
-  createResidentSchema,
+  createResidentUserSchema,
   deleteResidentSchema,
   getResidentSchema,
   getResidentsSchema,
   updateResidentSchema,
-} from './dto/resident-response';
+} from './dto/resident-user-response';
 import { UserCommandService } from './service/user-command';
 import { UserQueryService } from './service/user-query';
 import express, { Request, Response } from 'express';
@@ -22,7 +22,7 @@ export const createResidentController = (
   const createResident = async (req: Request, res: Response) => {
     const userId = '';
 
-    const reqDto = validate(createResidentSchema, {
+    const reqDto = validate(createResidentUserSchema, {
       ...req.body,
       //userId: req.userId -> 인증된 유저 페이로드
     });

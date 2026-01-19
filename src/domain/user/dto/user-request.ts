@@ -15,6 +15,9 @@ import {
   limitSchema,
   residentSearchKeyword,
   residentAccountSearchKeyword,
+  joinedStatusFilterSchema,
+  buildingFilterSchema,
+  unitFilterSchema,
 } from './common-schema';
 
 // 관리자
@@ -87,7 +90,7 @@ export type DeleteAdminDto = z.infer<typeof deleteAdminSchema>;
 
 // 입주민 계정
 export const signUpResidentAccountSchema = z.object({
-  username: emailSchema,
+  username: usernameSchema,
   password: passwordSchema,
   name: nameSchema,
   email: emailSchema,
@@ -101,22 +104,13 @@ export const signUpResidentAccountSchema = z.object({
 
 // 단건
 export const updateResidentAccountJoinedStatusSchema = z.object({
-  userId: userIdSchema,
+  id: userIdSchema,
   joinStatus: updateJoinedStatusSchema,
 });
 
 // 다건
 export const updateResidentAccountJoinedStatusesSchema = z.object({
   joinStatus: updateJoinedStatusSchema,
-});
-
-export const updateResidentAccountAvatarUrlSchema = z.object({
-  avatarUrl: avatarUrlSchema,
-});
-
-export const updateResidentAccountPasswordSchema = z.object({
-  password: passwordSchema,
-  newpassword: passwordSchema,
 });
 
 const deleteResidentAccountSchema = z.object({
@@ -128,9 +122,9 @@ export const getResidentAccountsSchema = z.object({
   page: pageSchema,
   limit: limitSchema,
   searchKeyword: residentAccountSearchKeyword,
-  joinStatus: joinedStatusSchema,
-  building: buildingSchema,
-  unit: unitSchema,
+  joinStatus: joinedStatusFilterSchema,
+  building: buildingFilterSchema,
+  unit: unitFilterSchema,
 });
 
 export type SignUpResidentAccountReqDto = z.infer<typeof signUpResidentAccountSchema>;
@@ -140,12 +134,6 @@ export type UpdateResidentAccountJoinedStatusReqDto = z.infer<
 export type UpdateResidentAccountJoinedStatusesReqDto = z.infer<
   typeof updateResidentAccountJoinedStatusesSchema
 >;
-// export type UpdateResidentAccountAvatarUrlReqDto = z.infer<
-//   typeof updateResidentAccountAvatarUrlSchema
-// >;
-// export type UpdateResidentAccountPasswordReqDto = z.infer<
-//   typeof updateResidentAccountPasswordSchema
-// >;
 export type DeleteResidentAccountReqDto = z.infer<typeof deleteResidentAccountSchema>;
 export type GetResidentAccountsReqDto = z.infer<typeof getResidentAccountsSchema>;
 

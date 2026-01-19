@@ -2,7 +2,7 @@ import { Status } from '../entity/base-user';
 import { AdministratorView } from '../dto/view/administrator';
 import { UserView } from '../dto/view/user-view';
 import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
-import { GetResidentsReqDto } from '../dto/resident-response';
+import { GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 
 export interface IUserQueryRepo {

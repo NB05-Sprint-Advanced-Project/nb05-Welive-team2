@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { ResidentAccountEntity, ResidentAccountProps } from './entity/resident-account';
 import { NotJoinedResidentEntity, NotJoinedResidentProps } from './entity/not-joined-resident';
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
-import { UpdateResidentReqDto, CreateResidentReqDto } from './dto/resident-response';
+import { UpdateResidentReqDto, CreateResidentReqDto } from './dto/resident-user-response';
 import { SignUpResidentAccountReqDto } from './dto/user-request';
 import { ResidentAddressVO } from './entity/vo/resident-address';
 

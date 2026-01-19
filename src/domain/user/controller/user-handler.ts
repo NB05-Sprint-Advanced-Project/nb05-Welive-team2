@@ -101,7 +101,7 @@ export const createUserHandlers = (
   };
 
   const getResidentAccounts = async (req: Request, res: Response) => {
-    const reqDto = validate(getResidentAccountsSchema, req.body);
+    const reqDto = validate(getResidentAccountsSchema, req.query);
 
     return res.json(await userQueryService.getResidentAccounts(reqDto));
   };
@@ -116,7 +116,10 @@ export const createUserHandlers = (
 
   // 단건
   const updateResidentAccountJoinStatus = async (req: Request, res: Response) => {
-    const reqDto = validate(updateResidentAccountJoinedStatusSchema, req.body);
+    const reqDto = validate(updateResidentAccountJoinedStatusSchema, {
+      ...req.body,
+      ...req.params,
+    });
     await userCommandService.updateResidentAccountJoinStatus(reqDto);
 
     return res.sendStatus(204);

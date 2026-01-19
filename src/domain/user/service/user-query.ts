@@ -1,6 +1,6 @@
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
-import { GetResidentReqDto, GetResidentsReqDto } from '../dto/resident-response';
+import { GetResidentReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
 import { Status } from '../entity/base-user';

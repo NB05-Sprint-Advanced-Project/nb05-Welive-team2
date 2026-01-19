@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  buildingFilterSchema,
   buildingSchema,
   contactSchema,
   emailSchema,
@@ -8,11 +9,12 @@ import {
   nameSchema,
   pageSchema,
   residentSearchKeyword,
+  unitFilterSchema,
   unitSchema,
   userIdSchema,
 } from './common-schema';
 
-export const createResidentSchema = z.object({
+export const createResidentUserSchema = z.object({
   userId: userIdSchema,
   apartmentId: z.string(),
   email: emailSchema,
@@ -43,10 +45,10 @@ export const getResidentsSchema = z.object({
   page: pageSchema,
   limit: limitSchema,
   searchKeyword: residentSearchKeyword,
-  building: buildingSchema,
-  unit: unitSchema,
-  isHouseholder: z.boolean(),
-  isRegistered: z.boolean(),
+  building: buildingFilterSchema,
+  unit: unitFilterSchema,
+  isHouseholder: z.boolean().optional(),
+  isRegistered: z.boolean().optional(),
 });
 
 export const getResidentSchema = z.object({
@@ -54,7 +56,7 @@ export const getResidentSchema = z.object({
   id: userIdSchema,
 });
 
-export type CreateResidentReqDto = z.infer<typeof createResidentSchema>;
+export type CreateResidentReqDto = z.infer<typeof createResidentUserSchema>;
 export type UpdateResidentReqDto = z.infer<typeof updateResidentSchema>;
 export type DeleteResidentReqDto = z.infer<typeof deleteResidentSchema>;
 export type GetResidentsReqDto = z.infer<typeof getResidentsSchema>;
