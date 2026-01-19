@@ -18,7 +18,7 @@ export const createPollHandler = (
   pollCommandService: PollCommandService,
 ) => {
   const getPoll = async (req: Request, res: Response) => {
-    const userId = 'test'; // 임시로 추가
+    const userId = req.userId as string;
     const params = validate(getPollReqParamsSchema, req.params);
     const poll = await pollQueryService.getPoll(params.pollId, userId);
     return res.json(poll);
@@ -31,8 +31,9 @@ export const createPollHandler = (
   };
 
   const createPoll = async (req: Request, res: Response) => {
+    const userId = req.userId as string;
     const body = validate(createPollReqBodySchema, req.body);
-    const poll = await pollCommandService.createPoll({ ...body });
+    const poll = await pollCommandService.createPoll({ ...body }, userId);
     return res.json(poll);
   };
 
@@ -51,14 +52,16 @@ export const createPollHandler = (
 
   const vote = async (req: Request, res: Response) => {
     const params = validate(voteReqParamsSchema, req.params);
-    const userId = 'test'; // temp
+    const userId = req.userId as string;
+
     await pollCommandService.vote({ ...params, userId });
     return res.json();
   };
 
   const cancle = async (req: Request, res: Response) => {
     const params = validate(voteReqParamsSchema, req.params);
-    const userId = 'temp'; // temp
+    const userId = req.userId as string;
+
     await pollCommandService.cancle({ ...params, userId });
   };
 

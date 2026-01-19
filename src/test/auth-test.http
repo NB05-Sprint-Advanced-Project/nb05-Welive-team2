@@ -1,0 +1,13 @@
+### 1. 로그인
+POST http://localhost:4000/api/v2/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin1",
+  "password": "test1234!"
+}
+
+### 2. 로그아웃
+POST http://localhost:4000/api/v2/auth/logout
+Content-Type: application/json
+

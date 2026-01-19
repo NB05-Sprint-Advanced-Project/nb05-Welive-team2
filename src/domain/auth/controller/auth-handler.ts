@@ -13,16 +13,16 @@ export const createAuthHandlers = (authService: AuthService) => {
     // cookies 설정
     res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax',
       maxAge: 15 * 60 * 1000, // 15분
       path: '/',
     });
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       path: '/',
     });

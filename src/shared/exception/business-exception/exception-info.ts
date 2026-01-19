@@ -1,5 +1,7 @@
 export enum BusinessExceptionType {
   APARTMENT_NOT_FOUND,
+  POLL_NOT_FOUND,
+  NOTICE_NOT_FOUND,
   EMAIL_ALREADY_IN_USE,
   USERNAME_ALREADY_IN_USE,
   CONTACT_ALREADY_IN_USE,
@@ -21,6 +23,8 @@ export enum BusinessExceptionType {
   REQ_INFO_INVALID,
   COMMENTS_LIST_NOT_FOUND,
   FAIL_SAVE_COMMENT,
+  FAIL_SAVE_POLL,
+  FAIL_SAVE_NOTICE,
   DONT_MODIFY_PENDING,
   DONT_MODIFY_RESOLVED,
   DONT_MODIFY_REJECTED,
@@ -128,6 +132,14 @@ export const BusinessExceptionTable: Record<
     statusCode: 404,
     message: '아파트를 찾을 수 없습니다.',
   },
+  [BusinessExceptionType.POLL_NOT_FOUND]: {
+    statusCode: 404,
+    message: '투표글을 찾을 수 없습니다.',
+  },
+  [BusinessExceptionType.NOTICE_NOT_FOUND]: {
+    statusCode: 404,
+    message: '공지를 찾을 수 없습니다.',
+  },
 
   // 권한 오류
   [BusinessExceptionType.UNAUTHORIZED]: {
@@ -177,5 +189,13 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS]: {
     statusCode: 409,
     message: '승인, 거절 상태에서는 다른 상태로 변경할 수 없습니다.',
+  },
+  [BusinessExceptionType.FAIL_SAVE_POLL]: {
+    statusCode: 409,
+    message: '투표를 저장하지 못했습니다.',
+  },
+  [BusinessExceptionType.FAIL_SAVE_NOTICE]: {
+    statusCode: 409,
+    message: '공지를 저장하지 못했습니다.',
   },
 };

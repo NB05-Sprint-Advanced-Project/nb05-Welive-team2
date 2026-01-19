@@ -4,43 +4,70 @@ import { IPollCommandRepo } from '../interface/i-poll-command-repo';
 import { IUserVoteOptionCommandRepo } from '../../user-vote-option/i-user-vote-option-command-repo';
 import { PollEntity, PollProps } from '../entity/poll';
 import { UserVoteOptionEntity } from '../../user-vote-option/user-vote-option-entity';
+import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
+import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createPollCommandService = (
   uow: IUnitOfWork,
   pollCommandRepo: IPollCommandRepo,
   userVoteOptionCommandRepo: IUserVoteOptionCommandRepo,
 ) => {
-  const createPoll = async (dto: CreatePollDto): Promise<PollProps> => {
-    return await uow.doWork(
-      async () => {
-        return await pollCommandRepo.create(
-          PollEntity.create({
-            ...dto,
-          }),
-        );
-      },
-      {
-        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
-        useOptimisticLock: false,
-      },
-    );
+  const createPoll = async (dto: CreatePollDto, userId: string): Promise<PollProps> => {
+    try {
+      return await uow.doWork(
+        async () => {
+          return await pollCommandRepo.create(
+            PollEntity.create({
+              ...dto,
+            }),
+            userId,
+          );
+        },
+        {
+          transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+          useOptimisticLock: false,
+        },
+      );
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.FOREIGN_KEY_VIOLATION) {
+          throw BusinessException({
+            type: BusinessExceptionType.FAIL_SAVE_POLL,
+          });
+        }
+      }
+      throw err;
+    }
   };
 
   const updatePoll = async (dto: UpdatePollDto): Promise<void> => {
-    return await uow.doWork(
-      async () => {
-        const { pollId, ...data } = dto;
-        const foundPoll = await pollCommandRepo.findById(pollId, 'exclusive');
-        if (!foundPoll) {
-          throw new Error();
-        }
-        await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
-      },
-      {
-        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
-        useOptimisticLock: true,
-      },
-    );
+    try {
+      return await uow.doWork(
+        async () => {
+          const { pollId, ...data } = dto;
+          const foundPoll = await pollCommandRepo.findById(pollId, 'exclusive');
+          if (!foundPoll) {
+            throw BusinessException({
+              type: BusinessExceptionType.POLL_NOT_FOUND,
+            });
+          }
+          await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
+        },
+        {
+          transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+          useOptimisticLock: true,
+        },
+      );
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        throw BusinessException({
+          type: BusinessExceptionType.FAIL_SAVE_POLL,
+        });
+      }
+      throw err;
+    }
   };
 
   const deletePoll = async (dto: DeletePollDto): Promise<void> => {

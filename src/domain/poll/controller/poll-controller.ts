@@ -14,7 +14,7 @@ export const createPollController = (
 
   const handler = createPollHandler(middlewares, pollQueryService, pollCommandService);
 
-  registerPollRoutes(router, handler);
+  registerPollRoutes(router, handler, middlewares);
 
   return { path, router };
 };

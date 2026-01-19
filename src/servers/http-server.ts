@@ -17,7 +17,6 @@ export const createHttpServer = (middlewares: Middlewares, controllers: Controll
       credentials: true,
     }),
   );
-
   app.use(cookieParser());
   app.use(express.json());
 

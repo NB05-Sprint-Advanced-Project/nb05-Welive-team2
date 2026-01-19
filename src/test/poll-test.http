@@ -1,0 +1,30 @@
+### 1. 투표 생성 (createPoll)
+POST http://localhost:4000/api/v2/polls
+Content-Type: application/json
+
+{
+  "title": "오늘은 쉬는날~",
+  "content": "점심 뭐먹지",
+  "startDate": "2026-01-11T00:00:00Z",
+  "endDate": "2026-01-12T00:00:00Z",
+  "apartmentId": "d22952ee-f44f-4d2d-84c6-f8b00c9e3d1a",
+  "building": 1,
+  "options": [
+    { "title": "김치찌개" },
+    { "title": "돈가스" },
+    { "title": "마라탕" }
+  ]
+}
+
+### 2. 투표 전체 조회 (getAllPolls)
+GET http://localhost:4000/api/v2/polls?page=1&limit=20&searchKeyword=제목&status=IN_PROGRESS&building=101
+Content-Type: application/json
+
+### 2. 투표 상세 조회 (getPoll)
+GET http//localhost:4000/polls/{{pollId}}
+Content-Type: application/json
+
+
+### 4. 투표 수정 (updatePoll)
+PATCH {{baseUrl}}/polls/{{pollId}}
+Content-Type: application/json

@@ -1,19 +1,26 @@
 import { Router } from 'express';
 import { PollHandler } from './poll-handler';
 import { catchHandler } from '../../../utils/controller-util';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
 
-export const registerPollRoutes = (router: Router, handler: PollHandler) => {
-  router.get('/:pollId', catchHandler(handler.getPoll));
+export const registerPollRoutes = (
+  router: Router,
+  handler: PollHandler,
+  middlewares: Middlewares,
+) => {
+  const auth = middlewares.auth;
 
-  router.get('/', catchHandler(handler.getAllPolls));
+  router.get('/:pollId', auth, catchHandler(handler.getPoll));
 
-  router.post('/', catchHandler(handler.createPoll));
+  router.get('/', auth, catchHandler(handler.getAllPolls));
 
-  router.patch('/:pollId', catchHandler(handler.updatePoll));
+  router.post('/', auth, catchHandler(handler.createPoll));
 
-  router.delete('/:pollId', catchHandler(handler.deletePoll));
+  router.patch('/:pollId', auth, catchHandler(handler.updatePoll));
 
-  router.post('/:pollId/options/:optionId/vote', catchHandler(handler.vote));
+  router.delete('/:pollId', auth, catchHandler(handler.deletePoll));
 
-  router.delete('/:pollId/options/:optionId/vote', catchHandler(handler.vote));
+  router.post('/:pollId/options/:optionId/vote', auth, catchHandler(handler.vote));
+
+  router.delete('/:pollId/options/:optionId/vote', auth, catchHandler(handler.vote));
 };

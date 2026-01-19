@@ -1,7 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
-import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
-import { asyncContextStorage } from '../../../utils/async-context-storage-util';
+import { BaseRepo } from '../../../shared/base-command-repo';
 import { NoticeProps } from '../entity/notice';
 
 export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeCommandRepo => {

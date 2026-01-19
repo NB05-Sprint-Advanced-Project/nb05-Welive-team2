@@ -35,9 +35,11 @@ export const TokenUtil = (): ITokenUtil => {
       expiresIn: getEnv().REFRESH_TOKEN_EXPIRES_IN,
     });
   };
+
   const generateCsrfValue = () => {
     return crypto.randomBytes(16).toString('hex');
   };
+
   const verifyToken = (props: { token: string; ignoreExpiration?: boolean }) => {
     try {
       const { token, ignoreExpiration } = props;

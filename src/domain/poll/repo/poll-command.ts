@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { PollProps } from '../entity/poll';
 import { IPollCommandRepo } from '../interface/i-poll-command-repo';
-import { asyncContextStorage } from '../../../utils/async-context-storage-util';
-import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
+import { BaseRepo } from '../../../shared/base-command-repo';
+import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
+import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 
 export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
@@ -73,40 +74,62 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
     }
   };
 
-  const create = async (props: PollProps): Promise<PollProps> => {
-    const { options, ...data } = props;
-    const poll = await prisma().polls.create({
-      data: {
-        ...data,
-        options: {
-          create: options.map((opt) => {
-            return { id: opt.id, title: opt.title };
-          }),
+  const create = async (props: PollProps, userId: string): Promise<PollProps> => {
+    try {
+      const { options, ...data } = props;
+      const poll = await prisma().polls.create({
+        data: {
+          ...data,
+          userId,
+          options: {
+            create: options.map((opt) => {
+              return { id: opt.id, title: opt.title };
+            }),
+          },
         },
-      },
-      include: {
-        options: {
-          include: {
-            UserVoteOptions: {
-              select: {
-                userId: true,
+        include: {
+          options: {
+            include: {
+              UserVoteOptions: {
+                select: {
+                  userId: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    return {
-      ...poll,
-      options: poll.options.map((opt) => {
-        return {
-          id: opt.id,
-          title: opt.title,
-          count: 0,
-        };
-      }),
-    };
+      return {
+        ...poll,
+        options: poll.options.map((opt) => {
+          return {
+            id: opt.id,
+            title: opt.title,
+            count: 0,
+          };
+        }),
+      };
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          const fieldName = (err.meta as any)?.field_name;
+          const targetConstraints = [
+            'Comment_userId_fkey',
+            'Comment_noticeId_fkey',
+            'Comment_complaintId_fkey',
+          ];
+
+          if (targetConstraints.some((c) => fieldName.include(c))) {
+            throw TechnicalException({
+              type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
+              meta: err.meta,
+            });
+          }
+        }
+      }
+      throw err;
+    }
   };
 
   const update = async (props: PollProps): Promise<void> => {
@@ -127,6 +150,14 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
       });
       return;
     } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw TechnicalException({
+            type: TechnicalExceptionType.RECORD_NOT_FOUND,
+            meta: err.meta,
+          });
+        }
+      }
       throw err;
     }
   };
