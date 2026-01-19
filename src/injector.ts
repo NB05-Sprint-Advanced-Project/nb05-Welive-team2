@@ -14,7 +14,6 @@ import { createPollCommandService } from './domain/poll/service/poll-command';
 import { createUserVoteOptionCommandRepo } from './domain/user-vote-option/user-vote-option-command-repo';
 import { createNoticeQueryService } from './domain/notice/service/notice-query';
 import { createNoticeCommandService } from './domain/notice/service/notice-command';
-import { createPollController } from './domain/poll/poll-controller';
 import { createGlobalErrorMiddleware } from './middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
@@ -37,6 +36,7 @@ import { createApartmentQueryService } from './domain/apartment/service/apartmen
 import { createApartmentCommandRepo } from './domain/apartment/repo/apartment-command';
 import { createApartmentController } from './domain/apartment/controller/apartment-controller';
 import { createNoticeController } from './domain/notice/controller/notice-controller';
+import { createPollController } from './domain/poll/controller/poll-controller';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
