@@ -149,6 +149,7 @@ model Options {
   poll   Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
   UserVoteOptions UserVoteOption[]
+
 }
 
 model Polls {
@@ -166,6 +167,7 @@ model Polls {
   userId      String
   author      User       @relation(fields: [userId], references: [id])
 
+  version   Int      @default(0)
   options Options[]
 }
 
@@ -198,7 +200,7 @@ model Notices {
   userId      String
   author      User           @relation(fields: [userId], references: [id])
   comment     Comment[]
-
+  version   Int      @default(0)
   event Events?
 }
 
