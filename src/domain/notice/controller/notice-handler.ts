@@ -1,7 +1,6 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { NoticeCommandService } from '../service/notice-command';
-import { NoticeQueryService } from '../service/notice-query';
-import { validate, catchHandler } from '../../../utils/controller-util';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
+import { validate } from '../../../utils/controller-util';
+import { getEventsReqParamsSchema } from '../dto/event-request';
 import {
   getNoticeReqParamsSchema,
   getAllNoticesReqParamsSchema,
@@ -10,23 +9,15 @@ import {
   updateNoticeReqBodySchema,
   deleteNoticeReqParamsSchema,
 } from '../dto/notice-request';
+import { NoticeCommandService } from '../service/notice-command';
+import { NoticeQueryService } from '../service/notice-query';
+import { Request, Response } from 'express';
 
-export const createNoticeController = (
-  middlewares: {
-    globalError: (
-      err: any,
-      req: Request,
-      res: Response,
-      next: NextFunction,
-    ) => express.Response<any, Record<string, any>>;
-    notFound: (req: Request, res: Response, next: NextFunction) => void;
-  },
+export const createNoticeHandler = (
+  middlewares: Middlewares,
   noticeQueryService: NoticeQueryService,
   noticeCommandService: NoticeCommandService,
 ) => {
-  const path: string = '/notices';
-  const router = express.Router();
-
   const getNotice = async (req: Request, res: Response) => {
     const params = validate(getNoticeReqParamsSchema, req.params);
     const notice = await noticeQueryService.getNotice(params.noticeId);
@@ -58,17 +49,21 @@ export const createNoticeController = (
     return res.json();
   };
 
-  router.get('/:noticeId', catchHandler(getNotice));
+  // 수정 필요.
+  const getEvents = async (req: Request, res: Response) => {
+    const params = validate(getEventsReqParamsSchema, req.params);
+    // const events = await noticeQueryService.getEvents({...params});
+    return res.json();
+  };
 
-  router.get('/', catchHandler(getAllNotices));
-
-  router.post('/', catchHandler(createNotice));
-
-  router.patch('/:noticeId', catchHandler(updateNotice));
-
-  router.delete('/:noticeId', catchHandler(deleteNotice));
-
-  return { path, router };
+  return {
+    getNotice,
+    getAllNotices,
+    createNotice,
+    updateNotice,
+    deleteNotice,
+    getEvents,
+  };
 };
 
-export type NoticeController = ReturnType<typeof createNoticeController>;
+export type NoticeHandler = ReturnType<typeof createNoticeHandler>;
