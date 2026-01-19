@@ -32,5 +32,4 @@ export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
     //catchHandler(middlewares.multer.uploadS3),
     catchHandler(handlers.updateAvatarUrl),
   );
-  return { path, router };
 };

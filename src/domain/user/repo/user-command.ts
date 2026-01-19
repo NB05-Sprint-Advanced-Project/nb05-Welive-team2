@@ -26,11 +26,12 @@ import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
 import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 
-export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo => {
-  const { getPrisma } = BaseRepo(prisma);
+export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandRepo => {
+  const { prisma } = BaseRepo(prismaClient);
+  // const prisma = BaseRepo(prismaClient)
 
   const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma().user.findUnique({
       where: { id },
       include: userInclude,
     });
@@ -39,7 +40,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const findPendingAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
-    const users = await prisma.user.findMany({
+    const users = await prisma().user.findMany({
       where: {
         role: {
           in: [Role.ADMIN, Role.SUPER_ADMIN],
@@ -59,7 +60,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const findRejectedAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
-    const users = await prisma.user.findMany({
+    const users = await prisma().user.findMany({
       where: {
         role: {
           in: [Role.ADMIN, Role.SUPER_ADMIN],
@@ -79,7 +80,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const findResidentAccountUserById = async (id: string): Promise<ResidentAccountProps | null> => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma().user.findUnique({
       where: { id },
       include: userInclude,
     });
@@ -88,7 +89,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const findPendingResidentUsers = async (): Promise<ResidentAccountProps[] | null> => {
-    const users = await prisma.user.findMany({
+    const users = await prisma().user.findMany({
       where: {
         role: {
           in: [Role.RESIDENT, Status.PENDING],
@@ -105,7 +106,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const findBaseUserById = async (id: string): Promise<BaseUserProps | null> => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma().user.findUnique({
       where: { id },
       include: userInclude,
     });
@@ -115,7 +116,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   const findJoinedUserById = async (
     id: string,
   ): Promise<AdminAccountProps | ResidentAccountProps | null> => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma().user.findUnique({
       where: { id },
       include: userInclude,
     });
@@ -133,7 +134,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   const findNotJoinedResidentByEmail = async (
     email: string,
   ): Promise<NotJoinedResidentProps | null> => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma().user.findUnique({
       where: {
         email,
         joinedStatus: Status.NOT_JOINED,
@@ -147,7 +148,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   const findResidentById = async (
     id: string,
   ): Promise<NotJoinedResidentProps | ResidentAccountProps | null> => {
-    const residentUser = await prisma.user.findUnique({
+    const residentUser = await prisma().user.findUnique({
       where: {
         id,
       },
@@ -168,8 +169,6 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   const create = async (
     entity: AdminAccountProps | ResidentAccountProps | NotJoinedResidentProps,
   ): Promise<void> => {
-    const prisma = getPrisma();
-
     try {
       // let보단 즉시 실행 함수(IIFE)함
       // 이유 - 반복적 if()문 사용으로 let으로 할당하는 것보다 깔끔하고 default로 할당 안 한 잡는 걸 안 해도 됨(컴파일 타임에서 잡아줌)
@@ -188,7 +187,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
         }
       })();
 
-      await prisma.user.create({
+      await prisma().user.create({
         data: createUserData,
         include: userInclude,
       });
@@ -240,7 +239,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
             }
         }
       })();
-      await prisma.user.update({
+      await prisma().user.update({
         where: {
           id: entity.id,
           version: entity.version,
@@ -292,7 +291,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
 
   const updateAvatar = async (entity: BaseUserProps): Promise<void> => {
     try {
-      await prisma.user.update({
+      await prisma().user.update({
         where: {
           id: entity.id,
           version: entity.version,
@@ -317,7 +316,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     entity: AdminAccountProps | ResidentAccountProps | NotJoinedResidentProps,
   ): Promise<void> => {
     try {
-      await prisma.user.update({
+      await prisma().user.update({
         where: {
           id: entity.id,
           version: entity.version,
@@ -344,7 +343,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   ): Promise<void> => {
     const entityIds = entities.map((entity) => entity.id);
 
-    await prisma.user.updateMany({
+    await prisma().user.updateMany({
       where: {
         id: { in: entityIds },
         version: entities[0].version, // baseVersion
@@ -360,7 +359,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
     entity: AdminAccountProps | ResidentAccountProps,
   ): Promise<void> => {
     try {
-      await prisma.user.update({
+      await prisma().user.update({
         where: {
           id: entity.id,
           version: entity.version,
@@ -384,7 +383,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
 
   const deleteUser = async (id: string): Promise<void> => {
     try {
-      await prisma.user.delete({
+      await prisma().user.delete({
         where: { id },
       });
     } catch (err) {
@@ -397,7 +396,7 @@ export const createUserCommandRepo = (prisma: PrismaClient): IUserCommandRepo =>
   };
 
   const deleteUsers = async (): Promise<void> => {
-    await prisma.user.deleteMany({
+    await prisma().user.deleteMany({
       where: {
         joinedStatus: Status.REJECTED,
       },

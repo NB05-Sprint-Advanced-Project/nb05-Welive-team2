@@ -136,41 +136,53 @@ export const createUserCommandService = (
   };
 
   const updateAdmin = async (dto: UpdateAdminDto): Promise<void> => {
-    // 1. 특정 Admin 계정 가져오기
-    const foundUser = await userCommandRepo.findAdminUserById(dto.adminId);
-
-    if (!foundUser) {
-      throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
-    }
-
-    // 2. 유저 정보 수정
-    const updatedUserEntity = AdminAccountEntity.update({
-      user: foundUser,
-      name: dto.name,
-      email: dto.email,
-      contact: dto.contact,
-    });
-
-    // 3. 아파트 정보 조회
-    const foundApartment = await apartmentRepo.findById(
-      foundUser.userApartmentLink![0].apartmentId,
-    );
-
-    // 4. 아파트 정보 수정
-    if (!foundApartment) {
-      throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
-    }
-    const updatedApartmentEntity = ApartmentEntity.update({
-      apartment: foundApartment,
-      name: dto.adminOf.name,
-      address: dto.adminOf.address,
-      description: dto.adminOf.description,
-      officeNumber: dto.adminOf.officeNumber,
-    });
-
     try {
-      await apartmentRepo.update(updatedApartmentEntity);
-      await userCommandRepo.update(updatedUserEntity);
+      await uow.doWork(
+        async () => {
+          // 1. 특정 Admin 계정 가져오기
+          const foundUser = await userCommandRepo.findAdminUserById(dto.adminId);
+
+          if (!foundUser) {
+            console.log('찾는 유저 없음', dto.adminId);
+            throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
+          }
+
+          // 2. 유저 정보 수정
+          const updatedUserEntity = AdminAccountEntity.update({
+            user: foundUser,
+            name: dto.name,
+            email: dto.email,
+            contact: dto.contact,
+          });
+
+          // 3. 아파트 정보 조회
+          const foundApartment = await apartmentRepo.findById(
+            foundUser.userApartmentLink![0].apartmentId,
+          );
+
+          // 4. 아파트 정보 수정
+          if (!foundApartment) {
+            throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
+          }
+          const updatedApartmentEntity = ApartmentEntity.update({
+            apartment: foundApartment,
+            name: dto.adminOf.name,
+            address: dto.adminOf.address,
+            description: dto.adminOf.description,
+            officeNumber: dto.adminOf.officeNumber,
+          });
+
+          await apartmentRepo.update(updatedApartmentEntity);
+          await userCommandRepo.update(updatedUserEntity);
+        },
+        {
+          transactionOptions: {
+            useTransaction: true,
+            isolationLevel: 'ReadCommitted',
+          },
+          useOptimisticLock: true,
+        },
+      );
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {

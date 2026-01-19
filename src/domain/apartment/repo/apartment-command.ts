@@ -4,15 +4,13 @@ import { TechnicalException } from '../../../shared/exception/technical-exceptio
 import { ApartmentProps } from '../entity/apartment-entity';
 import { IApartmentCommandRepo } from '../interface/i-apartment-command';
 import { BaseRepo } from '../../../shared/base-command-repo';
-import { asyncContextStorage } from '../../../utils/async-context-storage-util';
 
-export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentCommandRepo => {
-  const { getPrisma } = BaseRepo(prisma);
+export const createApartmentCommandRepo = (prismaClient: PrismaClient): IApartmentCommandRepo => {
+  const { prisma } = BaseRepo(prismaClient);
 
   const create = async (model: Apartment): Promise<Apartment> => {
-    const prisma = getPrisma();
     try {
-      return await prisma.apartment.create({
+      return await prisma().apartment.create({
         data: model,
       });
     } catch (err) {
@@ -30,7 +28,7 @@ export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentComm
   };
   const update = async (model: Apartment): Promise<Apartment> => {
     try {
-      return await prisma.apartment.update({
+      return await prisma().apartment.update({
         where: {
           id: model.id,
         },
@@ -51,7 +49,7 @@ export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentComm
   };
 
   const remove = async (apartmentId: string): Promise<void> => {
-    await prisma.apartment.delete({
+    await prisma().apartment.delete({
       where: {
         id: apartmentId,
       },
@@ -59,7 +57,7 @@ export const createApartmentCommandRepo = (prisma: PrismaClient): IApartmentComm
   };
 
   const findById = async (apartmentId: string): Promise<ApartmentProps | null> => {
-    return await prisma.apartment.findUnique({
+    return await prisma().apartment.findUnique({
       where: {
         id: apartmentId,
       },

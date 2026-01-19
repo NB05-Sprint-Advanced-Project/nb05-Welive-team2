@@ -19,9 +19,7 @@ const envSchema = z.object({
 
 type EnvParsed = z.infer<typeof envSchema>;
 
-export const getEnv = (): EnvParsed => {
-  let parsed: z.infer<typeof envSchema>;
-
+const getCredentials = () => {
   dotenv.config({
     path:
       process.env.NODE_ENV === 'development'
@@ -38,4 +36,10 @@ export const getEnv = (): EnvParsed => {
   }
 
   return result.data;
+};
+
+const credentials = getCredentials();
+
+export const getEnv = (): EnvParsed => {
+  return credentials;
 };

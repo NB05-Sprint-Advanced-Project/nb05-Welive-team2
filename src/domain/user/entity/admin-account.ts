@@ -55,7 +55,6 @@ export const AdminAccountEntity = {
   }): AdminAccountProps => {
     return {
       ...props,
-      version: 1,
     };
   },
 
