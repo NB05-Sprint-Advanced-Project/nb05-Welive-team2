@@ -101,25 +101,30 @@ export const createNoticeCommandRepo = (prismaClient: BasePrismaClient): INotice
     const prisma = getPrisma();
 
     const { comments, event, ...data } = props;
-    await prisma.notices.update({
-      where: { id: data.id },
-      data: {
-        ...data,
-        event: event
-          ? {
-              upsert: {
-                create: {
-                  ...event,
+    try {
+      await prisma.notices.update({
+        where: { id: data.id, version: props.version },
+        data: {
+          ...data,
+          version: { increment: 1 },
+          event: event
+            ? {
+                upsert: {
+                  create: {
+                    ...event,
+                  },
+                  update: {
+                    ...event,
+                  },
                 },
-                update: {
-                  ...event,
-                },
-              },
-            }
-          : { delete: true },
-      },
-    });
-    return;
+              }
+            : { delete: true },
+        },
+      });
+      return;
+    } catch (err) {
+      throw err;
+    }
   };
 
   const deleteNotice = async (noticeId: string): Promise<void> => {

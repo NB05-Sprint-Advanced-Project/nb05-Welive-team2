@@ -15,6 +15,8 @@ export type PollProps = {
   building: number;
   readonly userId: string;
   options: OptionProps[];
+
+  version: number;
 };
 export const PollEntity = {
   create: (props: {
@@ -27,6 +29,7 @@ export const PollEntity = {
     options: { title: string }[];
   }): PollProps => {
     const { options, ...data } = props;
+    const version = 1;
     let newOptions: OptionProps[] = [];
 
     for (const title of options) {
@@ -51,6 +54,7 @@ export const PollEntity = {
       userId,
       status,
       options: newOptions,
+      version,
     } as PollProps;
   },
   restore: (props: {

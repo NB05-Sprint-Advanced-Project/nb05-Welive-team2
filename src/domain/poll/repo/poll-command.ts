@@ -117,19 +117,24 @@ export const createPollCommandRepo = (prismaClient: BasePrismaClient): IPollComm
     const prisma = getPrisma();
 
     const { options, ...data } = props;
-    await prisma.polls.update({
-      where: { id: props.id },
-      data: {
-        ...data,
-        options: {
-          deleteMany: {},
-          create: options.map((opt) => {
-            return { id: opt.id, title: opt.title };
-          }),
+    try {
+      await prisma.polls.update({
+        where: { id: props.id, version: props.version },
+        data: {
+          ...data,
+          version: { increment: 1 },
+          options: {
+            deleteMany: {},
+            create: options.map((opt) => {
+              return { id: opt.id, title: opt.title };
+            }),
+          },
         },
-      },
-    });
-    return;
+      });
+      return;
+    } catch (err) {
+      throw err;
+    }
   };
 
   const deletePoll = async (pollId: string): Promise<void> => {

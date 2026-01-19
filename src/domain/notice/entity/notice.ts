@@ -15,6 +15,8 @@ export type NoticeProps = {
   readonly userId: string;
   comments?: Comment[];
   event?: EventProps;
+
+  version: number;
 };
 
 export const NoticeEntity = {
@@ -30,6 +32,7 @@ export const NoticeEntity = {
     };
   }): NoticeProps => {
     const { event, ...data } = props;
+    const version = 1;
     let createdEvent;
     if (event) {
       createdEvent = EventEntity.create(event);
@@ -45,6 +48,7 @@ export const NoticeEntity = {
       viewCount: 0,
       userId,
       event: createdEvent,
+      version,
     };
   },
   update: (
