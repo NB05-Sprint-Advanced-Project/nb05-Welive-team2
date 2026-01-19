@@ -2,12 +2,15 @@ import { Router } from 'express';
 import path from 'path';
 import { catchHandler } from '../../../utils/controller-util';
 import { UserHandlers } from './user-handler';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
 
-export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
+export const registerUserRoutes = (
+  router: Router,
+  handlers: UserHandlers,
+  middlewares: Middlewares,
+) => {
   router.post('/super-admins', catchHandler(handlers.createSuperAdmin));
   router.post('/admins', catchHandler(handlers.createAdmin));
-
-  router.patch('/me/password', catchHandler(handlers.updatePassword));
 
   // 관리자 계정
   router.get('/admins', catchHandler(handlers.getAdministrators));
@@ -27,9 +30,15 @@ export const registerUserRoutes = (router: Router, handlers: UserHandlers) => {
   );
   router.delete('/residents/rejected', catchHandler(handlers.deleteResidentAccounts));
 
+  // 공통
   router.patch(
     '/me/avatar',
     //catchHandler(middlewares.multer.uploadS3),
     catchHandler(handlers.updateAvatarUrl),
+  );
+  router.patch(
+    '/me/password',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handlers.updatePassword),
   );
 };

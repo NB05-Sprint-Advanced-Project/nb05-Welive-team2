@@ -91,9 +91,8 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
   const findPendingResidentUsers = async (): Promise<ResidentAccountProps[] | null> => {
     const users = await prisma().user.findMany({
       where: {
-        role: {
-          in: [Role.RESIDENT, Status.PENDING],
-        },
+        role: Role.RESIDENT,
+        joinedStatus: Status.PENDING,
       },
       include: userInclude,
     });

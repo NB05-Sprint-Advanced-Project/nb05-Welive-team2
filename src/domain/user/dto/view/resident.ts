@@ -16,7 +16,7 @@ export interface ResidentView {
   name: string;
   building: number;
   unit: number;
-  isHouseholder: boolean;
+  isHouseholder: string;
   createdAt: Date;
 }
 

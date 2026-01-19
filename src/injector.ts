@@ -37,6 +37,8 @@ import { createApartmentCommandRepo } from './domain/apartment/repo/apartment-co
 import { createApartmentController } from './domain/apartment/controller/apartment-controller';
 import { createNoticeController } from './domain/notice/controller/notice-controller';
 import { createPollController } from './domain/poll/controller/poll-controller';
+import { createAuthMiddleware } from './middlewares/auth-middleware';
+import { createResidentUserController } from './domain/user/controller/resident-user-controller';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
@@ -48,6 +50,7 @@ export const createInjector = () => {
   const middlewares = {
     globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
+    auth: createAuthMiddleware(tokenManager),
   };
 
   const hashManager = createBcryptHashManager();
@@ -106,6 +109,11 @@ export const createInjector = () => {
   // Controller
   const authController = createAuthController(authService);
   const userController = createUserController(middlewares, userCommandService, userQueryService);
+  const residentUserController = createResidentUserController(
+    middlewares,
+    userCommandService,
+    userQueryService,
+  );
   const pollController = createPollController(middlewares, pollQuerService, pollCommandService);
 
   const noticeController = createNoticeController(
@@ -129,6 +137,7 @@ export const createInjector = () => {
   const controllers = {
     authController,
     userController,
+    residentUserController,
     pollController,
     noticeController,
     complaintController,

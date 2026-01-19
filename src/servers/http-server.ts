@@ -4,6 +4,7 @@ import { Middlewares } from '../shared/interface/i-middlewares';
 import { Controllers } from '../shared/interface/i-controllers';
 import { getEnv } from '../config';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 export const createHttpServer = (middlewares: Middlewares, controllers: Controllers) => {
   const app = express();
@@ -16,6 +17,8 @@ export const createHttpServer = (middlewares: Middlewares, controllers: Controll
       credentials: true,
     }),
   );
+
+  app.use(cookieParser());
   app.use(express.json());
 
   // controllers

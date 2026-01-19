@@ -105,7 +105,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
         apartmentId: user.UserApartmentLink[0]?.apartment.id || '',
         building: user.Address?.building || 0,
         unit: user.Address?.unit || 0,
-        isHouseholder: user.Address?.isHouseholder || false,
+        isHouseholder: user.Address?.isHouseholder || 'false',
       },
     };
   };

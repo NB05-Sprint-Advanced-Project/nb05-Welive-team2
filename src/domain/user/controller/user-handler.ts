@@ -87,7 +87,10 @@ export const createUserHandlers = (
   };
 
   const updatePassword = async (req: Request, res: Response) => {
-    const dto = validate(updatePasswordSchema, req.body);
+    const dto = validate(updatePasswordSchema, {
+      ...req.body,
+      userId: req.userId,
+    });
     await userCommandService.updatePassword(dto);
     return res.sendStatus(204);
   };

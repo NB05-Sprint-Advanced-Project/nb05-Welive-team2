@@ -14,7 +14,7 @@ export const createUserController = (
 
   const handlers = createUserHandlers(middlewares, userCommandService, userQueryService);
 
-  registerUserRoutes(router, handlers);
+  registerUserRoutes(router, handlers, middlewares);
 
   return { path, router };
 };

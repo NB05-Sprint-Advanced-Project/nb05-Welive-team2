@@ -2,8 +2,8 @@ import { Middlewares } from '../../../shared/interface/i-middlewares';
 import { createBaseController } from '../../../utils/controller-util';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
-import { createUserHandlers } from './user-handler';
-import { registerUserRoutes } from './user-router';
+import { createResidentUserHandlers } from './resident-user-handler';
+import { registerResidentUserRoutes } from './resident-user-router';
 
 export const createResidentUserController = (
   middlewares: Middlewares,
@@ -12,9 +12,9 @@ export const createResidentUserController = (
 ) => {
   const { path, router } = createBaseController('/api/v2/residents');
 
-  const handlers = createUserHandlers(middlewares, userCommandService, userQueryService);
+  const handlers = createResidentUserHandlers(userCommandService, userQueryService);
 
-  registerUserRoutes(router, handlers);
+  registerResidentUserRoutes(router, handlers, middlewares);
 
   return { path, router };
 };

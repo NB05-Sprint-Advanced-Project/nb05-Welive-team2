@@ -49,7 +49,6 @@ export const createUserQueryService = (userQueryRepo: IUserQueryRepo) => {
 
   const getResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
     const notJoidedResidentUser = await userQueryRepo.findResidents(dto);
-
     return notJoidedResidentUser;
   };
 

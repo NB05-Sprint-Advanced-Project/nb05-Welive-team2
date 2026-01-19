@@ -22,18 +22,17 @@ export const createResidentUserSchema = z.object({
   name: nameSchema,
   building: buildingSchema,
   unit: unitSchema,
-  isHouseholder: z.boolean(),
+  isHouseholder: z.string(),
 });
 
 export const updateResidentSchema = z.object({
   id: userIdSchema,
-  apartmentId: z.string(),
   email: emailSchema,
   contact: contactSchema,
   name: nameSchema,
   building: buildingSchema,
   unit: unitSchema,
-  isHouseholder: z.boolean(),
+  isHouseholder: z.string(),
 });
 
 export const deleteResidentSchema = z.object({
@@ -47,8 +46,8 @@ export const getResidentsSchema = z.object({
   searchKeyword: residentSearchKeyword,
   building: buildingFilterSchema,
   unit: unitFilterSchema,
-  isHouseholder: z.boolean().optional(),
-  isRegistered: z.boolean().optional(),
+  isHouseholder: z.string().optional(),
+  isRegistered: z.string().optional(),
 });
 
 export const getResidentSchema = z.object({

@@ -84,6 +84,6 @@ export const pageSchema = z.coerce.number().min(1).default(1);
 
 export const limitSchema = z.coerce.number().min(1).max(20).default(20);
 
-export const residentSearchKeyword = z.enum(['name', 'contract', 'email']).optional();
+export const residentSearchKeyword = z.string().optional();
 
-export const residentAccountSearchKeyword = z.enum(['name', 'email']).optional();
+export const residentAccountSearchKeyword = z.string().optional();

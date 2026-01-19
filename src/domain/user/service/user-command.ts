@@ -243,6 +243,12 @@ export const createUserCommandService = (
       });
     }
 
+    if (user.joinedStatus === Status.APPROVED || user.joinedStatus === Status.REJECTED) {
+      throw BusinessException({
+        type: BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS,
+      });
+    }
+
     await userCommandRepo.updateJoinedStatus(
       AdminAccountEntity.updateJoinedStatus(user, dto.joinStatus),
     );
@@ -312,6 +318,12 @@ export const createUserCommandService = (
         if (!user) {
           throw BusinessException({
             type: BusinessExceptionType.USER_NOT_FOUND,
+          });
+        }
+
+        if (user.joinedStatus === Status.APPROVED || user.joinedStatus === Status.REJECTED) {
+          throw BusinessException({
+            type: BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS,
           });
         }
 

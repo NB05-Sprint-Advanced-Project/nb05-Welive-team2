@@ -86,7 +86,7 @@ model UserApartmentLink {
 
 model Address {
   userId        String  @id
-  isHouseholder Boolean
+  isHouseholder String // 프론트 쪽에서 string으로 받음
   unit          Int
   building      Int
 

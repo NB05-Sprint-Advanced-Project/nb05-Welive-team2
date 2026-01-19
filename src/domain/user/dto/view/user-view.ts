@@ -20,6 +20,6 @@ export interface UserView {
     apartmentId: string;
     building: number;
     unit: number;
-    isHouseholder: boolean;
+    isHouseholder: string;
   };
 }

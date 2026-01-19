@@ -29,6 +29,8 @@ export enum BusinessExceptionType {
   CORRECT_PASSWORD,
   TOKEN_EXPIRED,
   INVALID_CREDENTIALS,
+  NOT_UPDATE_JOINEDSTATUS,
+  INVALID_AUTH,
 }
 
 export const BusinessExceptionTable: Record<
@@ -95,6 +97,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.DONT_MODIFY_COMPLAINT]: {
     statusCode: 409,
     message: '관리자에게 민원이 접수되어 수정할 수 없습니다.',
+  },
+  [BusinessExceptionType.INVALID_AUTH]: {
+    statusCode: 401,
+    message: '인증이 유효하지 않습니다.',
   },
 
   // 존재 오류
@@ -167,5 +173,9 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.FAIL_SAVE_COMMENT]: {
     statusCode: 409,
     message: '댓글을 저장하지 못했습니다.',
+  },
+  [BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS]: {
+    statusCode: 409,
+    message: '승인, 거절 상태에서는 다른 상태로 변경할 수 없습니다.',
   },
 };

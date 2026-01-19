@@ -1,14 +1,14 @@
 export type ResidentAddressProps = {
   readonly building: number; // 동
   readonly unit: number; // 호
-  readonly isHouseholder: boolean; // 세대주이면 true, 세대원이면 false
+  readonly isHouseholder: string; // 세대주이면 true, 세대원이면 false
 };
 
 export const ResidentAddressVO = {
   create: (props: {
     building: number;
     unit: number;
-    isHouseholder: boolean;
+    isHouseholder: string;
   }): ResidentAddressProps => {
     return {
       ...props,
@@ -18,7 +18,7 @@ export const ResidentAddressVO = {
   restore: (props: {
     building: number;
     unit: number;
-    isHouseholder: boolean;
+    isHouseholder: string;
   }): ResidentAddressProps => {
     return {
       ...props,
