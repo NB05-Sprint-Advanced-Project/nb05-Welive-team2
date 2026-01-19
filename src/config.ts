@@ -13,6 +13,8 @@ const envSchema = z.object({
   JSON_LIMIT: z.string(),
   MAX_RETRIES: z.coerce.number(),
   OPTIMISTIC_LOCK_RETRY_DELAY_MS: z.coerce.number(),
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.coerce.number(),
 });
 
 type EnvParsed = z.infer<typeof envSchema>;
