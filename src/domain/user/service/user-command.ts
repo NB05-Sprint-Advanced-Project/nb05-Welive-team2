@@ -40,6 +40,8 @@ import {
   DeleteResidentReqDto,
 } from '../dto/resident-user-response';
 
+import { IRedisExtenal } from '../../../shared/interface/i-redis';
+
 export const createUserCommandService = (
   uow: IUnitOfWork,
   hashManager: IHashManager,
@@ -136,6 +138,7 @@ export const createUserCommandService = (
   };
 
   const updateAdmin = async (dto: UpdateAdminDto): Promise<void> => {
+    // 트랜잭션 + 낙관적 락킹
     try {
       await uow.doWork(
         async () => {

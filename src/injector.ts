@@ -38,6 +38,7 @@ import { createApartmentController } from './domain/apartment/controller/apartme
 import { createNoticeController } from './domain/notice/controller/notice-controller';
 import { createPollController } from './domain/poll/controller/poll-controller';
 import { createAuthMiddleware } from './middlewares/auth-middleware';
+import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
 
 export const createInjector = () => {
@@ -45,6 +46,7 @@ export const createInjector = () => {
   //util
   const unitOfwork = createUnitOfWork(prisma);
   const tokenManager = TokenUtil();
+  const redisExternal = createRedisExternal();
 
   // Middleware
   const middlewares = {
@@ -78,7 +80,7 @@ export const createInjector = () => {
   // Service
   const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo);
 
-  const userQueryService = createUserQueryService(userQueryRepository);
+  const userQueryService = createUserQueryService(userQueryRepository, redisExternal);
   const userCommandService = createUserCommandService(
     unitOfwork,
     hashManager,
@@ -107,6 +109,12 @@ export const createInjector = () => {
   const authService = createAuthService(userQueryRepository, hashManager, tokenManager);
 
   // Controller
+  const residentController = createResidentUserController(
+    middlewares,
+    userCommandService,
+    userQueryService,
+  );
+
   const authController = createAuthController(authService);
   const userController = createUserController(middlewares, userCommandService, userQueryService);
   const residentUserController = createResidentUserController(
@@ -143,6 +151,7 @@ export const createInjector = () => {
     complaintController,
     commentController,
     apartmentController,
+    residentController,
   };
 
   // Server
