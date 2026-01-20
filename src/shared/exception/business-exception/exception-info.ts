@@ -166,7 +166,7 @@ export const BusinessExceptionTable: Record<
   },
   [BusinessExceptionType.USERNAME_ALREADY_IN_USE]: {
     statusCode: 409,
-    message: '이미 사용중인 닉네임입니다.',
+    message: '이미 사용중인 아이디입니다.',
   },
   [BusinessExceptionType.CONTACT_ALREADY_IN_USE]: {
     statusCode: 409,

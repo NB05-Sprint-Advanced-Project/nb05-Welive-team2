@@ -17,6 +17,7 @@ export const createGlobalErrorMiddleware = () => {
     }
 
     if (isDev) console.error(err);
+
     return res.status(500).json({ message: '알 수 없는 서버 에러입니다.' });
   };
 };

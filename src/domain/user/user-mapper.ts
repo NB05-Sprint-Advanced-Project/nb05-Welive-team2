@@ -132,8 +132,10 @@ export const toUpdateResidentAccountDBData = (
     version: entity.version,
     updatedAt: entity.updatedAt,
     Address: {
-      delete: {},
-      create: { ...entity.address },
+      upsert: {
+        create: { ...entity.address },
+        update: { ...entity.address },
+      },
     },
   };
 };

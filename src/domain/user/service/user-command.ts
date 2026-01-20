@@ -155,24 +155,25 @@ export const createUserCommandService = (
             contact: dto.contact,
           });
 
-          // 3. 아파트 정보 조회
-          const foundApartment = await apartmentRepo.findById(
-            foundUser.userApartmentLink![0].apartmentId,
-          );
+          // // 3. 아파트 정보 조회
+          // const foundApartment = await apartmentRepo.findById(
+          //   foundUser.userApartmentLink![0].apartmentId,
+          // );
 
-          // 4. 아파트 정보 수정
-          if (!foundApartment) {
-            throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
-          }
-          const updatedApartmentEntity = ApartmentEntity.update({
-            apartment: foundApartment,
-            name: dto.adminOf.name,
-            address: dto.adminOf.address,
-            description: dto.adminOf.description,
-            officeNumber: dto.adminOf.officeNumber,
-          });
+          // // 4. 아파트 정보 수정
+          // if (!foundApartment) {
+          //   throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
+          // }
+          // const updatedApartmentEntity = ApartmentEntity.update({
+          //   apartment: foundApartment,
+          //   name: dto.adminOf.name,
+          //   address: dto.adminOf.address,
+          //   description: dto.adminOf.description,
+          //   officeNumber: dto.adminOf.officeNumber,
+          // });
 
-          await apartmentRepo.update(updatedApartmentEntity);
+          // await apartmentRepo.update(updatedApartmentEntity);
+
           await userCommandRepo.update(updatedUserEntity);
         },
         {

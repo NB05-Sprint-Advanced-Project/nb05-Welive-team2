@@ -42,8 +42,8 @@ export const createUnitOfWork = (prismaClient: PrismaClient): IUnitOfWork => {
       } catch (err) {
         if (
           isTechnicalException(err) &&
-          err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED
-          //i < maxRetries
+          err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED &&
+          i < maxRetries
         ) {
           const baseDelay = getEnv().OPTIMISTIC_LOCK_RETRY_DELAY_MS;
           const jitter = Math.random() * 100;
@@ -58,7 +58,7 @@ export const createUnitOfWork = (prismaClient: PrismaClient): IUnitOfWork => {
         break;
       }
     }
-    console.log('전부 실패:', lastErr);
+    //console.log('전부 실패:', lastErr);
     throw lastErr;
   };
 
