@@ -6,5 +6,5 @@ export interface EventView {
   title: string;
   apartmentId: string;
   resourceId: string;
-  resourceType: 'NOTICE' | 'POLL';
+  resourceType: 'NOTICE';
 }

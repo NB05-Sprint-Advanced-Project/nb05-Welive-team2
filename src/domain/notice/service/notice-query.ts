@@ -1,13 +1,17 @@
 import { NoticeCategory } from '@prisma/client';
 import { NoticesView, NoticeView } from '../dto/notice-view';
 import { INoticeQueryRepo } from '../interface/i-notice-query-repo';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
   const getNotice = async (noticeId: string): Promise<NoticeView> => {
     const notice = await repo.findById(noticeId);
 
     if (!notice) {
-      throw new Error();
+      throw BusinessException({
+        type: BusinessExceptionType.NOTICE_NOT_FOUND,
+      });
     }
 
     return notice;
@@ -22,13 +26,24 @@ export const createNoticeQueryService = (repo: INoticeQueryRepo) => {
     page: number;
     limit: number;
     searchKeyword: string;
-    category: NoticeCategory;
+    category: NoticeCategory | 'ALL';
   }): Promise<NoticesView> => {
-    const notices = await repo.findAll(page, limit, searchKeyword, category);
-    return notices;
+    return await repo.findAll(page, limit, searchKeyword, category);
   };
 
-  return { getNotice, getAllNotices };
+  const getEvents = async ({
+    apartmentId,
+    year,
+    month,
+  }: {
+    apartmentId: string;
+    year: number;
+    month: number;
+  }) => {
+    return await repo.findEvents(apartmentId, year, month);
+  };
+
+  return { getNotice, getAllNotices, getEvents };
 };
 
 export type NoticeQueryService = ReturnType<typeof createNoticeQueryService>;

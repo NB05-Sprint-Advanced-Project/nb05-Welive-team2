@@ -51,10 +51,10 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
           o.id as option_id,
           o.title as option_title,
           (SELECT COUNT(*) FROM "UserVoteOption" uvo WHERE uvo."optionId" = o.id)::int AS option_count
-          FROM "Polls" p
-          LEFT JOIN "Options" o ON o."pollId" = p.id
-          WHERE p.id = ${pollId}
-          ${lockSql}
+        FROM "Polls" p
+        LEFT JOIN "Options" o ON o."pollId" = p.id
+        WHERE p.id = ${pollId}
+        ${lockSql}
         `);
       if (polls.length === 0) {
         return null;

@@ -14,36 +14,32 @@ Content-Type: application/json
   }
 }
 
-### 2. 투표 전체 조회 (getAllPolls)
-GET http://localhost:4000/api/v2/polls
+### 2. 공지 전체 조회 (getAllNotices)
+GET http://localhost:4000/api/v2/notices
 Content-Type: application/json
 
-### 3. 투표 상세 조회 (getPoll)
-GET http://localhost:4000/api/v2/polls/3ebca94f-610a-4efd-9e29-75cf0ab2b06a
+### 3. 공지 상세 조회 (getPoll)
+GET http://localhost:4000/api/v2/notices/5302543c-c8a5-4c30-98aa-a010bb90d758
 Content-Type: application/json
 
-### 4. 투표 수정 (updatePoll)
-PATCH  http://localhost:4000/api/v2/polls/3ebca94f-610a-4efd-9e29-75cf0ab2b06a
+### 4. 공지 수정 (updateNtocie)
+PATCH  http://localhost:4000/api/v2/notices/5302543c-c8a5-4c30-98aa-a010bb90d758
 Content-Type: application/json
 
 {
-  "title": "수정이지롱",
-  "options": [
-    {
-      "id": "b8d84b9f-334a-4208-830a-be4ee4feabbb",
-      "title": "김치찌개보다는 부대찌개"
-    }
-  ]
+  "title": "수정이지롱~",
+  "category": "COMMUNITY",
+  "isPinned": true,
+  "event": {
+    "startDate": "2026-01-20T02:13:14.159Z",
+    "endDate": "2026-01-20T02:13:14.159Z"
+  }
 }
 
-### 5. 투표 삭제 (deletePoll)
-DELETE http://localhost:4000/api/v2/polls/cd229c03-bd72-41fa-9b53-6019c3c6c54c
+### 5. 공지 삭제 (deleteNotice)
+DELETE http://localhost:4000/api/v2/notices/5302543c-c8a5-4c30-98aa-a010bb90d758
 Content-Type: application/json
 
-### 6. 투표 하기 (vote)
-POST http://localhost:4000/api/v2/polls/3ebca94f-610a-4efd-9e29-75cf0ab2b06a/options/53877952-267b-42bb-9ab2-d3fcdd7638fe/vote
-Content-Type: application/json
-
-### 7. 투표 취소하기 (cancle)
-DELETE http://localhost:4000/api/v2/polls/3ebca94f-610a-4efd-9e29-75cf0ab2b06a/options/53877952-267b-42bb-9ab2-d3fcdd7638fe/vote
+### 6. 이벤트 조회 (getEvnets)
+GET http://localhost:4000/api/v2/events?apartmentId=d22952ee-f44f-4d2d-84c6-f8b00c9e3d1a&year=2026&month=1
 Content-Type: application/json

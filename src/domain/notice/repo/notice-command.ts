@@ -2,6 +2,8 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
 import { BaseRepo } from '../../../shared/base-command-repo';
 import { NoticeProps } from '../entity/notice';
+import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
+import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 
 export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
@@ -34,23 +36,24 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
           : undefined,
       };
     } else {
-      const lockSql = pessimisticLock === 'share' ? Prisma.sql`FOR SHARE` : Prisma.sql`FOR UPDATE`;
+      const lockSql =
+        pessimisticLock === 'share' ? Prisma.sql`FOR SHARE OF n` : Prisma.sql`FOR UPDATE OF n`;
 
       const notices = await prisma().$queryRaw<any[]>(Prisma.sql`
-    SELECT
-      n.*, 
-      e.id            AS event_id,
-      e."startDate"   AS event_startDate,
-      e."endDate"     AS event_endDate
-    FROM "Notice" n
-    LEFT JOIN "Event" e ON e."noticeId" = n.id
-    WHERE n.id = ${noticeId}
-    ${lockSql}
-  `);
+      SELECT
+        n.*, 
+        e.id            as event_id,
+        e."startDate"   as event_startDate,
+        e."endDate"     as event_endDate
+      FROM "Notices" n
+      LEFT JOIN "Events" e ON e."noticeId" = n.id
+      WHERE n.id = ${noticeId}
+      ${lockSql}
+      `);
       if (notices.length === 0) {
         return null;
       }
-      const { event_id, event_startDate, event_endDate, ...noticeData } = notices[0];
+      const { event_id, event_startDate, event_endDate, apartmentId, ...noticeData } = notices[0];
       return {
         ...noticeData,
         event: event_id
@@ -64,11 +67,12 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
     }
   };
 
-  const create = async (props: NoticeProps): Promise<NoticeProps> => {
+  const create = async (props: NoticeProps, userId: string): Promise<NoticeProps> => {
     const { comments, event, ...data } = props;
     const notice = await prisma().notices.create({
       data: {
         ...data,
+        userId,
         event: event
           ? {
               create: { ...event },
@@ -94,7 +98,18 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
   };
 
   const update = async (props: NoticeProps): Promise<void> => {
-    const { comments, event, ...data } = props;
+    const {
+      comments,
+      event,
+      apartmentId,
+      userId,
+      event_id,
+      event_startDate,
+      event_endDate,
+      event_startdate,
+      event_enddate,
+      ...data
+    } = props as any;
     try {
       await prisma().notices.update({
         where: { id: data.id, version: props.version },
@@ -117,12 +132,20 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       });
       return;
     } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw TechnicalException({
+            type: TechnicalExceptionType.RECORD_NOT_FOUND,
+            meta: err.meta,
+          });
+        }
+      }
       throw err;
     }
   };
 
   const deleteNotice = async (noticeId: string): Promise<void> => {
-    await prisma().notices.delete({
+    await prisma().notices.deleteMany({
       where: { id: noticeId },
     });
     return;

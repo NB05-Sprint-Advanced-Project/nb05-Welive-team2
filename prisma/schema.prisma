@@ -182,7 +182,7 @@ model Events {
   startDate DateTime
   endDate   DateTime
 
-  noticeId String  @unique // 1:1 관계를 위해 @unique가 필수입니다.
+  noticeId String  @unique
   notice   Notices @relation(fields: [noticeId], references: [id], onDelete: Cascade)
 }
 

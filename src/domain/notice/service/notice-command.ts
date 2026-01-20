@@ -4,13 +4,14 @@ import { CreateNoticeDto, UpdateNoticeDto, DeleteNoticeDto } from '../dto/notice
 import { NoticeProps, NoticeEntity } from '../entity/notice';
 
 export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeCommandRepo) => {
-  const createNotice = async (dto: CreateNoticeDto): Promise<NoticeProps> => {
+  const createNotice = async (dto: CreateNoticeDto, userId: string): Promise<NoticeProps> => {
     return await uow.doWork(
       async () => {
         return await repo.create(
           NoticeEntity.create({
             ...dto,
           }),
+          userId,
         );
       },
       {

@@ -32,7 +32,8 @@ export const createNoticeHandler = (
 
   const createNotice = async (req: Request, res: Response) => {
     const body = validate(createNoticeReqBodySchema, req.body);
-    const notice = await noticeCommandService.createNotice({ ...body });
+    const userId = req.userId as string;
+    const notice = await noticeCommandService.createNotice({ ...body }, userId);
     return res.json(notice);
   };
 
@@ -49,11 +50,10 @@ export const createNoticeHandler = (
     return res.json();
   };
 
-  // 수정 필요.
   const getEvents = async (req: Request, res: Response) => {
-    const params = validate(getEventsReqParamsSchema, req.params);
-    // const events = await noticeQueryService.getEvents({...params});
-    return res.json();
+    const params = validate(getEventsReqParamsSchema, req.query);
+    const events = await noticeQueryService.getEvents({...params});
+    return res.json(events);
   };
 
   return {

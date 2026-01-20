@@ -1,6 +1,7 @@
 import { NoticeCategory, PrismaClient } from '@prisma/client';
 import { INoticeQueryRepo } from '../interface/i-notice-query-repo';
 import { NoticesView, NoticeView } from '../dto/notice-view';
+import { EventView } from '../dto/event-view';
 
 export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryRepo => {
   const findById = async (noticeId: string): Promise<NoticeView | null> => {
@@ -48,28 +49,33 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
     page: number,
     limit: number,
     searchKeyword: string,
-    category: NoticeCategory,
+    category: NoticeCategory | 'ALL',
   ): Promise<NoticesView> => {
-    // todo :
-    // 1. category가 없을 경우 전체 조회
-    // 2. searchKeyword 범위 title, contet, author.name
-
     const where = {
-      category,
-      title: { contains: searchKeyword },
+      category: category === 'ALL' ? undefined : category,
+      ...(searchKeyword
+        ? {
+            OR: [
+              { title: { contains: searchKeyword } },
+              { content: { contains: searchKeyword } },
+              { author: { name: { contains: searchKeyword } } },
+            ],
+          }
+        : {}),
     };
-    const notices = await prismaClient.notices.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      include: {
-        author: true,
-        comment: true,
-      },
-    });
-    const totalCount = await prismaClient.notices.count({
-      where,
-    });
+    const [notices, totalCount] = await Promise.all([
+      prismaClient.notices.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          author: true,
+          comment: true,
+        },
+        orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+      }),
+      prismaClient.notices.count({ where }),
+    ]);
 
     const hasNext = page * limit < totalCount;
 
@@ -100,7 +106,42 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
     };
   };
 
-  return { findById, findAll };
+  const findEvents = async (
+    apartmentId: string,
+    year: number,
+    month: number,
+  ): Promise<EventView[]> => {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1);
+    const notices = await prismaClient.notices.findMany({
+      where: {
+        apartmentId,
+        event: {
+          AND: [{ startDate: { lt: endDate } }, { endDate: { gte: startDate } }],
+        },
+      },
+      include: {
+        event: true,
+      },
+    });
+    if (notices.length === 0) {
+      return [];
+    }
+    return notices.map((notice) => {
+      return {
+        id: notice.event!.id,
+        startDate: notice.event!.startDate,
+        endDate: notice.event!.endDate,
+        category: notice.category,
+        title: notice.title,
+        apartmentId: notice.apartmentId,
+        resourceId: notice.id,
+        resourceType: 'NOTICE',
+      };
+    });
+  };
+
+  return { findById, findAll, findEvents };
 };
 
 export type NoticeQueryRepo = ReturnType<typeof createNoticeQueryRepo>;

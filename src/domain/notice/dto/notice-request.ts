@@ -6,12 +6,14 @@ export const getNoticeReqParamsSchema = z.object({
   noticeId: z.string(),
 });
 
-// get all notice
+// get all notices
 export const getAllNoticesReqParamsSchema = z.object({
-  page: z.int(),
-  limit: z.int(),
-  searchKeyword: z.string(),
-  category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+  page: z.coerce.number().int().default(1),
+  limit: z.coerce.number().int().default(10),
+  searchKeyword: z.string().default(''),
+  category: z
+    .enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC', 'ALL'])
+    .default('ALL'),
 });
 
 // create notice
@@ -31,13 +33,15 @@ export const updateNoticeReqParamsSchema = z.object({
   noticeId: z.string(),
 });
 
-export const updateNoticeReqBodySchema = z.object({
-  title: z.string(),
-  content: z.string(),
-  category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
-  isPinned: z.boolean(),
-  event: eventSchema.optional(),
-});
+export const updateNoticeReqBodySchema = z
+  .object({
+    title: z.string(),
+    content: z.string(),
+    category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+    isPinned: z.boolean(),
+    event: eventSchema.optional(),
+  })
+  .partial();
 
 export type UpdateNoticeDto = z.infer<typeof updateNoticeReqBodySchema> &
   z.infer<typeof updateNoticeReqParamsSchema>;
