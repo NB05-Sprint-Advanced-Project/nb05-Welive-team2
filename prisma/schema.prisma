@@ -205,7 +205,7 @@ model Notices {
 }
 
 enum NoticeCategory {
-  MAINTENCE
+  MAINTENANCE
   URGENT
   COMMUNITY
   VOTING

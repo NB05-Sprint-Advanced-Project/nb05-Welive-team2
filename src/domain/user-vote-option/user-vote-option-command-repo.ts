@@ -1,12 +1,14 @@
 import { UserVoteOptionProps } from './user-vote-option-entity';
 import { IUserVoteOptionCommandRepo } from './i-user-vote-option-command-repo';
-import { BasePrismaClient } from '../../shared/base-command-repo';
+import { BasePrismaClient, BaseRepo } from '../../shared/base-command-repo';
+import { PrismaClient } from '@prisma/client';
 
 export const createUserVoteOptionCommandRepo = (
-  prismaClient: BasePrismaClient,
+  prismaClient: PrismaClient,
 ): IUserVoteOptionCommandRepo => {
+  const { prisma } = BaseRepo(prismaClient);
   const vote = async (props: UserVoteOptionProps): Promise<void> => {
-    await prismaClient.userVoteOption.create({
+    await prisma().userVoteOption.create({
       data: {
         ...props,
       },
@@ -14,9 +16,10 @@ export const createUserVoteOptionCommandRepo = (
   };
 
   const cancle = async (optionId: string, userId: string): Promise<void> => {
-    await prismaClient.userVoteOption.delete({
+    await prisma().userVoteOption.deleteMany({
       where: {
-        userId_optionId: { userId, optionId },
+        userId,
+        optionId,
       },
     });
   };

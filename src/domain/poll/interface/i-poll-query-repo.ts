@@ -7,7 +7,7 @@ export interface IPollQueryRepo {
     page: number,
     limit: number,
     searchKeyword: string,
-    status: PollStatus,
+    status: PollStatus | 'ALL',
     building: number,
   ): Promise<PollsView>;
 }

@@ -8,11 +8,11 @@ export const getPollReqParamsSchema = z.object({
 
 // get all polls
 export const getAllPollsReqParamsSchema = z.object({
-  page: z.int(),
-  limit: z.int(),
-  searchKeyword: z.string(),
-  status: z.enum(['IN_PROGRESS', 'PENDING', 'CLOSED']).default('PENDING'),
-  building: z.int().default(0),
+  page: z.coerce.number().int().default(1),
+  limit: z.coerce.number().int().default(10),
+  searchKeyword: z.string().default(''),
+  status: z.enum(['IN_PROGRESS', 'PENDING', 'CLOSED', 'ALL']).default('ALL'),
+  building: z.coerce.number().int().default(0),
 });
 
 // create poll
@@ -33,14 +33,16 @@ export const updatePollReqParamsSchema = z.object({
   pollId: z.string(),
 });
 
-export const updatePollReqBodySchema = z.object({
-  title: z.string(),
-  content: z.string(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
-  building: z.int(),
-  options: z.array(updateOptionSchema),
-});
+export const updatePollReqBodySchema = z
+  .object({
+    title: z.string(),
+    content: z.string(),
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date(),
+    building: z.int(),
+    options: z.array(updateOptionSchema),
+  })
+  .partial();
 
 export type UpdatePollDto = z.infer<typeof updatePollReqBodySchema> &
   z.infer<typeof updatePollReqParamsSchema>;

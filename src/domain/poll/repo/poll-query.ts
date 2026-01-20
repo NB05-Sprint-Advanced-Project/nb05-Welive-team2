@@ -60,7 +60,7 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     page: number,
     limit: number,
     searchKeyword: string,
-    status: PollStatus,
+    status: PollStatus | 'ALL',
     building: number,
   ): Promise<PollsView> => {
     // 1. status가 없을 경우 전체 조회
@@ -68,37 +68,44 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     // 3. building이 없을 경우 전체 조회
 
     const where = {
-      building,
-      status,
-      title: { contains: searchKeyword },
+      status: status === 'ALL' ? undefined : status,
+      building: building === 0 ? undefined : building,
+      ...(searchKeyword
+        ? {
+            OR: [
+              { title: { contains: searchKeyword } },
+              { content: { contains: searchKeyword } },
+              { author: { name: { contains: searchKeyword } } },
+            ],
+          }
+        : {}),
     };
-    const polls = await prismaClient.polls.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
-        id: true,
-        createdAt: true,
-        title: true,
-        content: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-        apartmentId: true,
-        building: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
+    const [polls, totalCount] = await Promise.all([
+      prismaClient.polls.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          createdAt: true,
+          title: true,
+          content: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+          apartmentId: true,
+          building: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-    const totalCount = await prismaClient.polls.count({
-      where,
-    });
-
+        orderBy: { createdAt: 'desc' },
+      }),
+      prismaClient.polls.count({ where }),
+    ]);
     const hasNext = page * limit < totalCount;
 
     return { data: polls, totalCount, page, limit, hasNext };

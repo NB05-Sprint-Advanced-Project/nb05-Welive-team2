@@ -39,6 +39,6 @@ export const registerPollRoutes = (
   router.delete(
     '/:pollId/options/:optionId/vote',
     catchHandler(middlewares.auth.authenticate),
-    catchHandler(handler.vote),
+    catchHandler(handler.cancle),
   );
 };

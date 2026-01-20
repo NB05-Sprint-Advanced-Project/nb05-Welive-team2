@@ -25,7 +25,8 @@ export const createPollHandler = (
   };
 
   const getAllPolls = async (req: Request, res: Response) => {
-    const params = validate(getAllPollsReqParamsSchema, req.params);
+    const params = validate(getAllPollsReqParamsSchema, req.query);
+    console.log(params);
     const polls = await pollQueryService.getAllPolls({ ...params });
     return res.json(polls);
   };
@@ -40,6 +41,7 @@ export const createPollHandler = (
   const updatePoll = async (req: Request, res: Response) => {
     const params = validate(updatePollReqParamsSchema, req.params);
     const body = validate(updatePollReqBodySchema, req.body);
+
     await pollCommandService.updatePoll({ ...body, pollId: params.pollId });
     return res.json();
   };

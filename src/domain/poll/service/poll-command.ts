@@ -76,7 +76,10 @@ export const createPollCommandService = (
         const { pollId } = dto;
         await pollCommandRepo.deletePoll(pollId);
       },
-      { transactionOptions: { useTransaction: false }, useOptimisticLock: false },
+      {
+        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+        useOptimisticLock: false,
+      },
     );
   };
 
@@ -86,7 +89,10 @@ export const createPollCommandService = (
         const { optionId, userId } = dto;
         await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
       },
-      { transactionOptions: { useTransaction: false }, useOptimisticLock: true },
+      {
+        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+        useOptimisticLock: true,
+      },
     );
   };
 
@@ -96,7 +102,10 @@ export const createPollCommandService = (
         const { optionId, userId } = dto;
         await userVoteOptionCommandRepo.cancle(optionId, userId);
       },
-      { transactionOptions: { useTransaction: false }, useOptimisticLock: false },
+      {
+        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+        useOptimisticLock: false,
+      },
     );
   };
   return {

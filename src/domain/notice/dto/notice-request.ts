@@ -11,14 +11,14 @@ export const getAllNoticesReqParamsSchema = z.object({
   page: z.int(),
   limit: z.int(),
   searchKeyword: z.string(),
-  category: z.enum(['MAINTENCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+  category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
 });
 
 // create notice
 export const createNoticeReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
-  category: z.enum(['MAINTENCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+  category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
   isPinned: z.boolean(),
   apartmentId: z.string(),
   event: eventSchema.optional(),
@@ -34,7 +34,7 @@ export const updateNoticeReqParamsSchema = z.object({
 export const updateNoticeReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
-  category: z.enum(['MAINTENCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
+  category: z.enum(['MAINTENANCE', 'URGENT', 'COMMUNITY', 'VOTING', 'BOARD_MEETING', 'ETC']),
   isPinned: z.boolean(),
   event: eventSchema.optional(),
 });

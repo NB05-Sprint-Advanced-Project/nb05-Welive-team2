@@ -2,17 +2,46 @@ import { Router } from 'express';
 import { NoticeHandler } from './notice-handler';
 import { catchHandler } from '../../../utils/controller-util';
 import { createAuthMiddleware } from '../../../middlewares/auth-middleware';
+import { Middlewares } from '../../../shared/interface/i-middlewares';
 
-export const registerNoticeRoutes = (router: Router, handler: NoticeHandler) => {
-  router.get('/notices/:noticeId', createAuthMiddleware, catchHandler(handler.getNotice));
+export const registerNoticeRoutes = (
+  router: Router,
+  handler: NoticeHandler,
+  middleware: Middlewares,
+) => {
+  router.get(
+    '/notices/:noticeId',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.getNotice),
+  );
 
-  router.get('/notices/', createAuthMiddleware, catchHandler(handler.getAllNotices));
+  router.get(
+    '/notices/',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.getAllNotices),
+  );
 
-  router.post('/notices/', createAuthMiddleware, catchHandler(handler.createNotice));
+  router.post(
+    '/notices/',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.createNotice),
+  );
 
-  router.patch('/notices/:noticeId', createAuthMiddleware, catchHandler(handler.updateNotice));
+  router.patch(
+    '/notices/:noticeId',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.updateNotice),
+  );
 
-  router.delete('/notices/:noticeId', createAuthMiddleware, catchHandler(handler.deleteNotice));
+  router.delete(
+    '/notices/:noticeId',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.deleteNotice),
+  );
 
-  router.get('/events', createAuthMiddleware, catchHandler(handler.getEvents));
+  router.get(
+    '/events',
+    catchHandler(middleware.auth.authenticate),
+    catchHandler(handler.getEvents),
+  );
 };

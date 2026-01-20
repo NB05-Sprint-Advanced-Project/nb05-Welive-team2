@@ -14,7 +14,7 @@ export const createNoticeController = (
 
   const handler = createNoticeHandler(middlewares, noticeQueryService, noticeCommandService);
 
-  registerNoticeRoutes(router, handler);
+  registerNoticeRoutes(router, handler, middlewares);
 
   return { path, router };
 };

@@ -1,19 +1,17 @@
-### 1. 투표 생성 (createPoll)
-POST http://localhost:4000/api/v2/polls
+### 1. 공지 생성 (createNotice)
+POST http://localhost:4000/api/v2/notices
 Content-Type: application/json
 
 {
-  "title": "오늘은 쉬는날~",
-  "content": "점심 뭐먹지",
-  "startDate": "2026-01-11T00:00:00Z",
-  "endDate": "2026-01-12T00:00:00Z",
+  "title": "공지다 !",
+  "content": "첫번째 공지다 이것들아 !",
+  "category": "MAINTENANCE",
+  "isPinned": false,
   "apartmentId": "d22952ee-f44f-4d2d-84c6-f8b00c9e3d1a",
-  "building": 1,
-  "options": [
-    { "title": "김치찌개" },
-    { "title": "돈가스" },
-    { "title": "마라탕" }
-  ]
+  "event": {
+    "startDate": "2026-01-11T00:00:00Z",
+    "endDate": "2026-01-12T00:00:00Z"
+  }
 }
 
 ### 2. 투표 전체 조회 (getAllPolls)

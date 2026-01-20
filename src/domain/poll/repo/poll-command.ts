@@ -42,7 +42,8 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
         }),
       };
     } else {
-      const lockSql = pessimisticLock === 'share' ? Prisma.sql`FOR SHARE` : Prisma.sql`FOR UPDATE`;
+      const lockSql =
+        pessimisticLock === 'share' ? Prisma.sql`FOR SHARE OF p` : Prisma.sql`FOR UPDATE OF p`;
 
       const polls = await prisma().$queryRaw<any[]>(Prisma.sql`
         SELECT
@@ -65,9 +66,9 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
           .filter((poll) => poll.option_id)
           .map((opt) => {
             return {
-              id: opt.opotion_id,
-              title: opt.opotion_title,
-              count: opt.opotion_count || 0,
+              id: opt.option_id,
+              title: opt.option_title,
+              count: opt.option_count || 0,
             };
           }),
       };
@@ -163,7 +164,7 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
   };
 
   const deletePoll = async (pollId: string): Promise<void> => {
-    await prisma().polls.delete({
+    await prisma().polls.deleteMany({
       where: { id: pollId },
     });
     return;
