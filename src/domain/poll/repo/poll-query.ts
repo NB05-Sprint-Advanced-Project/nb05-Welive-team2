@@ -63,7 +63,6 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     status: PollStatus | 'ALL',
     building: number,
   ): Promise<PollsView> => {
-    
     const where = {
       status: status === 'ALL' ? undefined : status,
       building: building === 0 ? undefined : building,

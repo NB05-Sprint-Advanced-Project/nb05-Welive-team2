@@ -52,7 +52,7 @@ export const createNoticeHandler = (
 
   const getEvents = async (req: Request, res: Response) => {
     const params = validate(getEventsReqParamsSchema, req.query);
-    const events = await noticeQueryService.getEvents({...params});
+    const events = await noticeQueryService.getEvents({ ...params });
     return res.json(events);
   };
 
