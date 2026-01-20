@@ -4,6 +4,8 @@ import {
   buildingSchema,
   contactSchema,
   emailSchema,
+  isHouseholderFilterSchema,
+  isRegisteredFilterSchema,
   joinedStatusSchema,
   limitSchema,
   nameSchema,
@@ -22,7 +24,7 @@ export const createResidentUserSchema = z.object({
   name: nameSchema,
   building: buildingSchema,
   unit: unitSchema,
-  isHouseholder: z.string(),
+  isHouseholder: z.boolean(),
 });
 
 export const updateResidentSchema = z.object({
@@ -32,7 +34,7 @@ export const updateResidentSchema = z.object({
   name: nameSchema,
   building: buildingSchema,
   unit: unitSchema,
-  isHouseholder: z.string(),
+  isHouseholder: z.boolean(),
 });
 
 export const deleteResidentSchema = z.object({
@@ -46,8 +48,8 @@ export const getResidentsSchema = z.object({
   searchKeyword: residentSearchKeyword,
   building: buildingFilterSchema,
   unit: unitFilterSchema,
-  isHouseholder: z.string().optional(),
-  isRegistered: z.string().optional(),
+  isHouseholder: isHouseholderFilterSchema,
+  isRegistered: isRegisteredFilterSchema,
 });
 
 export const getResidentSchema = z.object({

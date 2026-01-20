@@ -291,7 +291,7 @@ export const toResidentAccountEntityFromDto = async (
     contact: dto.contact,
     userApartmentLink: [UserApartmentLinkVO.create(dto.resident.apartmentId)],
     address: {
-      isHouseholder: 'true',
+      isHouseholder: true,
       building: dto.resident.building,
       unit: dto.resident.unit,
     },

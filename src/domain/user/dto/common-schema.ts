@@ -87,3 +87,13 @@ export const limitSchema = z.coerce.number().min(1).max(20).default(20);
 export const residentSearchKeyword = z.string().optional();
 
 export const residentAccountSearchKeyword = z.string().optional();
+
+export const isHouseholderFilterSchema = z.preprocess(
+  (v) => (v === 'true' ? true : v === 'false' ? false : v),
+  z.boolean().optional(),
+);
+
+export const isRegisteredFilterSchema = z.preprocess(
+  (v) => (v === 'true' ? true : v === 'false' ? false : v),
+  z.boolean().optional(),
+);

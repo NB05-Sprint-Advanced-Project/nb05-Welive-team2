@@ -105,7 +105,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
         apartmentId: user.UserApartmentLink[0]?.apartment.id || '',
         building: user.Address?.building || 0,
         unit: user.Address?.unit || 0,
-        isHouseholder: user.Address?.isHouseholder || 'false',
+        isHouseholder: user.Address?.isHouseholder || false,
       },
     };
   };
@@ -136,7 +136,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
-  const findResidentById = async (id: string, userId: string): Promise<ResidentView | null> => {
+  const findResidentById = async (id: string): Promise<ResidentView | null> => {
     const resident = await prisma.user.findUnique({
       where: { id },
       include: userInclude,
@@ -148,7 +148,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
 
     return {
       id: resident.id,
-      userId: userId,
+      userId: resident.joinedStatus === Status.NOT_JOINED ? null : resident.id,
       email: resident.email,
       contact: resident.contact,
       name: resident.name,
@@ -166,16 +166,15 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
         : dto.isRegistered
           ? Status.APPROVED
           : Status.NOT_JOINED;
-
     const where = {
       joinedStatus,
       Address: {
         is: {
           ...(dto.building !== undefined && { building: dto.building }),
           ...(dto.unit !== undefined && { unit: dto.unit }),
+          ...(dto.isHouseholder !== undefined && { isHouseholder: dto.isHouseholder }),
         },
       },
-      ...(dto.isHouseholder !== undefined && { isHouseholder: dto.isHouseholder }),
       ...(dto.searchKeyword && {
         OR: [
           { name: { contains: dto.searchKeyword } },
@@ -200,7 +199,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     return {
       data: residents.map((resident) => ({
         id: resident.id,
-        userId: dto.userId,
+        userId: resident.joinedStatus === Status.NOT_JOINED ? null : resident.id,
         email: resident.email,
         contact: resident.contact,
         name: resident.name,

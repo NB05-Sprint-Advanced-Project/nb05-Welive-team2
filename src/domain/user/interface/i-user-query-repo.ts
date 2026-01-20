@@ -17,7 +17,7 @@ export interface IUserQueryRepo {
 
   findNotJoinedResidentByEmail: (email: string, userId: string) => Promise<ResidentView | null>;
 
-  findResidentById: (id: string, userId: string) => Promise<ResidentView | null>;
+  findResidentById: (id: string) => Promise<ResidentView | null>;
 
   findResidents: (dto: GetResidentsReqDto) => Promise<ResidentsView>;
 

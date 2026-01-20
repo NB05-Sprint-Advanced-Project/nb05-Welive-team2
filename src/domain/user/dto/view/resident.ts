@@ -9,14 +9,14 @@ export interface ResidentsView {
 }
 
 export interface ResidentView {
-  id: string; // 입주민 ID
-  userId: string; // 인증된 ID(관리자 ID)
+  id: string;
+  userId: string | null;
   email: string;
   contact: string;
   name: string;
   building: number;
   unit: number;
-  isHouseholder: string;
+  isHouseholder: boolean;
   createdAt: Date;
 }
 

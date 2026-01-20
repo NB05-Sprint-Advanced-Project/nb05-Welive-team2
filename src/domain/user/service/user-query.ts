@@ -71,7 +71,7 @@ export const createUserQueryService = (
   };
 
   const getResidentById = async (dto: GetResidentReqDto): Promise<ResidentView> => {
-    const notJoidedResidentUser = await userQueryRepo.findResidentById(dto.id, dto.userId);
+    const notJoidedResidentUser = await userQueryRepo.findResidentById(dto.id);
 
     if (!notJoidedResidentUser) {
       throw BusinessException({
@@ -83,8 +83,8 @@ export const createUserQueryService = (
   };
 
   const getResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
-    const notJoidedResidentUser = await userQueryRepo.findResidents(dto);
-    return notJoidedResidentUser;
+    const residentsUser = await userQueryRepo.findResidents(dto);
+    return residentsUser;
   };
 
   const getResidentAccounts = async (
