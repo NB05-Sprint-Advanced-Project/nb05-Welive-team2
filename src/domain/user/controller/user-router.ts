@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import path from 'path';
 import { catchHandler } from '../../../utils/controller-util';
 import { UserHandlers } from './user-handler';
 import { Middlewares } from '../../../shared/interface/i-middlewares';

@@ -8,19 +8,37 @@ export const registerPollRoutes = (
   handler: PollHandler,
   middlewares: Middlewares,
 ) => {
-  const auth = middlewares.auth;
+  router.get(
+    '/:pollId',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handler.getPoll),
+  );
 
-  router.get('/:pollId', auth, catchHandler(handler.getPoll));
+  router.get('/', catchHandler(middlewares.auth.authenticate), catchHandler(handler.getAllPolls));
 
-  router.get('/', auth, catchHandler(handler.getAllPolls));
+  router.post('/', catchHandler(middlewares.auth.authenticate), catchHandler(handler.createPoll));
 
-  router.post('/', auth, catchHandler(handler.createPoll));
+  router.patch(
+    '/:pollId',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handler.updatePoll),
+  );
 
-  router.patch('/:pollId', auth, catchHandler(handler.updatePoll));
+  router.delete(
+    '/:pollId',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handler.deletePoll),
+  );
 
-  router.delete('/:pollId', auth, catchHandler(handler.deletePoll));
+  router.post(
+    '/:pollId/options/:optionId/vote',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handler.vote),
+  );
 
-  router.post('/:pollId/options/:optionId/vote', auth, catchHandler(handler.vote));
-
-  router.delete('/:pollId/options/:optionId/vote', auth, catchHandler(handler.vote));
+  router.delete(
+    '/:pollId/options/:optionId/vote',
+    catchHandler(middlewares.auth.authenticate),
+    catchHandler(handler.vote),
+  );
 };
