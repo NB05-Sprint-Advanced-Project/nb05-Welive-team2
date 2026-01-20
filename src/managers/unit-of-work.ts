@@ -46,7 +46,7 @@ export const createUnitOfWork = (prismaClient: PrismaClient): IUnitOfWork => {
           i < maxRetries
         ) {
           const baseDelay = getEnv().OPTIMISTIC_LOCK_RETRY_DELAY_MS;
-          const jitter = Math.random() * 100;
+          const jitter = Math.random() * 1000;
           const delay = Math.pow(2, i) * baseDelay + jitter;
           console.log(`재시도 전 대기중... ${delay}ms`);
           await new Promise((resolve) => setTimeout(resolve, delay));

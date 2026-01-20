@@ -31,10 +31,21 @@ export const createApartmentCommandRepo = (prismaClient: PrismaClient): IApartme
       return await prisma().apartment.update({
         where: {
           id: model.id,
+          version: model.version,
         },
-        data: model,
+        data: {
+          ...model,
+          version: { increment: 1 },
+        },
       });
     } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw TechnicalException({
+          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
+          error: err,
+        });
+      }
+
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
         const target = (err.meta as any)?.target;
         if (target?.includes('address')) {

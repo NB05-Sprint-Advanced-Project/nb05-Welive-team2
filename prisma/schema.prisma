@@ -55,6 +55,7 @@ model Apartment {
   unitCountPerFloor     Int
   createdAt             DateTime
   updatedAt             DateTime
+  version               Int      @default(1)
 
   UserApartmentLink UserApartmentLink[]
   complaint         Complaint[]
@@ -85,7 +86,7 @@ model UserApartmentLink {
 }
 
 model Address {
-  userId        String  @id
+  userId        String @id
   isHouseholder String // 프론트 쪽에서 string으로 받음
   unit          Int
   building      Int
@@ -149,7 +150,6 @@ model Options {
   poll   Polls  @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
   UserVoteOptions UserVoteOption[]
-
 }
 
 model Polls {
@@ -167,7 +167,7 @@ model Polls {
   userId      String
   author      User       @relation(fields: [userId], references: [id])
 
-  version   Int      
+  version Int
   options Options[]
 }
 
@@ -200,8 +200,8 @@ model Notices {
   userId      String
   author      User           @relation(fields: [userId], references: [id])
   comment     Comment[]
-  version   Int      
-  event Events?
+  version     Int
+  event       Events?
 }
 
 enum NoticeCategory {

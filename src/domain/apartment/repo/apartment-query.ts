@@ -17,8 +17,7 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
     }
 
     const totalBuildings = apartment.buildingNumberTo - apartment.buildingNumberFrom + 1;
-    const totalUnits =
-      apartment.unitCountPerFloor * apartment.floorCountPerBuilding * totalBuildings;
+    const totalUnits = apartment.unitCountPerFloor * apartment.floorCountPerBuilding;
 
     return {
       id: apartment.id,
@@ -26,8 +25,15 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
       address: apartment.address,
       description: apartment.description,
       officeNumber: apartment.officeNumber,
-      buildings: [totalBuildings],
-      units: [totalUnits],
+      buildings: Array.from(
+        { length: totalBuildings },
+        (_, i) => apartment.buildingNumberFrom + i,
+      ) as [number], // 아파트 동수
+      units: Array.from({ length: totalUnits }, (_, i) => {
+        const floor = Math.floor(i / apartment.unitCountPerFloor) + 1;
+        const unit = (i % apartment.unitCountPerFloor) + 1;
+        return floor * 100 + unit;
+      }) as [number], // 아파트 호수
     };
   };
 
@@ -60,16 +66,22 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
     return {
       data: apartments.map((apartment) => {
         const totalBuildings = apartment.buildingNumberTo - apartment.buildingNumberFrom + 1;
-        const totalUnits =
-          apartment.unitCountPerFloor * apartment.floorCountPerBuilding * totalBuildings;
+        const totalUnits = apartment.unitCountPerFloor * apartment.floorCountPerBuilding;
         return {
           id: apartment.id,
           name: apartment.name,
           address: apartment.address,
           description: apartment.description,
           officeNumber: apartment.officeNumber,
-          buildings: [totalBuildings],
-          units: [totalUnits],
+          buildings: Array.from(
+            { length: totalBuildings },
+            (_, i) => apartment.buildingNumberFrom + i,
+          ) as [number],
+          units: Array.from({ length: totalUnits }, (_, i) => {
+            const floor = Math.floor(i / apartment.unitCountPerFloor) + 1;
+            const unit = (i % apartment.unitCountPerFloor) + 1;
+            return floor * 100 + unit;
+          }) as [number], // 아파트 호수
         };
       }),
       totalCount: apartments.length,

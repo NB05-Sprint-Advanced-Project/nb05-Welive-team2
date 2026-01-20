@@ -4,6 +4,7 @@ export type ApartmentProps = {
   readonly id: string;
   createdAt: Date;
   updatedAt: Date;
+  version: number;
   name: string;
   address: string;
   description: string;
