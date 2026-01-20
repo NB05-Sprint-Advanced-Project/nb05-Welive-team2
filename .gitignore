@@ -201,4 +201,7 @@ $RECYCLE.BIN/
 
 /prisma/migrations/
 
-/src/test/test.http
+/src/test/auth-test.http
+/src/test/notice-test.http
+/src/test/poll-test.http
+/src/test/user-test.http
