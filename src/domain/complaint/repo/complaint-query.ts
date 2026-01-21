@@ -63,7 +63,7 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
   };
 
   const findAll = async (
-    apartmentId: number,
+    apartmentId: string,
     page: number,
     limit: number,
     filter: ComplaintListFilter,
