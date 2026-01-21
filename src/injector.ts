@@ -40,9 +40,11 @@ import { createPollController } from './domain/poll/controller/poll-controller';
 import { createAuthMiddleware } from './middlewares/auth-middleware';
 import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
+import { createRedisExternal } from './redis';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
+  const redisExternal = createRedisExternal();
   //util
   const unitOfwork = createUnitOfWork(prisma);
   const tokenManager = TokenUtil();
@@ -98,9 +100,13 @@ export const createInjector = () => {
   const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
   const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
 
-  const complaintQueryService = createComplaintQueryService(complaintQueryRepository);
+  const complaintQueryService = createComplaintQueryService(
+    redisExternal,
+    complaintQueryRepository,
+  );
   const complaintCommandService = createComplaintCommandService(
     unitOfwork,
+    redisExternal,
     complaintCommandRepository,
   );
 

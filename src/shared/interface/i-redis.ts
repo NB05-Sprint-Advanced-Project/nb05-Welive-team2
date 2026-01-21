@@ -1,4 +1,4 @@
-export type IRedisExtenal = {
+export type IRedisExternal = {
   get(key: string): Promise<string | null>;
   getMany(keys: string[]): Promise<(string | null)[]>;
   set(key: string, data: string, ttl?: number): Promise<void>;

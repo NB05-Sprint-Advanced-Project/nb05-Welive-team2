@@ -1,8 +1,8 @@
 import Redis from 'ioredis';
 import { getEnv } from './config';
-import { IRedisExtenal } from './shared/interface/i-redis';
+import { IRedisExternal } from './shared/interface/i-redis';
 
-export const createRedisExternal = (): IRedisExtenal => {
+export const createRedisExternal = (): IRedisExternal => {
   const redisClient = new Redis({
     host: getEnv().REDIS_HOST,
     port: getEnv().REDIS_PORT,
