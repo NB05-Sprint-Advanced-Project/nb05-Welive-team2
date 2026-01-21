@@ -13,7 +13,7 @@ export const createGlobalErrorMiddleware = () => {
 
     if (isTechnicalException(err)) {
       if (isDev) console.error(err);
-      return res.json({ message: err.message, meta: err.meta });
+      return res.status(400).json({ message: err.message, meta: err.meta });
     }
 
     if (isDev) console.error(err);
