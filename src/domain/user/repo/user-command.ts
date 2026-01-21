@@ -23,8 +23,7 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { AdminAccountProps } from '../entity/admin-account';
 import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
-import { BasePrismaClient, BaseRepo } from '../../../shared/base-command-repo';
-import { asyncContextStorage } from '../../../utils/async-context-storage-util';
+import { BaseRepo } from '../../../shared/base-command-repo';
 
 export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);

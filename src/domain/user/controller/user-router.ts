@@ -12,12 +12,41 @@ export const registerUserRoutes = (
   router.post('/admins', catchHandler(handlers.createAdmin));
 
   // 관리자 계정
-  router.get('/admins', catchHandler(handlers.getAdministrators));
-  router.patch('/admins/join-status', catchHandler(handlers.updateAdminsJoinStatuses));
-  router.delete('/admins/rejected', catchHandler(handlers.deleteRejectedAdmins));
-  router.patch('/admins/:id/join-status', catchHandler(handlers.updateAdminJoinStatus));
-  router.patch('/admins/:adminId', catchHandler(handlers.updateAdmin));
-  router.delete('/admins/:adminId', catchHandler(handlers.deleteAdmin));
+  router.get(
+    '/admins',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.getAdministrators),
+  );
+
+  router.patch(
+    '/admins/join-status',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.updateAdminsJoinStatuses),
+  );
+
+  router.delete(
+    '/admins/rejected',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.deleteRejectedAdmins),
+  );
+
+  router.patch(
+    '/admins/:id/join-status',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.updateAdminJoinStatus),
+  );
+
+  router.patch(
+    '/admins/:adminId',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.updateAdmin),
+  );
+
+  router.delete(
+    '/admins/:adminId',
+    catchHandler(middlewares.auth.authSuperAdmin),
+    catchHandler(handlers.deleteAdmin),
+  );
 
   // 입주민 계정
   router.post('/residents', catchHandler(handlers.signUpResidentAccount));

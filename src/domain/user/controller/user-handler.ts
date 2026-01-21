@@ -39,7 +39,10 @@ export const createUserHandlers = (
   };
 
   const getAdministrators = async (req: Request, res: Response) => {
-    const dto = validate(viewAdministratorSchema, req.query);
+    const dto = validate(viewAdministratorSchema, {
+      ...req.user,
+      ...req.query,
+    });
     const admins = await userQueryService.getAdministrators(dto);
     return res.status(200).json(admins);
   };
@@ -48,19 +51,24 @@ export const createUserHandlers = (
     const dto = validate(updateAdminSchema, {
       ...req.body,
       ...req.params,
+      ...req.user,
     });
     const updatedAdmin = await userCommandService.updateAdmin(dto);
     return res.status(204).send();
   };
 
   const updateAdminsJoinStatuses = async (req: Request, res: Response) => {
-    const dto = validate(updateAdminsJoinStatusesSchema, req.body);
+    const dto = validate(updateAdminsJoinStatusesSchema, {
+      ...req.user,
+      ...req.body,
+    });
     const result = await userCommandService.updateAdminJoinedStatuses(dto);
     return res.status(204).send();
   };
 
   const updateAdminJoinStatus = async (req: Request, res: Response) => {
     const dto = validate(updateAdminJoinStatusSchema, {
+      ...req.user,
       ...req.body,
       ...req.params,
     });
@@ -69,7 +77,10 @@ export const createUserHandlers = (
   };
 
   const deleteAdmin = async (req: Request, res: Response) => {
-    const dto = validate(deleteAdminSchema, req.params);
+    const dto = validate(deleteAdminSchema, {
+      ...req.user,
+      ...req.params,
+    });
     await userCommandService.deleteAdmin(dto);
     return res.status(204).send();
   };

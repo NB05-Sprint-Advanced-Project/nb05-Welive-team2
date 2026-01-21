@@ -35,6 +35,8 @@ export enum BusinessExceptionType {
   INVALID_CREDENTIALS,
   NOT_UPDATE_JOINEDSTATUS,
   INVALID_AUTH,
+  NOT_SUPERADMIN,
+  NOT_ADMIN,
 }
 
 export const BusinessExceptionTable: Record<
@@ -149,6 +151,14 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.FORBIDDEN]: {
     statusCode: 403,
     message: '권한이 없습니다.',
+  },
+  [BusinessExceptionType.NOT_SUPERADMIN]: {
+    statusCode: 403,
+    message: '슈퍼 관리자 권한이 없습니다.',
+  },
+  [BusinessExceptionType.NOT_ADMIN]: {
+    statusCode: 403,
+    message: '관리자 권한이 없습니다.',
   },
 
   // 중복, 충돌

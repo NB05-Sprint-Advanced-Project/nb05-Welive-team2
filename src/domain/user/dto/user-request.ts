@@ -23,6 +23,7 @@ import {
 // 관리자
 // 관리자 계정
 export const viewAdministratorSchema = z.object({
+  userId: userIdSchema,
   page: z.coerce.number().default(1),
   limit: z.coerce.number().default(10),
   searchKeyword: z.string().default(''),
@@ -56,6 +57,7 @@ export const createAdminSchema = z.object({
 });
 
 export const updateAdminSchema = z.object({
+  userId: userIdSchema,
   adminId: userIdSchema,
   email: emailSchema,
   contact: contactSchema,
@@ -69,15 +71,18 @@ export const updateAdminSchema = z.object({
 });
 
 export const updateAdminsJoinStatusesSchema = z.object({
+  userId: userIdSchema,
   joinStatus: joinedStatusSchema,
 });
 
 export const updateAdminJoinStatusSchema = z.object({
+  userId: userIdSchema,
   id: userIdSchema,
   joinStatus: joinedStatusSchema,
 });
 
 export const deleteAdminSchema = z.object({
+  userId: userIdSchema,
   adminId: userIdSchema,
 });
 

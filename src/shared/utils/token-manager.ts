@@ -6,6 +6,13 @@ import { BusinessException } from '../exception/business-exception/business-exce
 
 export type TokenPayload = {
   userId: string;
+  role?: string;
+  exp: number;
+};
+
+export type SecretTokenPayload = {
+  userId: string;
+  role: string;
   exp: number;
 };
 
@@ -20,7 +27,7 @@ export interface ITokenUtil {
    * ignoreExpiration이 false이고 토큰이 만료된 경우 예외를 던집니다.
    * @throws {BusinessException}
    */
-  verifyToken(props: { token: string; ignoreExpiration?: boolean }): TokenPayload;
+  verifyToken(props: { token: string; ignoreExpiration?: boolean }): SecretTokenPayload;
 }
 
 export const TokenUtil = (): ITokenUtil => {
@@ -45,7 +52,7 @@ export const TokenUtil = (): ITokenUtil => {
       const { token, ignoreExpiration } = props;
       return jwt.verify(token, getEnv().TOKEN_SECRET, {
         ignoreExpiration,
-      }) as TokenPayload;
+      }) as SecretTokenPayload;
     } catch (err) {
       if (err instanceof TokenExpiredError) {
         throw BusinessException({

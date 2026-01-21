@@ -19,9 +19,10 @@ export const createAuthHandlers = (authService: AuthService) => {
       path: '/',
     });
 
+    // 쿠키 감
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: false, // 개발 환경에서는 false, 배포 환경에서는 true
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       path: '/',
