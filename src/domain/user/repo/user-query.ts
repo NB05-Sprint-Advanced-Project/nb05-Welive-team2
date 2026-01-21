@@ -5,6 +5,7 @@ import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/re
 import { userInclude } from '../user-mapper';
 import { GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
+import { LoginView } from '../../auth/controller/view/log-in';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   const findAllAdmins = async (
@@ -71,7 +72,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
-  const findByUsername = async (username: string) => {
+  const findByUsername = async (username: string): Promise<LoginView | null> => {
     const user = await prisma.user.findUnique({
       where: { username },
       include: {
@@ -81,32 +82,39 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
         Address: true,
       },
     });
+
     if (!user) {
       return null;
     }
 
     return {
       id: user.id,
-      username: user.username || '',
-      password: user.password || '',
+      username: user.username!,
+      password: user.password!,
       email: user.email,
       contact: user.contact,
       name: user.name,
-      role: user.role,
+      role: user.role === Role.RESIDENT ? 'USER' : user.role,
       avatar: user.avatarUrl || '',
-      joinStatus: user.joinedStatus,
-      isActive: true as const,
-      adminOf: {
-        id: user.UserApartmentLink[0]?.apartment.id || '',
-        name: user.UserApartmentLink[0]?.apartment.name || '',
-      },
-      resident: {
-        id: user.id,
-        apartmentId: user.UserApartmentLink[0]?.apartment.id || '',
-        building: user.Address?.building || 0,
-        unit: user.Address?.unit || 0,
-        isHouseholder: user.Address?.isHouseholder || false,
-      },
+      joinStatus: user.joinedStatus as Status,
+      isActive: true,
+      adminOf:
+        user.UserApartmentLink.length > 0
+          ? {
+              id: user.UserApartmentLink[0].apartmentId,
+              name: user.UserApartmentLink[0].apartment.name,
+            }
+          : undefined,
+      resident:
+        user.UserApartmentLink.length > 0 && user.Address
+          ? {
+              id: user.id,
+              apartmentId: user.UserApartmentLink[0].apartmentId,
+              building: user.Address.building,
+              unit: user.Address.unit,
+              isHouseholder: user.Address.isHouseholder,
+            }
+          : undefined,
     };
   };
 

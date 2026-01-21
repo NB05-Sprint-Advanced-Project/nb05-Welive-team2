@@ -26,7 +26,6 @@ export const createAuthHandlers = (authService: AuthService) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       path: '/',
     });
-    console.log(userWithoutPassword);
     return res.status(200).json(userWithoutPassword);
   };
 

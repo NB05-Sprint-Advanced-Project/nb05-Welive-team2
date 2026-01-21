@@ -1,9 +1,9 @@
 import { Status } from '../entity/base-user';
 import { AdministratorView } from '../dto/view/administrator';
-import { UserView } from '../dto/view/user-view';
 import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
 import { GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
+import { LoginView } from '../../auth/controller/view/log-in';
 
 export interface IUserQueryRepo {
   findAllAdmins(
@@ -13,7 +13,7 @@ export interface IUserQueryRepo {
     joinStatus?: Status,
   ): Promise<AdministratorView>;
 
-  findByUsername(username: string): Promise<UserView | null>;
+  findByUsername(username: string): Promise<LoginView | null>;
 
   findNotJoinedResidentByEmail: (email: string, userId: string) => Promise<ResidentView | null>;
 

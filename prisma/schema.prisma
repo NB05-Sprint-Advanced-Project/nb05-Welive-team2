@@ -30,14 +30,16 @@ model User {
   createdAt    DateTime
   updatedAt    DateTime
 
-  Address           Address?
-  UserApartmentLink UserApartmentLink[]
-  Complaint         Complaint[]
-  Polls             Polls[]
-  Notices           Notices[]
-  Notifications     Notifications[]
-  Comment           Comment[]
-  UserVoteOption    UserVoteOption[]
+  Address            Address?
+  UserApartmentLink  UserApartmentLink[]
+  Complaint          Complaint[]
+  Polls              Polls[]
+  Notices            Notices[]
+  Notifications      Notifications[]
+  Comment            Comment[]
+  UserVoteOption     UserVoteOption[]
+  addressUserId      String?
+  addressApartmentId String?
 
   @@index([email])
   @@index([joinedStatus])
@@ -86,7 +88,7 @@ model UserApartmentLink {
 }
 
 model Address {
-  userId        String @id
+  userId        String  @id
   isHouseholder Boolean // 프론트 쪽에서 string으로 받음
   unit          Int
   building      Int
@@ -162,7 +164,7 @@ model Polls {
   startDate   DateTime
   endDate     DateTime
   apartmentId String
-  apartment   Apartment  @relation(fields: [apartmentId], references: [id])
+  apartment   Apartment  @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
   building    Int
   userId      String
   author      User       @relation(fields: [userId], references: [id])
@@ -196,7 +198,7 @@ model Notices {
   isPinned    Boolean
   viewCount   Int
   apartmentId String
-  apartment   Apartment      @relation(fields: [apartmentId], references: [id])
+  apartment   Apartment      @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
   userId      String
   author      User           @relation(fields: [userId], references: [id])
   comment     Comment[]

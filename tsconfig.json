@@ -20,7 +20,6 @@
     /* 타입 정의 경로 */
     "typeRoots": [
       // 커스텀 타입 정의를 저장할 폴더 지정
-      "./src/types",
       "./src/shared/types",
       "./node_modules/@types"
     ]
