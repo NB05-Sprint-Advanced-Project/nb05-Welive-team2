@@ -26,6 +26,6 @@
     ]
   },
   /* 포함/제외 설정 */
-  "include": ["src", "./src/types"], // TypeScript가 읽어야 할 코드 폴더
+  "include": ["src", "./src/shared/types"], // TypeScript가 읽어야 할 코드 폴더
   "exclude": ["node_modules", "dist"] // 컴파일 대상에서 제외할 폴더
 }
