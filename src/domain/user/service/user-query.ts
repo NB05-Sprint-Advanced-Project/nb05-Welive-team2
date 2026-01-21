@@ -1,7 +1,6 @@
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { GetResidentReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
-import { IRedisExtenal } from '../../../shared/interface/i-redis';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 import { AdministratorView } from '../dto/view/administrator';
 import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
@@ -9,10 +8,11 @@ import { Status } from '../entity/base-user';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { redisKeys } from '../../../utils/redis-keys';
 import { randomUUID } from 'node:crypto';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 
 export const createUserQueryService = (
   userQueryRepo: IUserQueryRepo,
-  redisExternal: IRedisExtenal,
+  redisExternal: IRedisExternal,
 ) => {
   const getAdministrators = async (params: {
     page: number;

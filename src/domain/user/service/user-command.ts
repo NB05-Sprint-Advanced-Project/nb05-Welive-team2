@@ -40,8 +40,6 @@ import {
   DeleteResidentReqDto,
 } from '../dto/resident-user-response';
 
-import { IRedisExtenal } from '../../../shared/interface/i-redis';
-
 export const createUserCommandService = (
   uow: IUnitOfWork,
   hashManager: IHashManager,
