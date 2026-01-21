@@ -1,13 +1,17 @@
+import { dir } from 'console';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
 import { ComplaintEntity, ComplaintStatus } from '../complaint-entity';
 import { IComplaintCommandRepo } from '../interface/i-complaint-command-repo';
+import { createComplaintCommandRepo } from '../repo/complaint-command';
 
 export const createComplaintCommandService = (
   uow: IUnitOfWork,
+  redisExternal: IRedisExternal,
   complaintRepo: IComplaintCommandRepo,
 ) => {
   const createComplaint = async (
@@ -66,6 +70,8 @@ export const createComplaintCommandService = (
 
           const entity = ComplaintEntity.update(beforeContext, complaint);
           await complaintRepo.update(entity);
+
+          await redisExternal.del(`complaint:${complaintId}`);
         },
         {
           transactionOptions: { useTransaction: false },
@@ -105,6 +111,7 @@ export const createComplaintCommandService = (
       }
 
       await complaintRepo.delete(complaintId);
+      await redisExternal.del(`complaint:${complaintId}`);
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.RECORD_NOT_FOUND) {
@@ -157,6 +164,7 @@ export const createComplaintCommandService = (
 
           const entity = ComplaintEntity.updateStatus(beforeContext, { status });
           await complaintRepo.updateStatus(entity);
+          await redisExternal.del(`complaint:${complaintId}`);
         }
       });
     } catch (err) {
@@ -176,7 +184,36 @@ export const createComplaintCommandService = (
     }
   };
 
-  return { createComplaint, updateComplaint, deleteComplaint, updateComplaintStatus };
+  const syncViewCounts = async () => {
+    const key = `dirty:complaintIds`;
+    while (true) {
+      const dirtyComplaintIds = await redisExternal.popFromSet(key, 50);
+      if (dirtyComplaintIds.length === 0) {
+        break;
+      }
+
+      const viewCounts = await redisExternal.getMany(
+        dirtyComplaintIds.map((complaintId) => `complaint:${complaintId}:viewCount`),
+      );
+
+      await complaintRepo.updateViewCountBulk(
+        dirtyComplaintIds.map((complaintId, index) => {
+          return {
+            complaintId,
+            viewCount: viewCounts[index] === null ? 0 : Number(viewCounts[index]),
+          };
+        }),
+      );
+    }
+  };
+
+  return {
+    createComplaint,
+    updateComplaint,
+    deleteComplaint,
+    updateComplaintStatus,
+    syncViewCounts,
+  };
 };
 
 export type ComplaintCommandService = ReturnType<typeof createComplaintCommandService>;

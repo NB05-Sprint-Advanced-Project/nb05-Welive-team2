@@ -5,12 +5,73 @@ import { isTechnicalException } from '../../../shared/exception/technical-except
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
+import { randomUUID } from 'crypto';
 
-export const createComplaintQueryService = (compliantRepo: IComplaintQueryRepo) => {
+export const createComplaintQueryService = (
+  redisExternal: IRedisExternal,
+  compliantRepo: IComplaintQueryRepo,
+) => {
   const getComplaint = async (complaintId: string): Promise<ComplaintView> => {
     try {
-      const complaint = await compliantRepo.findById(complaintId);
+      let complaint;
+      const key = `complaint:${complaintId}`;
+      const cachedComplaint = await redisExternal.get(key);
 
+      if (cachedComplaint) {
+        complaint = JSON.parse(cachedComplaint);
+      } else {
+        for (let i = 0; i < 10; i++) {
+          const locktoken = randomUUID();
+          const isLocked = await redisExternal.setIfNotExist(
+            `lock:complaint:${complaintId}`,
+            locktoken,
+            3,
+          );
+          if (isLocked) {
+            try {
+              const foundComplaint = await compliantRepo.findById(complaintId);
+              await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
+              complaint = foundComplaint;
+            } finally {
+              await redisExternal.delifmatch(`lock:complaint:${complaintId}`, locktoken);
+            }
+            break;
+          } else {
+            await new Promise((resolve, reject) =>
+              setTimeout(() => {
+                resolve(0);
+              }, 100),
+            );
+
+            const cachedComplaint = await redisExternal.get(key);
+            if (cachedComplaint) {
+              complaint = JSON.parse(cachedComplaint);
+              break;
+            }
+          }
+        }
+      }
+
+      if (!complaint) {
+        const foundComplaint = await compliantRepo.findById(complaintId);
+        await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
+        complaint = foundComplaint;
+      }
+      if (!complaint) {
+        throw BusinessException({
+          type: BusinessExceptionType.COMPLAINT_NOT_FOUND,
+        });
+      }
+
+      const viewCountKey = `complaint:${complaintId}:viewCount`;
+      await redisExternal.setIfNotExist(viewCountKey, String(complaint.viewCount), 3600 * 24);
+      const newViewCount = await redisExternal.increase(viewCountKey);
+
+      const dirtyComplaintKey = 'dirty:complaintIds';
+      await redisExternal.addToSet(dirtyComplaintKey, complaintId);
+
+      complaint.viewCount = newViewCount;
       return complaint;
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -30,7 +91,7 @@ export const createComplaintQueryService = (compliantRepo: IComplaintQueryRepo) 
   };
 
   const getAllComplaints = async (
-    apartmentId: number,
+    apartmentId: string,
     params: ComplaintListFilter & { page: number; limit: number },
   ): Promise<PageView<ComplaintView>> => {
     try {

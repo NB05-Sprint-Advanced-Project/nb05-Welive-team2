@@ -127,5 +127,21 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
     }
   };
 
-  return { findById, create, update, delete: deleteComplaint, updateStatus };
+  const updateViewCountBulk = async (props: { complaintId: string; viewCount: number }[]) => {
+    if (props.length === 0) {
+      return;
+    }
+
+    const complaintIds = props.map((v) => v.complaintId);
+    const cases = props.map((v) => Prisma.sql`WHEN ${v.complaintId} THEN ${v.viewCount}`);
+    let query = Prisma.sql`
+      UPDATE "ARTICLE"
+      SET "viewCount" = CASE id ${Prisma.join(cases, ' ')} ELSE "viewCount" END
+      WHERE id IN (${Prisma.join(complaintIds)})
+    `;
+
+    await prisma.$executeRaw(query);
+  };
+
+  return { findById, create, update, delete: deleteComplaint, updateStatus, updateViewCountBulk };
 };

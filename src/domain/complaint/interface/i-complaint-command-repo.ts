@@ -6,4 +6,5 @@ export interface IComplaintCommandRepo {
   update(entity: ComplaintProps): Promise<void>;
   delete(complaintId: string): Promise<void>;
   updateStatus(entity: ComplaintProps): Promise<void>;
+  updateViewCountBulk(props: { complaintId: string; viewCount: number }[]): Promise<void>;
 }
