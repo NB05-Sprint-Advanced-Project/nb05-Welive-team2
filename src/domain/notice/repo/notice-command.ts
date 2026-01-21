@@ -135,8 +135,8 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2025') {
           throw TechnicalException({
-            type: TechnicalExceptionType.RECORD_NOT_FOUND,
-            meta: err.meta,
+            type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
+            error: err,
           });
         }
       }

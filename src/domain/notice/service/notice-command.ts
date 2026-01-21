@@ -2,6 +2,13 @@ import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
 import { CreateNoticeDto, UpdateNoticeDto, DeleteNoticeDto } from '../dto/notice-request';
 import { NoticeProps, NoticeEntity } from '../entity/notice';
+import {
+  isTechnicalException,
+  TechnicalException,
+} from '../../../shared/exception/technical-exception/technical-exception';
+import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeCommandRepo) => {
   const createNotice = async (dto: CreateNoticeDto, userId: string): Promise<NoticeProps> => {
@@ -22,20 +29,35 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
   };
 
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
-    return await uow.doWork(
-      async () => {
-        const { noticeId, ...data } = dto;
-        const foundNotice = await repo.findById(noticeId, 'exclusive');
-        if (!foundNotice) {
-          throw new Error();
+    try {
+      return await uow.doWork(
+        async () => {
+          const { noticeId, ...data } = dto;
+          const foundNotice = await repo.findById(noticeId);
+          if (!foundNotice) {
+            throw new Error();
+          }
+          await repo.update(NoticeEntity.update(foundNotice, { ...data }));
+        },
+        // {
+        //   transactionOptions: { useTransaction: false, isolationLevel: 'ReadCommitted' },
+        //   useOptimisticLock: true,
+        // },
+      );
+    } catch (err) {
+      if (isTechnicalException(err)) {
+        if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+          throw BusinessException({ type: BusinessExceptionType.CONCURRENT_MODIFICATION });
         }
-        await repo.update(NoticeEntity.update(foundNotice, { ...data }));
-      },
-      {
-        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
-        useOptimisticLock: true,
-      },
-    );
+
+        throw TechnicalException({
+          type: TechnicalExceptionType.UNKNOWN_ERROR,
+          error: err,
+        });
+      }
+
+      throw err;
+    }
   };
 
   const deleteNotice = async (dto: DeleteNoticeDto): Promise<void> => {
