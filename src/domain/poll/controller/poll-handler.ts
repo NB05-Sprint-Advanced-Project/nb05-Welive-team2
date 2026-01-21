@@ -26,7 +26,6 @@ export const createPollHandler = (
 
   const getAllPolls = async (req: Request, res: Response) => {
     const params = validate(getAllPollsReqParamsSchema, req.query);
-    console.log(params);
     const polls = await pollQueryService.getAllPolls({ ...params });
     return res.json(polls);
   };

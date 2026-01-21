@@ -54,11 +54,11 @@ export const createUnitOfWork = (prismaClient: PrismaClient): IUnitOfWork => {
         }
 
         lastErr = err;
-        console.log('UnitOfWork 실패:', lastErr);
+        // console.log('UnitOfWork 실패:', lastErr);
         break;
       }
     }
-    //console.log('전부 실패:', lastErr);
+    console.log('전부 실패:', lastErr);
     throw lastErr;
   };
 
