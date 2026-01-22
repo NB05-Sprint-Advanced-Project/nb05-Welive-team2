@@ -1,12 +1,12 @@
 ﻿import { randomUUID } from 'crypto';
 import { IRedisExternal } from '../shared/interface/i-redis';
-import { IRedisLocker, RedisLockRequest, RedisLockWork } from '../shared/interface/i-redis-locker';
+import { RedisLockWork, IRedisLocker, RedisLockRequest } from '../shared/interface/i-redis-locker';
 
 const DEFAULT_OPTIONS = {
   cacheTtlSeconds: 3,
   lockTtlSeconds: 3,
-  retryCount: 10,
-  retryDelayMs: 100,
+  retryCount: 310,
+  retryDelayMs: 1000,
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -31,32 +31,34 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
     } = request;
 
     const cache = await redisExternal.get(key);
+    let result: T | null = null;
+
     if (cache) {
-      return JSON.parse(cache) as T;
-    }
+      result = JSON.parse(cache);
+    } else {
+      for (let i = 0; i < retryCount; i++) {
+        const lockToken = randomUUID();
+        const isLocked = await redisExternal.setIfNotExist(lockKey, lockToken, lockTtlSeconds);
 
-    for (let i = 0; i < retryCount; i++) {
-      const lockToken = randomUUID();
-      const isLocked = await redisExternal.setIfNotExist(lockKey, lockToken, lockTtlSeconds);
-
-      if (isLocked) {
-        try {
-          const result = await resolveWork(work);
-          await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
-          return result;
-        } finally {
-          await redisExternal.delifmatch(lockKey, lockToken);
+        if (isLocked) {
+          try {
+            result = await resolveWork(work);
+            await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
+          } finally {
+            await redisExternal.delifmatch(lockKey, lockToken);
+          }
+        } else {
+          await sleep(retryDelayMs);
+          const cachedResult = await redisExternal.get(key);
+          if (cachedResult) {
+            result = JSON.parse(cachedResult);
+            break;
+          }
         }
       }
-
-      await sleep(retryDelayMs);
-      const result = await redisExternal.get(key);
-      if (result) {
-        return JSON.parse(result) as T;
-      }
     }
 
-    return null;
+    return result;
   };
 
   return {

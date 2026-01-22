@@ -3,7 +3,7 @@ import http from 'k6/http';
 
 export const options = {
   stages: [
-    { duration: '10s', target: 2000 },
+    { duration: '10s', target: 2000 }, // 10초동안 2000명의 유저가 동시에 요청
     // { duration: "1m", target: 800 },
     // { duration: "30s",c target: 0 },
   ],
