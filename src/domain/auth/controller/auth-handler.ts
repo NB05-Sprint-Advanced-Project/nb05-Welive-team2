@@ -1,4 +1,6 @@
 import { AuthService } from '../auth-service';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { validate } from '../../../utils/controller-util';
 import { loginSchema, cookieTokenSchema } from '../dto/auth-request';
 

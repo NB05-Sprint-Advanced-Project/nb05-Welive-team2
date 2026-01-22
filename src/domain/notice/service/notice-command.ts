@@ -2,13 +2,13 @@ import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
 import { CreateNoticeDto, UpdateNoticeDto, DeleteNoticeDto } from '../dto/notice-request';
 import { NoticeProps, NoticeEntity } from '../entity/notice';
-import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
-import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import {
   isTechnicalException,
   TechnicalException,
 } from '../../../shared/exception/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeCommandRepo) => {
   const createNotice = async (dto: CreateNoticeDto, userId: string): Promise<NoticeProps> => {

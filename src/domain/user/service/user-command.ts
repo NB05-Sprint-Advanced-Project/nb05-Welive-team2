@@ -157,7 +157,7 @@ export const createUserCommandService = (
 
           await userCommandRepo.update(updatedUserEntity);
 
-          // 3. 아파트 정보 조회
+          // // 3. 아파트 정보 조회
           const foundApartment = await apartmentRepo.findById(
             foundUser.userApartmentLink![0].apartmentId,
           );
@@ -175,7 +175,15 @@ export const createUserCommandService = (
             officeNumber: dto.adminOf.officeNumber,
           });
 
-          await apartmentRepo.update(updatedApartmentEntity);
+          // const updatedApartmentEntity = ApartmentEntity.update({
+          //   apartment: foundApartment,
+          //   name: dto.adminOf.name,
+          //   address: dto.adminOf.address,
+          //   description: dto.adminOf.description,
+          //   officeNumber: dto.adminOf.officeNumber,
+          // });
+
+          // await apartmentRepo.update(updatedApartmentEntity);
         },
         {
           transactionOptions: {

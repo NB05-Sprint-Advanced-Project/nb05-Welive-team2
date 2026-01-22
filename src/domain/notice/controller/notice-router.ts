@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { NoticeHandler } from './notice-handler';
 import { catchHandler } from '../../../utils/controller-util';
+import { createAuthMiddleware } from '../../../middlewares/auth-middleware';
 import { Middlewares } from '../../../shared/interface/i-middlewares';
 
 export const registerNoticeRoutes = (

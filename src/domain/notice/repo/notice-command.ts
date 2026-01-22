@@ -43,8 +43,8 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       SELECT
         n.*, 
         e.id            as event_id,
-        e."startDate"   as "event_startDate",
-        e."endDate"     as "event_endDate"
+        e."startDate"   as event_startDate,
+        e."endDate"     as event_endDate
       FROM "Notices" n
       LEFT JOIN "Events" e ON e."noticeId" = n.id
       WHERE n.id = ${noticeId}

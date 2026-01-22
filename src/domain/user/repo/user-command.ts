@@ -27,6 +27,7 @@ import { BaseRepo } from '../../../shared/base-command-repo';
 
 export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
+  // const prisma = BaseRepo(prismaClient)
 
   const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma().user.findUnique({
@@ -247,7 +248,8 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
         },
       });
     } catch (err) {
-
+      console.log(err);
+      console.log('------------');
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw TechnicalException({
           type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,

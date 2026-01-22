@@ -4,14 +4,10 @@ import { IPollCommandRepo } from '../interface/i-poll-command-repo';
 import { IUserVoteOptionCommandRepo } from '../../user-vote-option/i-user-vote-option-command-repo';
 import { PollEntity, PollProps } from '../entity/poll';
 import { UserVoteOptionEntity } from '../../user-vote-option/user-vote-option-entity';
-import {
-  isTechnicalException,
-  TechnicalException,
-} from '../../../shared/exception/technical-exception/technical-exception';
+import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
-import { Prisma } from '@prisma/client';
 
 export const createPollCommandService = (
   uow: IUnitOfWork,
@@ -68,12 +64,6 @@ export const createPollCommandService = (
       if (isTechnicalException(err)) {
         throw BusinessException({
           type: BusinessExceptionType.FAIL_SAVE_POLL,
-        });
-      }
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw TechnicalException({
-          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
-          error: err,
         });
       }
       throw err;
