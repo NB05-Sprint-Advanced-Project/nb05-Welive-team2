@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { NoticeHandler } from './notice-handler';
 import { catchHandler } from '../../../utils/controller-util';
-import { createAuthMiddleware } from '../../../middlewares/auth-middleware';
 import { Middlewares } from '../../../shared/interface/i-middlewares';
 
 export const registerNoticeRoutes = (
@@ -16,26 +15,26 @@ export const registerNoticeRoutes = (
   );
 
   router.get(
-    '/notices/',
+    '/notices',
     catchHandler(middleware.auth.authenticate),
     catchHandler(handler.getAllNotices),
   );
 
   router.post(
-    '/notices/',
-    catchHandler(middleware.auth.authenticate),
+    '/notices',
+    catchHandler(middleware.auth.authAdmin),
     catchHandler(handler.createNotice),
   );
 
   router.patch(
     '/notices/:noticeId',
-    //catchHandler(middleware.auth.authenticate),
+    catchHandler(middleware.auth.authAdmin),
     catchHandler(handler.updateNotice),
   );
 
   router.delete(
     '/notices/:noticeId',
-    catchHandler(middleware.auth.authenticate),
+    catchHandler(middleware.auth.authAdmin),
     catchHandler(handler.deleteNotice),
   );
 

@@ -30,20 +30,16 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
 
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
     try {
-      return await uow.doWork(
-        async () => {
-          const { noticeId, ...data } = dto;
-          const foundNotice = await repo.findById(noticeId);
-          if (!foundNotice) {
-            throw new Error();
-          }
-          await repo.update(NoticeEntity.update(foundNotice, { ...data }));
-        },
-        // {
-        //   transactionOptions: { useTransaction: false, isolationLevel: 'ReadCommitted' },
-        //   useOptimisticLock: true,
-        // },
-      );
+      return await uow.doWork(async () => {
+        const { noticeId, ...data } = dto;
+        const foundNotice = await repo.findById(noticeId);
+        if (!foundNotice) {
+          throw BusinessException({
+            type: BusinessExceptionType.NOTICE_NOT_FOUND,
+          });
+        }
+        await repo.update(NoticeEntity.update(foundNotice, { ...data }));
+      });
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
@@ -55,7 +51,6 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
           error: err,
         });
       }
-
       throw err;
     }
   };

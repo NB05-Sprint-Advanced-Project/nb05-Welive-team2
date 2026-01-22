@@ -16,17 +16,17 @@ export const registerPollRoutes = (
 
   router.get('/', catchHandler(middlewares.auth.authenticate), catchHandler(handler.getAllPolls));
 
-  router.post('/', catchHandler(middlewares.auth.authenticate), catchHandler(handler.createPoll));
+  router.post('/', catchHandler(middlewares.auth.authAdmin), catchHandler(handler.createPoll));
 
   router.patch(
     '/:pollId',
-    catchHandler(middlewares.auth.authenticate),
+    catchHandler(middlewares.auth.authAdmin),
     catchHandler(handler.updatePoll),
   );
 
   router.delete(
     '/:pollId',
-    catchHandler(middlewares.auth.authenticate),
+    catchHandler(middlewares.auth.authAdmin),
     catchHandler(handler.deletePoll),
   );
 

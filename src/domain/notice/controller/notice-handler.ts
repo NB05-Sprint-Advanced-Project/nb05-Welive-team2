@@ -34,20 +34,20 @@ export const createNoticeHandler = (
     const body = validate(createNoticeReqBodySchema, req.body);
     const userId = req.userId as string;
     const notice = await noticeCommandService.createNotice({ ...body }, userId);
-    return res.json(notice);
+    return res.status(201).json(notice);
   };
 
   const updateNotice = async (req: Request, res: Response) => {
     const params = validate(updateNoticeReqParamsSchema, req.params);
     const body = validate(updateNoticeReqBodySchema, req.body);
     await noticeCommandService.updateNotice({ ...body, noticeId: params.noticeId });
-    return res.json();
+    return res.status(200).json();
   };
 
   const deleteNotice = async (req: Request, res: Response) => {
     const params = validate(deleteNoticeReqParamsSchema, req.params);
     await noticeCommandService.deleteNotice({ noticeId: params.noticeId });
-    return res.json();
+    return res.status(204).json();
   };
 
   const getEvents = async (req: Request, res: Response) => {

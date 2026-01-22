@@ -76,8 +76,8 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
   };
 
   const create = async (props: PollProps, userId: string): Promise<PollProps> => {
+    const { options, ...data } = props;
     try {
-      const { options, ...data } = props;
       const poll = await prisma().polls.create({
         data: {
           ...data,

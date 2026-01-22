@@ -11,4 +11,5 @@ export type IRedisExternal = {
   popFromSet(key: string, count: number): Promise<string[]>;
   increase(key: string): Promise<number>;
   decrease(key: string): Promise<number>;
+  quit(): void;
 };

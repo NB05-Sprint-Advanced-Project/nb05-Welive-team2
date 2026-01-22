@@ -248,8 +248,6 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
         },
       });
     } catch (err) {
-      console.log(err);
-      console.log('------------');
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw TechnicalException({
           type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,

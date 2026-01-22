@@ -79,6 +79,9 @@ export const createRedisExternal = (): IRedisExternal => {
     return await redisClient.decr(key);
   };
 
+  const quit = async () => {
+    await redisClient.quit();
+  };
   return {
     get,
     getMany,
@@ -92,5 +95,6 @@ export const createRedisExternal = (): IRedisExternal => {
     popFromSet,
     increase,
     decrease,
+    quit,
   };
 };

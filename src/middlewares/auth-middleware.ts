@@ -69,6 +69,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
         userId: payload.userId,
         role: payload.role,
       };
+      req.userId = payload.userId;
       return next();
     } catch (err) {
       return next(BusinessException({ type: BusinessExceptionType.TOKEN_EXPIRED }));

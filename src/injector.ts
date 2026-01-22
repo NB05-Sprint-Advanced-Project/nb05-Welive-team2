@@ -42,8 +42,8 @@ import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
 import { createRedisLocker } from './managers/redis-locker';
 
-export const createInjector = () => {
-  const prisma = new PrismaClient();
+export const createInjector = (mockPrisma?: PrismaClient) => {
+  const prisma = mockPrisma ?? new PrismaClient();
   //util
   const unitOfwork = createUnitOfWork(prisma);
   const tokenManager = TokenUtil();
@@ -172,6 +172,7 @@ export const createInjector = () => {
 
   return {
     httpServer,
+    redisExternal,
     // wsServer,
   };
 };

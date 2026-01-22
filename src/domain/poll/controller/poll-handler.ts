@@ -35,7 +35,7 @@ export const createPollHandler = (
     const userId = req.userId as string;
     const body = validate(createPollReqBodySchema, req.body);
     const poll = await pollCommandService.createPoll({ ...body }, userId);
-    return res.json(poll);
+    return res.status(201).json(poll);
   };
 
   const updatePoll = async (req: Request, res: Response) => {
@@ -43,13 +43,13 @@ export const createPollHandler = (
     const body = validate(updatePollReqBodySchema, req.body);
 
     await pollCommandService.updatePoll({ ...body, pollId: params.pollId });
-    return res.json();
+    return res.status(200).json();
   };
 
   const deletePoll = async (req: Request, res: Response) => {
     const params = validate(updatePollReqParamsSchema, req.params);
     await pollCommandService.deletePoll({ pollId: params.pollId });
-    return res.json();
+    return res.status(204).json();
   };
 
   const vote = async (req: Request, res: Response) => {
@@ -57,7 +57,7 @@ export const createPollHandler = (
     const userId = req.userId as string;
 
     await pollCommandService.vote({ ...params, userId });
-    return res.json();
+    return res.status(201).json();
   };
 
   const cancle = async (req: Request, res: Response) => {
@@ -65,6 +65,7 @@ export const createPollHandler = (
     const userId = req.userId as string;
 
     await pollCommandService.cancle({ ...params, userId });
+    return res.status(204).json();
   };
 
   return {

@@ -31,11 +31,13 @@ export const TechnicalException = ({
 export const isTechnicalException = (error: unknown): error is TechnicalException => {
   if (!(error instanceof Error)) return false;
 
-  const maybe = error as Partial<TechnicalException>;
+  const maybe = error as any;
 
-  return (
-    typeof maybe.type === 'number' &&
-    typeof maybe.message === 'string' &&
-    TechnicalExceptionTable[maybe.type as TechnicalExceptionType] !== undefined
-  );
+  const hasRequiredFields = typeof maybe.type === 'number' && typeof maybe.message === 'string';
+
+  if (!hasRequiredFields) return false;
+
+  const expectedMessage = TechnicalExceptionTable[maybe.type as TechnicalExceptionType];
+
+  return expectedMessage !== undefined && maybe.message === expectedMessage;
 };

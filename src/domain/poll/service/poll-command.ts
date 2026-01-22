@@ -8,6 +8,7 @@ import { isTechnicalException } from '../../../shared/exception/technical-except
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
+import { Prisma } from '@prisma/client';
 
 export const createPollCommandService = (
   uow: IUnitOfWork,
@@ -44,22 +45,16 @@ export const createPollCommandService = (
 
   const updatePoll = async (dto: UpdatePollDto): Promise<void> => {
     try {
-      return await uow.doWork(
-        async () => {
-          const { pollId, ...data } = dto;
-          const foundPoll = await pollCommandRepo.findById(pollId, 'exclusive');
-          if (!foundPoll) {
-            throw BusinessException({
-              type: BusinessExceptionType.POLL_NOT_FOUND,
-            });
-          }
-          await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
-        },
-        {
-          transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
-          useOptimisticLock: true,
-        },
-      );
+      return await uow.doWork(async () => {
+        const { pollId, ...data } = dto;
+        const foundPoll = await pollCommandRepo.findById(pollId);
+        if (!foundPoll) {
+          throw BusinessException({
+            type: BusinessExceptionType.POLL_NOT_FOUND,
+          });
+        }
+        await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
+      });
     } catch (err) {
       if (isTechnicalException(err)) {
         throw BusinessException({
@@ -84,16 +79,25 @@ export const createPollCommandService = (
   };
 
   const vote = async (dto: voteDto): Promise<void> => {
-    return await uow.doWork(
-      async () => {
-        const { optionId, userId } = dto;
-        await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
-      },
-      {
-        transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
-        useOptimisticLock: true,
-      },
-    );
+    try {
+      return await uow.doWork(
+        async () => {
+          const { optionId, userId } = dto;
+          await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
+        },
+        {
+          transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
+          useOptimisticLock: true,
+        },
+      );
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw BusinessException({
+          type: BusinessExceptionType.ALREADY_VOTED,
+        });
+      }
+      throw err;
+    }
   };
 
   const cancle = async (dto: voteDto): Promise<void> => {

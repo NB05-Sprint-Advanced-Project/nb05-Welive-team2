@@ -19,7 +19,6 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
           event: true,
         },
       });
-
       if (!notice) {
         return null;
       }
@@ -69,34 +68,42 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
 
   const create = async (props: NoticeProps, userId: string): Promise<NoticeProps> => {
     const { comments, event, ...data } = props;
-    const notice = await prisma().notices.create({
-      data: {
-        ...data,
-        userId,
-        event: event
+    try {
+      const notice = await prisma().notices.create({
+        data: {
+          ...data,
+          userId,
+          event: event
+            ? {
+                create: { ...event },
+              }
+            : undefined,
+        },
+        include: {
+          event: true,
+        },
+      });
+      const { event: resultEvent, ...resultData } = notice;
+      return {
+        ...resultData,
+        event: resultEvent
           ? {
-              create: { ...event },
+              id: resultEvent.id,
+              startDate: resultEvent.startDate,
+              endDate: resultEvent.endDate,
             }
           : undefined,
-      },
-      include: {
-        event: true,
-      },
-    });
-
-    const { event: resultEvent, ...resultData } = notice;
-    return {
-      ...resultData,
-      event: resultEvent
-        ? {
-            id: resultEvent.id,
-            startDate: resultEvent.startDate,
-            endDate: resultEvent.endDate,
-          }
-        : undefined,
-    };
+      };
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+        throw TechnicalException({
+          type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION,
+          error: err,
+        });
+      }
+      throw err;
+    }
   };
-
   const update = async (props: NoticeProps): Promise<void> => {
     const {
       comments,
@@ -116,18 +123,16 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
         data: {
           ...data,
           version: { increment: 1 },
-          event: event
+          ...(event
             ? {
-                upsert: {
-                  create: {
-                    ...event,
-                  },
-                  update: {
-                    ...event,
+                event: {
+                  upsert: {
+                    create: { ...event },
+                    update: { ...event },
                   },
                 },
               }
-            : { delete: true },
+            : {}),
         },
       });
       return;

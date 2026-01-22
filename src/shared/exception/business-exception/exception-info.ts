@@ -37,6 +37,7 @@ export enum BusinessExceptionType {
   INVALID_AUTH,
   NOT_SUPERADMIN,
   NOT_ADMIN,
+  ALREADY_VOTED,
 }
 
 export const BusinessExceptionTable: Record<
@@ -103,6 +104,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.DONT_MODIFY_COMPLAINT]: {
     statusCode: 409,
     message: '관리자에게 민원이 접수되어 수정할 수 없습니다.',
+  },
+  [BusinessExceptionType.ALREADY_VOTED]: {
+    statusCode: 409,
+    message: '이미 투표를 마친 항목입니다.',
   },
   [BusinessExceptionType.INVALID_AUTH]: {
     statusCode: 401,
