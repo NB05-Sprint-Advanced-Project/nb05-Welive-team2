@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 import { ITokenUtil } from '../shared/utils/token-manager';
+import { Role } from '../domain/user/entity/base-user';
 
 export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
   const authenticate = (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +37,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
 
       const payload = tokenUtil.verifyToken({ token: access_token });
 
-      if (payload.role !== 'SUPER_ADMIN') {
+      if (payload.role !== Role.SUPER_ADMIN) {
         return next(BusinessException({ type: BusinessExceptionType.NOT_SUPERADMIN }));
       }
 
@@ -60,7 +61,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
 
       const payload = tokenUtil.verifyToken({ token: access_token });
 
-      if (payload.role !== 'ADMIN') {
+      if (payload.role !== Role.ADMIN) {
         return next(BusinessException({ type: BusinessExceptionType.NOT_ADMIN }));
       }
 

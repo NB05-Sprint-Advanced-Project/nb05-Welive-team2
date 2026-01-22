@@ -9,10 +9,12 @@ import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { redisKeys } from '../../../utils/redis-keys';
 import { randomUUID } from 'node:crypto';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
+import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
 
 export const createUserQueryService = (
   userQueryRepo: IUserQueryRepo,
   redisExternal: IRedisExternal,
+  redisLocker: IRedisLocker,
 ) => {
   const getAdministrators = async (params: {
     page: number;
@@ -20,40 +22,20 @@ export const createUserQueryService = (
     searchKeyword: string;
     joinStatus?: Status;
   }) => {
-    let administrators: AdministratorView | null = null;
-    const key = redisKeys.administratorViews;
-    const cache = await redisExternal.get(key); // 통째로 캐싱, 가져옴
+    const { key, lock } = redisKeys.administratorsList({
+      ...params,
+    });
 
-    if (cache) {
-      administrators = JSON.parse(cache); // 캐시가 존재하면 파싱해서 반환
-    } else {
-      for (let i = 0; i < 10; i++) {
-        const lockToken = randomUUID();
-        const isLocked = await redisExternal.setIfNotExist('lock:administratorsView', lockToken, 3);
-
-        if (isLocked) {
-          try {
-            administrators = await userQueryRepo.findAllAdmins(
-              params.page,
-              params.limit,
-              params.searchKeyword,
-              params.joinStatus,
-            );
-
-            await redisExternal.set(key, JSON.stringify(administrators), 3);
-          } finally {
-            await redisExternal.delifmatch('lock:administratorsView', lockToken);
-          }
-        } else {
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          const result = await redisExternal.get(key);
-          if (result) {
-            administrators = JSON.parse(result);
-            break;
-          }
-        }
-      }
-    }
+    const administrators = await redisLocker.doWork({
+      key,
+      lockKey: lock,
+      work: userQueryRepo.findAllAdmins(
+        params.page,
+        params.limit,
+        params.searchKeyword,
+        params.joinStatus,
+      ),
+    });
 
     return administrators;
   };

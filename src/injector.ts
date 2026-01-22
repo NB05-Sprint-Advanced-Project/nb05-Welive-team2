@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import { createUserQueryRepo } from './domain/user/repo/user-query';
 import { createUserQueryService } from './domain/user/service/user-query';
 import { createUserCommandService } from './domain/user/service/user-command';
@@ -40,6 +40,7 @@ import { createPollController } from './domain/poll/controller/poll-controller';
 import { createAuthMiddleware } from './middlewares/auth-middleware';
 import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
+import { createRedisLocker } from './managers/redis-locker';
 
 export const createInjector = () => {
   const prisma = new PrismaClient();
@@ -47,6 +48,7 @@ export const createInjector = () => {
   const unitOfwork = createUnitOfWork(prisma);
   const tokenManager = TokenUtil();
   const redisExternal = createRedisExternal();
+  const redisLocker = createRedisLocker(redisExternal);
 
   // Middleware
   const middlewares = {
@@ -78,9 +80,9 @@ export const createInjector = () => {
   const commentCommandRepository = createCommentCommandRepo(prisma);
 
   // Service
-  const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo);
+  const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo, redisLocker);
 
-  const userQueryService = createUserQueryService(userQueryRepository, redisExternal);
+  const userQueryService = createUserQueryService(userQueryRepository, redisExternal, redisLocker);
   const userCommandService = createUserCommandService(
     unitOfwork,
     hashManager,
