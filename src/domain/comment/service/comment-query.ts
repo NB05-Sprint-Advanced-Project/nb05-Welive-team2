@@ -10,7 +10,7 @@ import { BusinessException } from '../../../shared/exception/business-exception/
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createCommentQueryService = (repo: ICommentQueryRepo) => {
-  const getAllComments = async (params: {
+  const getAllComments = async (query: {
     page: number;
     limit: number;
     resourceId: string;
@@ -18,10 +18,10 @@ export const createCommentQueryService = (repo: ICommentQueryRepo) => {
   }): Promise<PageView<CommentView>> => {
     try {
       const comments = await repo.findAll(
-        params.page,
-        params.limit,
-        params.resourceId,
-        params.resourceType,
+        query.page,
+        query.limit,
+        query.resourceId,
+        query.resourceType,
       );
 
       return comments;

@@ -31,7 +31,7 @@ export const createCommentCommandRepo = (prisma: PrismaClient): ICommentCommandR
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = [
             'Comment_userId_fkey',
             'Comment_noticeId_fkey',

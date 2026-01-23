@@ -1,13 +1,20 @@
 import { z } from 'zod';
 
 // query
-export const getAllConplaintsReqParamsSchema = z.object({
-  params: z.object({
+export const getAllConplaintsReqQuerySchema = z.object({
+  query: z.object({
     page: z.coerce.number(),
     limit: z.coerce.number(),
     searchKeyword: z.string().optional(),
     status: z.enum(['PENDING', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']).optional(),
-    isPublic: z.coerce.boolean().optional(),
+    isPublic: z
+      .preprocess((value) => {
+        if (value === undefined) return undefined;
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return value;
+      }, z.boolean())
+      .optional(),
     building: z.coerce.number().optional(),
     unit: z.coerce.number().optional(),
   }),
@@ -50,7 +57,7 @@ export const updateComplaintStatusReqBodySchema = z.object({
   }),
 });
 
-export type GetAllComplaintsDto = z.infer<typeof getAllConplaintsReqParamsSchema>;
+export type GetAllComplaintsDto = z.infer<typeof getAllConplaintsReqQuerySchema>;
 
 export type GetComplaintDto = z.infer<typeof getComplaintReqParamsSchema>;
 

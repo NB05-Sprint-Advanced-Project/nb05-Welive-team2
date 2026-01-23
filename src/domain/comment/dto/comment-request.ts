@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 // query
-export const getAllCommentsReqParamsSchema = z.object({
-  params: z.object({
-    page: z.number(),
-    limit: z.number(),
+export const getAllCommentsReqQuerySchema = z.object({
+  query: z.object({
+    page: z.coerce.number(),
+    limit: z.coerce.number(),
     searchKeyword: z.string().optional(),
     resourceId: z.string(),
     resourceType: z.enum(['NOTICE', 'COMPLAINT']),
@@ -32,7 +32,7 @@ export const deleteCommentReqParamsSchema = z.object({
   params: z.object({ commentId: z.string() }),
 });
 
-export type GetAllCommentsDto = z.infer<typeof getAllCommentsReqParamsSchema>;
+export type GetAllCommentsDto = z.infer<typeof getAllCommentsReqQuerySchema>;
 
 export type CreateCommentDto = z.infer<typeof createCommentReqBodySchema>;
 

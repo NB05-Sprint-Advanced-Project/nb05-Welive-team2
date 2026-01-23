@@ -10,15 +10,11 @@ export const createComplaintController = (
   complaintQueryService: ComplaintQueryService,
   complaintCommandService: ComplaintCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/users');
+  const { path, router } = createBaseController('/api/v2/complaints');
 
-  const handlers = createComplaintHandlers(
-    middlewares,
-    complaintQueryService,
-    complaintCommandService,
-  );
+  const handlers = createComplaintHandlers(complaintQueryService, complaintCommandService);
 
-  registerComplaintRouters(router, handlers);
+  registerComplaintRouters(router, middlewares, handlers);
 
   return { path, router };
 };

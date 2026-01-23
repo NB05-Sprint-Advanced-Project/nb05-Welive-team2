@@ -65,13 +65,13 @@ export const createComplaintQueryService = (
       }
 
       const viewCountKey = `complaint:${complaintId}:viewCount`;
-      await redisExternal.setIfNotExist(viewCountKey, String(complaint.viewCount), 3600 * 24);
+      await redisExternal.setIfNotExist(viewCountKey, String(complaint.viewsCount), 3600 * 24);
       const newViewCount = await redisExternal.increase(viewCountKey);
 
       const dirtyComplaintKey = 'dirty:complaintIds';
       await redisExternal.addToSet(dirtyComplaintKey, complaintId);
 
-      complaint.viewCount = newViewCount;
+      complaint.viewsCount = newViewCount;
       return complaint;
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -91,12 +91,12 @@ export const createComplaintQueryService = (
   };
 
   const getAllComplaints = async (
-    apartmentId: string,
+    userId: string,
     params: ComplaintListFilter & { page: number; limit: number },
   ): Promise<PageView<ComplaintView>> => {
     try {
       const { page, limit, ...filter } = params;
-      const complaints = await complaintRepo.findAll(apartmentId, page, limit, filter);
+      const complaints = await complaintRepo.findAll(userId, page, limit, filter);
 
       return complaints;
     } catch (err) {

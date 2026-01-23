@@ -93,7 +93,7 @@ export const createComplaintCommandService = (
     }
   };
 
-  const deleteComplaint = async (userId: string, complaintId: string) => {
+  const deleteComplaint = async (userId: string, requesterRole: string, complaintId: string) => {
     try {
       const beforeContext = await complaintRepo.findById(complaintId);
 
@@ -102,7 +102,7 @@ export const createComplaintCommandService = (
           type: BusinessExceptionType.REQ_INFO_INVALID,
         });
       }
-      if (beforeContext.userId !== userId) {
+      if (requesterRole === 'RESIDENT' && beforeContext.userId !== userId) {
         throw BusinessException({
           type: BusinessExceptionType.FORBIDDEN,
         });
@@ -136,7 +136,6 @@ export const createComplaintCommandService = (
         }
 
         const beforeContext = await complaintRepo.findById(complaintId);
-
         if (!beforeContext) {
           throw BusinessException({
             type: BusinessExceptionType.REQ_INFO_INVALID,
@@ -159,11 +158,10 @@ export const createComplaintCommandService = (
               type: BusinessExceptionType.DONT_MODIFY_REJECTED,
             });
           }
-
-          const entity = ComplaintEntity.updateStatus(beforeContext, { status });
-          await complaintRepo.updateStatus(entity);
-          await redisExternal.del(`complaint:${complaintId}`);
         }
+        const entity = ComplaintEntity.updateStatus(beforeContext, { status });
+        await complaintRepo.updateStatus(entity);
+        await redisExternal.del(`complaint:${complaintId}`);
       });
     } catch (err) {
       if (isTechnicalException(err)) {

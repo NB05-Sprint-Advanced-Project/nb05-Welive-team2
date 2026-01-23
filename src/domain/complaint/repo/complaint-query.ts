@@ -47,7 +47,7 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
           });
         }
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
           if (targetConstraints.some((c) => fieldName.includes(c))) {
@@ -63,7 +63,7 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
   };
 
   const findAll = async (
-    apartmentId: string,
+    userId: string,
     page: number,
     limit: number,
     filter: ComplaintListFilter,
@@ -73,12 +73,27 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
 
       const { status, isPublic, searchKeyword, building, unit } = filter;
 
+      const addressFilter =
+        building !== undefined || unit !== undefined
+          ? {
+              complainant: {
+                Address: {
+                  building: building ?? undefined,
+                  unit: unit ?? undefined,
+                },
+              },
+            }
+          : {};
+
       const where: any = {
-        apartmentId: apartmentId,
+        apartment: {
+          UserApartmentLink: {
+            some: { userId },
+          },
+        },
         status: status ?? undefined,
         isPublic: isPublic ?? undefined,
-        building: building ?? undefined,
-        unit: unit ?? undefined,
+        ...addressFilter,
         ...(searchKeyword && {
           OR: [
             { title: { contains: searchKeyword, mode: 'insensitive' } },
@@ -129,7 +144,7 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          const fieldName = (err.meta as any)?.constraint;
 
           if (fieldName.includes('Complaint_apartmentId_fkey')) {
             throw TechnicalException({
@@ -142,6 +157,7 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
       throw err;
     }
   };
+
   return {
     findById,
     findAll,

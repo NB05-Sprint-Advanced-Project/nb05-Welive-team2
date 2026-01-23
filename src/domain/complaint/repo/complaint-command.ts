@@ -24,7 +24,8 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          console.error('[P2003 meta]', err.meta);
+          const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
           if (targetConstraints.some((c) => fieldName.includes(c))) {
@@ -60,7 +61,8 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
           });
         }
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          console.error('[P2003 meta]', err.meta);
+          const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
           if (targetConstraints.some((c) => fieldName.includes(c))) {
@@ -95,7 +97,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
 
   const updateStatus = async (entity: ComplaintProps) => {
     try {
-      await prisma.complaint.update({
+      const result = await prisma.complaint.update({
         where: { id: entity.id, version: entity.version },
         data: {
           status: entity.status,
@@ -112,7 +114,8 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
           });
         }
         if (err.code === 'P2003') {
-          const fieldName = (err.meta as any)?.field_name;
+          console.error('[P2003 meta]', err.meta);
+          const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
           if (targetConstraints.some((c) => fieldName.includes(c))) {

@@ -10,11 +10,11 @@ export const createCommentController = (
   commentQueryService: CommentQueryService,
   commentCommandService: CommentCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/users');
+  const { path, router } = createBaseController('/api/v2/comments');
 
-  const handlers = createCommentHandlers(middlewares, commentCommandService, commentQueryService);
+  const handlers = createCommentHandlers(commentCommandService, commentQueryService);
 
-  registerCommentRouters(router, handlers);
+  registerCommentRouters(router, middlewares, handlers);
 
   return { path, router };
 };

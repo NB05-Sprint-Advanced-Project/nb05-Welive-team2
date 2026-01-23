@@ -63,7 +63,7 @@ export const createCommentCommandService = (
     }
   };
 
-  const deleteComment = async (userId: string, commentId: string) => {
+  const deleteComment = async (userId: string, requesterRole: string, commentId: string) => {
     try {
       const beforeContext = await commentCommandRepo.findById(commentId);
 
@@ -72,7 +72,7 @@ export const createCommentCommandService = (
           type: BusinessExceptionType.REQ_INFO_INVALID,
         });
       }
-      if (beforeContext.userId !== userId) {
+      if (requesterRole === 'RESIDENT' && beforeContext.userId !== userId) {
         throw BusinessException({
           type: BusinessExceptionType.FORBIDDEN,
         });
