@@ -7,7 +7,6 @@ import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/re
 import { Status } from '../entity/base-user';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { redisKeys } from '../../../utils/redis-keys';
-import { randomUUID } from 'node:crypto';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
 

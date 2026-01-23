@@ -5,7 +5,7 @@ import { RedisLockWork, IRedisLocker, RedisLockRequest } from '../shared/interfa
 const DEFAULT_OPTIONS = {
   cacheTtlSeconds: 3,
   lockTtlSeconds: 3,
-  retryCount: 310,
+  retryCount: 10,
   retryDelayMs: 1000,
 };
 

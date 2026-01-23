@@ -10,7 +10,7 @@ import { randomUUID } from 'crypto';
 
 export const createComplaintQueryService = (
   redisExternal: IRedisExternal,
-  compliantRepo: IComplaintQueryRepo,
+  complaintRepo: IComplaintQueryRepo,
 ) => {
   const getComplaint = async (complaintId: string): Promise<ComplaintView> => {
     try {
@@ -30,7 +30,7 @@ export const createComplaintQueryService = (
           );
           if (isLocked) {
             try {
-              const foundComplaint = await compliantRepo.findById(complaintId);
+              const foundComplaint = await complaintRepo.findById(complaintId);
               await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
               complaint = foundComplaint;
             } finally {
@@ -54,7 +54,7 @@ export const createComplaintQueryService = (
       }
 
       if (!complaint) {
-        const foundComplaint = await compliantRepo.findById(complaintId);
+        const foundComplaint = await complaintRepo.findById(complaintId);
         await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
         complaint = foundComplaint;
       }
@@ -96,7 +96,7 @@ export const createComplaintQueryService = (
   ): Promise<PageView<ComplaintView>> => {
     try {
       const { page, limit, ...filter } = params;
-      const complaints = await compliantRepo.findAll(apartmentId, page, limit, filter);
+      const complaints = await complaintRepo.findAll(apartmentId, page, limit, filter);
 
       return complaints;
     } catch (err) {

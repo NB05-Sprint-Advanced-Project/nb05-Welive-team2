@@ -1,4 +1,3 @@
-import { dir } from 'console';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
@@ -7,7 +6,6 @@ import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
 import { ComplaintEntity, ComplaintStatus } from '../complaint-entity';
 import { IComplaintCommandRepo } from '../interface/i-complaint-command-repo';
-import { createComplaintCommandRepo } from '../repo/complaint-command';
 
 export const createComplaintCommandService = (
   uow: IUnitOfWork,

@@ -9,4 +9,5 @@ export interface INoticeCommandRepo {
   ): Promise<NoticeProps>;
   update(props: NoticeProps, pessimisticLock?: 'share' | 'exclusive'): Promise<void>;
   deleteNotice(noticeId: string, pessimisticLock?: 'share' | 'exclusive'): Promise<void>;
+  updateViewCountBulk(props:{noticeId: string, viewCount: number}[]): Promise<void>;
 }

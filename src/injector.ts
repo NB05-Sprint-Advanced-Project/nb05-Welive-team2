@@ -41,6 +41,8 @@ import { createAuthMiddleware } from './middlewares/auth-middleware';
 import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
 import { createRedisLocker } from './managers/redis-locker';
+import { createNoticeBatchService } from './domain/notice/service/notice-batch';
+import { createNoticeScheduler } from './domain/notice/notice-scheduler';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
@@ -90,15 +92,20 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     apartmentCommandRepo,
   );
 
-  const pollQuerService = createPollQueryService(pollQueryRepository);
+  const pollQuerService = createPollQueryService(pollQueryRepository, redisExternal, redisLocker);
   const pollCommandService = createPollCommandService(
     unitOfwork,
     pollCommandRepository,
     userVoteOptionCommandRepository,
   );
 
-  const noticeQueryService = createNoticeQueryService(noticeQueryRepository);
+  const noticeQueryService = createNoticeQueryService(
+    noticeQueryRepository,
+    redisExternal,
+    redisLocker,
+  );
   const noticeCommandService = createNoticeCommandService(unitOfwork, noticeCommandRepository);
+  const noticeBatchService = createNoticeBatchService(noticeCommandRepository, redisExternal);
 
   const complaintQueryService = createComplaintQueryService(
     redisExternal,
@@ -160,6 +167,9 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     residentController,
   };
 
+  // Scheduler
+  const noticeScheduler = createNoticeScheduler(noticeBatchService);
+
   // Server
   const httpServer = createHttpServer(middlewares, controllers);
 
@@ -173,6 +183,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   return {
     httpServer,
     redisExternal,
+    noticeScheduler,
     // wsServer,
     hashManager,
   };

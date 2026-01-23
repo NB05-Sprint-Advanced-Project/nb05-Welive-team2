@@ -1,4 +1,5 @@
 import { createInjector } from './injector';
 
-const { httpServer } = createInjector();
+const { httpServer, noticeScheduler } = createInjector();
 httpServer.listen();
+noticeScheduler.start();
