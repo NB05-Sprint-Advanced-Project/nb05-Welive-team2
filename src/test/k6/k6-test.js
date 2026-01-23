@@ -24,16 +24,17 @@ export default () => {
   sleep(1);
 };
 
-// /**
-//  * 가입한 입주자들 get 성능 테스트
-//  */
+
 // export default () => {
-//   const res = http.get('http://localhost:4000/api/v2/users/residents', {
-//     headers: {
-//       Cookie:
-//         'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwMGM4ZDIwZC02ZjkzLTQ4ODgtYjk0NS1lZmE3OGQxOWMyMmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkxNjEyMzEsImV4cCI6MTc2OTE2MjEzMX0.pcd1DYNssEXF1FEu7ln0dYfrcRredqrHQyyFkPllmtA;',
-//     },
-//   });
+
+//   const res = http.get(
+//     'http://localhost:4000/api/v2/users/residents',
+//     {
+//       headers: {
+//         Cookie: 'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmZDg5OTMzNC1hNTQ4LTQ3MTAtODFhZi1hZjc3ZDE5OGNhODYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkxNTg1MjAsImV4cCI6MTc2OTE1OTQyMH0.pMTEaAOSKlsElDp7UySyxqsJ43bKYGJj7Nvs7pfEB6U;',
+//       },
+//     }
+//   );
 //   check(res, { 'status was 200': (r) => r.status === 200 });
 //   sleep(1);
 // };
