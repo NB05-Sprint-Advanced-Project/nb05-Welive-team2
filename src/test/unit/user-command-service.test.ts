@@ -215,7 +215,6 @@ describe('user service 유닛 테스트', () => {
 
   describe('관리자 계정 수정 테스트(updateAdmin())', () => {
     const dto: UpdateAdminDto = {
-      userId: 'admin-1',
       adminId: 'admin-1',
       name: '관리자 수정',
       email: 'admin-update@test.com',
@@ -327,7 +326,6 @@ describe('user service 유닛 테스트', () => {
 
   describe('관리자 계정 가입 상태 일괄 변경 테스트(updateAdminJoinedStatuses())', () => {
     const dto: UpdateAdminjoinedStatusesDto = {
-      userId: 'admin-1',
       joinStatus: Status.APPROVED,
     };
 
@@ -389,7 +387,6 @@ describe('user service 유닛 테스트', () => {
 
   describe('관리자 계정 가입 상태 변경 테스트(updateAdminJoinedStatus())', () => {
     const dto: UpdateAdminjoinedStatusDto = {
-      userId: 'admin-1',
       id: 'admin-1',
       joinStatus: Status.APPROVED,
     };
@@ -444,7 +441,6 @@ describe('user service 유닛 테스트', () => {
 
   describe('관리자 계정 삭제 테스트(deleteAdmin())', () => {
     const dto: DeleteAdminDto = {
-      userId: 'admin-1',
       adminId: 'admin-1',
     };
 

@@ -15,6 +15,7 @@ const envSchema = z.object({
   OPTIMISTIC_LOCK_RETRY_DELAY_MS: z.coerce.number(),
   REDIS_HOST: z.string(),
   REDIS_PORT: z.coerce.number(),
+  ENABLE_RESOURCE_MONITORING: z.coerce.boolean().default(false),
 });
 
 type EnvParsed = z.infer<typeof envSchema>;
