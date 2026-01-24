@@ -46,7 +46,6 @@ import { createNoticeScheduler } from './domain/notice/notice-scheduler';
 import { createNotificationController } from './domain/notification/controller/notification-controller';
 import { createNotificationQueryRepo } from './domain/notification/repo/notification-query';
 import { createNotificationQueryService } from './domain/notification/service/notification-query';
-import { no } from 'zod/v4/locales';
 import { createNotificationCommandService } from './domain/notification/service/notification-command';
 import { createNotificationCommandRepo } from './domain/notification/repo/notification-command';
 import { createComplaintScheduler } from './domain/complaint/complaint-scheduler';
@@ -54,6 +53,7 @@ import { createComplaintBatchService } from './domain/complaint/service/complain
 import { createStateCommandRepo } from './domain/state/repo/state-command';
 import { createNotificationScheduler } from './domain/notification/notification-scheduler';
 import { createStateCommandService } from './domain/state/service/state-command';
+import { createMulterMiddleware } from './middlewares/multer-middleware';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
@@ -68,6 +68,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
     auth: createAuthMiddleware(tokenManager, redisExternal),
+    multer: createMulterMiddleware(),
   };
 
   const hashManager = createBcryptHashManager();

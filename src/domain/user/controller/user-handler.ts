@@ -91,7 +91,10 @@ export const createUserHandlers = (
 
   // 공통 controllers
   const updateAvatarUrl = async (req: Request, res: Response) => {
-    const dto = validate(updateAvatarUrlSchema, req.body);
+    const dto = validate(updateAvatarUrlSchema, {
+      userId: req.userId,
+      avatarUrl: (req.file as Express.MulterS3.File).location,
+    });
     await userCommandService.updateAvatarUrl(dto);
     return res.sendStatus(204);
   };

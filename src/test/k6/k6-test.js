@@ -16,10 +16,14 @@ export const options = {
     http_req_duration: ['p(99)<100'],
   },
 };
-// let vuCounter = 0;
 
 export default () => {
-  const res = http.get('http://localhost:4000/api/v2/apartments');
+  const res = http.get('http://localhost:4000/api/v2/residents', {
+    headers: {
+      Cookie:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZDE0MWViYy00YjUzLTQxNmEtOWY5MC1lOTA5YzBhMjgwNmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkyMzc0ODYsImV4cCI6MTc2OTI1OTA4Nn0.QGoV6EEkf6PT-Uxt9cWnSO5aLI6LJgwkF6WOYc48b-A;',
+    },
+  });
   check(res, { 'status was 200': (r) => r.status === 200 });
   sleep(1);
 };

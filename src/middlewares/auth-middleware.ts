@@ -7,7 +7,7 @@ import { redisKeys } from '../utils/redis-keys';
 import { IRedisExternal } from '../shared/interface/i-redis';
 
 export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedisExternal) => {
-  const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const cookie = req.cookies;
       const access_token = cookie['access_token'];
@@ -16,7 +16,29 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         return next(BusinessException({ type: BusinessExceptionType.INVALID_AUTH }));
       }
 
+      const key = redisKeys.authToken(access_token);
+      const cached = await redisExternal.get(key);
+      if (cached) {
+        const payload = JSON.parse(cached);
+
+        req.user = {
+          userId: payload.userId,
+          role: payload.role,
+        };
+        req.userId = payload.userId;
+        return next();
+      }
       const payload = tokenUtil.verifyToken({ token: access_token });
+
+      await redisExternal.set(
+        key,
+        JSON.stringify({
+          userId: payload.userId,
+          role: payload.role,
+        }),
+        300,
+      );
+
       req.user = {
         userId: payload.userId,
         role: payload.role,
@@ -39,7 +61,31 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         return next(BusinessException({ type: BusinessExceptionType.INVALID_AUTH }));
       }
 
+      const key = redisKeys.authToken(access_token);
+      const cached = await redisExternal.get(key);
+      if (cached) {
+        const payload = JSON.parse(cached);
+
+        if (payload.role !== Role.ADMIN) {
+          return next(BusinessException({ type: BusinessExceptionType.NOT_SUPERADMIN }));
+        }
+        req.user = {
+          userId: payload.userId,
+          role: payload.role,
+        };
+        req.userId = payload.userId;
+        return next();
+      }
       const payload = tokenUtil.verifyToken({ token: access_token });
+
+      await redisExternal.set(
+        key,
+        JSON.stringify({
+          userId: payload.userId,
+          role: payload.role,
+        }),
+        300,
+      );
 
       if (payload.role !== Role.SUPER_ADMIN) {
         return next(BusinessException({ type: BusinessExceptionType.NOT_SUPERADMIN }));
@@ -65,7 +111,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         return next(BusinessException({ type: BusinessExceptionType.INVALID_AUTH }));
       }
 
-      const key = redisKeys.authAdminToken(access_token);
+      const key = redisKeys.authToken(access_token);
       const cached = await redisExternal.get(key);
       if (cached) {
         const payload = JSON.parse(cached);

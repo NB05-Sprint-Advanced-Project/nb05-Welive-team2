@@ -40,6 +40,7 @@ export enum BusinessExceptionType {
   ALREADY_VOTED,
   TEMPORARY_UNAVAILABLE,
   UNAUTORIZED_REQUEST,
+  NOT_IMAGE_FILE,
 }
 
 export const BusinessExceptionTable: Record<
@@ -93,6 +94,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.CORRECT_PASSWORD]: {
     statusCode: 401,
     message: '새 비밀번호가 이전 비밀번호하고 동일합니다.',
+  },
+  [BusinessExceptionType.NOT_IMAGE_FILE]: {
+    statusCode: 401,
+    message: '이미지 파일이 아닙니다.',
   },
 
   [BusinessExceptionType.DONT_MODIFY_PENDING]: {
