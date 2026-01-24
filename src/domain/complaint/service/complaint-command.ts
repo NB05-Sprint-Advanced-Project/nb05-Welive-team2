@@ -196,7 +196,7 @@ export const createComplaintCommandService = (
         dirtyComplaintIds.map((complaintId, index) => {
           return {
             complaintId,
-            viewCount: viewCounts[index] === null ? 0 : Number(viewCounts[index]),
+            viewsCount: viewCounts[index] === null ? 0 : Number(viewCounts[index]),
           };
         }),
       );
