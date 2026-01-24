@@ -32,22 +32,27 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
 
     const cache = await redisExternal.get(key);
     let result: T | null = null;
-
+    //console.log("캐시 확인 전")
     if (cache) {
       result = JSON.parse(cache);
+      // console.log("이미 캐시 있어서 리턴")
     } else {
       for (let i = 0; i < retryCount; i++) {
+        // console.log("캐시가 없는 상태")
         const lockToken = randomUUID();
         const isLocked = await redisExternal.setIfNotExist(lockKey, lockToken, lockTtlSeconds);
 
         if (isLocked) {
           try {
+            // console.log("한명 락 잡음")
             result = await resolveWork(work);
             await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
           } finally {
+            // console.log("한명 락 잡아서 캐시 발급 끝")
             await redisExternal.delifmatch(lockKey, lockToken);
           }
         } else {
+          // console.log("대기 중인 사람들")
           await sleep(retryDelayMs);
           const cachedResult = await redisExternal.get(key);
           if (cachedResult) {
@@ -57,7 +62,6 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
         }
       }
     }
-
     return result;
   };
 

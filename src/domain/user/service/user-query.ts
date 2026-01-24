@@ -70,13 +70,12 @@ export const createUserQueryService = (
     dto: GetResidentAccountsReqDto,
   ): Promise<ResidentAccountView | null> => {
     const { key, lock } = redisKeys.residentAccounts(dto);
-
     const residentAccountsUser = await redisLocker.doWork({
       key,
       lockKey: lock,
-      cacheTtlSeconds: 30,
-      lockTtlSeconds: 1,
-      work: userQueryRepo.findResidentAccounts(dto),
+      // cacheTtlSeconds: 30,
+      // lockTtlSeconds: 3,
+      work: () => userQueryRepo.findResidentAccounts(dto),
     });
 
     if (residentAccountsUser === null) {

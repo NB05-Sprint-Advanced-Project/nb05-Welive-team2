@@ -25,8 +25,13 @@ export const redisKeys = {
   },
 
   residentAccounts: (dto: GetResidentAccountsReqDto) => {
-    const key = `apartments:list:${dto.page}:${dto.limit}`;
-    const lock = `lock:apartments:list:${dto.page}:${dto.limit}`;
+    const key = `residentAccounts:${dto.page}:${dto.limit}`;
+    const lock = `lock:residentAccounts:${dto.page}:${dto.limit}`;
     return { key, lock };
+  },
+
+  authAdminToken: (accessToken: string) => {
+    const key = `auth:token:${accessToken}`;
+    return key;
   },
 };

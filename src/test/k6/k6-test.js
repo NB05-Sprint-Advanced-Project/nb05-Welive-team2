@@ -3,15 +3,20 @@ import http from 'k6/http';
 
 export const options = {
   stages: [
-    { duration: '10s', target: 1000 }, // 10초동안 2000명의 유저가 동시에 요청
-    // { duration: "1m", target: 800 },
-    // { duration: "30s",c target: 0 },
-    // { duration: '10s', target: 1000 },
+    // { duration: '10s', target: 100 },
+    // { duration: '10s', target: 300 },
+    // { duration: '10s', target: 500 },
+    // { duration: '10s', target: 800 },
+    { duration: '10s', target: 2000 },
+    // { duration: '30s', target: 300 },
+    // { duration: '30s', target: 300 },
+    // { duration: '30s', target: 300 },
   ],
   thresholds: {
     http_req_duration: ['p(99)<100'],
   },
 };
+// let vuCounter = 0;
 
 // export default () => {
 //   const res = http.get('http://localhost:4000/api/v2/apartments');
@@ -23,10 +28,12 @@ export const options = {
  * 가입한 입주자들 get 성능 테스트
  */
 export default () => {
+  // vuCounter += 1;
+  // console.log(`VU ${__VU} 요청 카운트: ${vuCounter}`);
   const res = http.get('http://localhost:4000/api/v2/users/residents', {
     headers: {
       Cookie:
-        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmZDg5OTMzNC1hNTQ4LTQ3MTAtODFhZi1hZjc3ZDE5OGNhODYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkxNTg1MjAsImV4cCI6MTc2OTE1OTQyMH0.pMTEaAOSKlsElDp7UySyxqsJ43bKYGJj7Nvs7pfEB6U;',
+        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZDE0MWViYy00YjUzLTQxNmEtOWY5MC1lOTA5YzBhMjgwNmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkyMjI4OTMsImV4cCI6MTc2OTI0NDQ5M30.ni4lsiVlGXKV4F2_YONbwwulJkqYg36yADGgNvRhLKs;',
     },
   });
   check(res, { 'status was 200': (r) => r.status === 200 });

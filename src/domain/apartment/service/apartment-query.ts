@@ -18,7 +18,7 @@ export const createApartmentQueryService = (
       lockKey: lock,
       work: apartmentQueryRepo.findAll(dto.page, dto.limit, dto.searchKeyword),
     });
-
+    // const apartments = await apartmentQueryRepo.findAll(dto.page, dto.limit, dto.searchKeyword)
     return apartments;
   };
 

@@ -56,7 +56,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const middlewares = {
     globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
-    auth: createAuthMiddleware(tokenManager),
+    auth: createAuthMiddleware(tokenManager, redisExternal),
   };
 
   const hashManager = createBcryptHashManager();

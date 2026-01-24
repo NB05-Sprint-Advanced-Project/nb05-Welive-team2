@@ -16,14 +16,14 @@ export const createRedisExternal = (): IRedisExternal => {
   };
 
   const set = async (key: string, data: string, ttl?: number) => {
-    if (!ttl) {
+    if (ttl === undefined) {
       await redisClient.set(key, data);
     } else {
       await redisClient.set(key, data, 'EX', ttl);
     }
   };
   const setIfNotExist = async (key: string, data: string, ttl?: number) => {
-    if (!ttl) {
+    if (ttl === undefined) {
       const res = await redisClient.setnx(key, data);
       if (res === 1) {
         return true;

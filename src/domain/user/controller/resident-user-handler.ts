@@ -1,4 +1,3 @@
-import { Middlewares } from '../../../shared/interface/i-middlewares';
 import { validate } from '../../../utils/controller-util';
 import {
   createResidentUserSchema,

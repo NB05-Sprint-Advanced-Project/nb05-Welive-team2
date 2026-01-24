@@ -3,8 +3,10 @@ import { BusinessException } from '../shared/exception/business-exception/busine
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 import { ITokenUtil } from '../shared/utils/token-manager';
 import { Role } from '../domain/user/entity/base-user';
+import { redisKeys } from '../utils/redis-keys';
+import { IRedisExternal } from '../shared/interface/i-redis';
 
-export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
+export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedisExternal) => {
   const authenticate = (req: Request, res: Response, next: NextFunction) => {
     try {
       const cookie = req.cookies;
@@ -51,7 +53,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
     }
   };
 
-  const authAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const authAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const cookie = req.cookies;
       const access_token = cookie['access_token'];
@@ -59,7 +61,32 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil) => {
         return next(BusinessException({ type: BusinessExceptionType.INVALID_AUTH }));
       }
 
+      const key = redisKeys.authAdminToken(access_token);
+      const cached = await redisExternal.get(key);
+      if (cached) {
+        const payload = JSON.parse(cached);
+
+        if (payload.role !== Role.ADMIN) {
+          return next(BusinessException({ type: BusinessExceptionType.NOT_ADMIN }));
+        }
+        req.user = {
+          userId: payload.userId,
+          role: payload.role,
+        };
+        req.userId = payload.userId;
+        return next();
+      }
+
       const payload = tokenUtil.verifyToken({ token: access_token });
+
+      await redisExternal.set(
+        key,
+        JSON.stringify({
+          userId: payload.userId,
+          role: payload.role,
+        }),
+        300,
+      );
 
       if (payload.role !== Role.ADMIN) {
         return next(BusinessException({ type: BusinessExceptionType.NOT_ADMIN }));
