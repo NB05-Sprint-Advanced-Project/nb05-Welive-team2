@@ -75,7 +75,8 @@ export const registerUserRoutes = (
   // 공통
   router.patch(
     '/me/avatar',
-    //catchHandler(middlewares.multer.uploadS3),
+    catchHandler(middlewares.multer.handlerImage('avatarImage')),
+    catchHandler(middlewares.auth.authenticate),
     catchHandler(handlers.updateAvatarUrl),
   );
   router.patch(

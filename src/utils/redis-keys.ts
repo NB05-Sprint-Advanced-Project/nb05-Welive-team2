@@ -1,8 +1,13 @@
 import { ComplaintStatus } from '../domain/complaint/complaint-entity';
-import { ComplaintListFilter } from '../domain/complaint/interface/i-complaint-query-repo';
+import { GetResidentsReqDto } from '../domain/user/dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../domain/user/dto/user-request';
 
 export const redisKeys = {
+  authToken: (accessToken: string) => {
+    const key = `auth:token:${accessToken}`;
+    return key;
+  },
+
   administratorsList: (params: {
     page: number;
     limit: number;
@@ -32,9 +37,10 @@ export const redisKeys = {
     return { key, lock };
   },
 
-  authAdminToken: (accessToken: string) => {
-    const key = `auth:token:${accessToken}`;
-    return key;
+  residents: (dto: GetResidentsReqDto) => {
+    const key = `residents:${dto.page}:${dto.limit}`;
+    const lock = `lock:residents:${dto.page}:${dto.limit}`;
+    return { key, lock };
   },
 
   complaintById: (complaintId: string) => {
