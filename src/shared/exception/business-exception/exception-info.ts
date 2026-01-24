@@ -39,6 +39,7 @@ export enum BusinessExceptionType {
   NOT_ADMIN,
   ALREADY_VOTED,
   TEMPORARY_UNAVAILABLE,
+  UNAUTORIZED_REQUEST,
 }
 
 export const BusinessExceptionTable: Record<
@@ -52,6 +53,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.TOKEN_EXPIRED]: {
     statusCode: 401,
     message: '토큰이 만료되었습니다.',
+  },
+  [BusinessExceptionType.UNAUTORIZED_REQUEST]: {
+    statusCode: 401,
+    message: '접근 권한이 없습니다.',
   },
 
   // 공통

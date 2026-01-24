@@ -9,6 +9,7 @@ export const registerUserRoutes = (
   middlewares: Middlewares,
 ) => {
   router.post('/super-admins', catchHandler(handlers.createSuperAdmin));
+
   router.post('/admins', catchHandler(handlers.createAdmin));
 
   // 관리자 계정

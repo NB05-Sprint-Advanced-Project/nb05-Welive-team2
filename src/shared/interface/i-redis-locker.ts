@@ -5,6 +5,7 @@
   lockTtlSeconds?: number;
   retryCount?: number;
   retryDelayMs?: number;
+  redisLock?: boolean;
 };
 
 export type RedisLockWork<T> = Promise<T> | (() => Promise<T>);

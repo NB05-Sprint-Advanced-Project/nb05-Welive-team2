@@ -10,10 +10,6 @@ export const BaseRepo = (basePrisma: PrismaClient) => {
 
   const prisma = () => {
     const prisma: BasePrismaClient = asyncContextStorage.get() ?? basePrisma;
-    console.log(
-      'Prisma Client 사용중 ',
-      prisma === basePrisma ? 'BasePrismaClient' : 'TxPrismaClient',
-    );
     return prisma;
   };
 

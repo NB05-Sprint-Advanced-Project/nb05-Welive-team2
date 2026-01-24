@@ -57,13 +57,13 @@ export const createAuthService = (
       });
     }
 
-    const payload = tokenManager.verifyToken({ token: oldToken });
+    const payload = await tokenManager.verifyToken({ token: oldToken });
 
-    const accessToken = tokenManager.generateAccessToken({
+    const accessToken = await tokenManager.generateAccessToken({
       userId: payload.userId,
     });
 
-    const refreshToken = tokenManager.generateRefreshToken({
+    const refreshToken = await tokenManager.generateRefreshToken({
       userId: payload.userId,
     });
 

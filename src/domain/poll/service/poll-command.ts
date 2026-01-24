@@ -43,6 +43,9 @@ export const createPollCommandService = (
     }
   };
 
+  // 1. 레포에서 중복 데이터 에러 로직 처리 (나나나나님) =>
+  // 2. 서비스에서 중복 데이터 에러 로직 처리 (훈석님) => 조회 코드 재활용 가능
+
   const updatePoll = async (dto: UpdatePollDto): Promise<void> => {
     try {
       return await uow.doWork(async () => {

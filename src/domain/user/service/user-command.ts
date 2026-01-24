@@ -107,6 +107,7 @@ export const createUserCommandService = (
           });
 
           await userCommandRepo.create(userEntity);
+          // await notificationRepo.create()
         },
         {
           transactionOptions: {

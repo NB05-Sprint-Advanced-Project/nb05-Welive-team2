@@ -1,6 +1,12 @@
 import { IApartmentCommandRepo } from '../../domain/apartment/interface/i-apartment-command';
 import {
+  CreateAdminDto,
+  CreateSuperAdminDto,
+  DeleteAdminDto,
   SignUpResidentAccountReqDto,
+  UpdateAdminDto,
+  UpdateAdminjoinedStatusDto,
+  UpdateAdminjoinedStatusesDto,
   UpdatePasswordReqDto,
   UpdateResidentAccountJoinedStatusesReqDto,
   UpdateResidentAccountJoinedStatusReqDto,
@@ -96,6 +102,401 @@ describe('user service 유닛 테스트', () => {
     jest.restoreAllMocks();
   });
   // 관리자 계정
+  describe('관리자 계정 생성 테스트(createSuperAdmin())', () => {
+    const dto: CreateSuperAdminDto = {
+      username: 'admin01',
+      password: 'Password123!',
+      name: '관리자',
+      email: 'admin01@test.com',
+      contact: '010-1111-2222',
+    };
+
+    beforeEach(() => {
+      (mockHashManager.hash as jest.Mock).mockResolvedValue('hashed');
+    });
+
+    test('정상적으로 슈퍼 관리자 계정을 생성한다', async () => {
+      // given
+      (mockUserCommandRepo.create as jest.Mock).mockResolvedValue(undefined);
+
+      // when
+      await userCommandService.createSuperAdmin(dto);
+
+      // then
+      expect(mockUserCommandRepo.create).toHaveBeenCalled();
+    });
+
+    test.each([
+      [TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL, BusinessExceptionType.EMAIL_ALREADY_IN_USE],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+        BusinessExceptionType.USERNAME_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+        BusinessExceptionType.CONTACT_ALREADY_IN_USE,
+      ],
+    ])('%s 발생 시 %s 예외를 던진다', async (technicalType, businessType) => {
+      // given
+      (mockUserCommandRepo.create as jest.Mock).mockRejectedValue(
+        TechnicalException({ type: technicalType }),
+      );
+
+      // when & then
+      await expect(userCommandService.createSuperAdmin(dto)).rejects.toMatchObject({
+        type: businessType,
+      });
+    });
+  });
+
+  describe('관리자 계정 생성 테스트(createAdmin())', () => {
+    const dto: CreateAdminDto = {
+      username: 'admin02',
+      password: 'Password123!',
+      name: '관리자',
+      email: 'admin02@test.com',
+      contact: '010-2222-3333',
+      adminOf: {
+        name: '테스트 아파트',
+        address: '서울시 테스트구',
+        description: '설명',
+        officeNumber: '02-000-0000',
+        buildingNumberFrom: 1,
+        buildingNumberTo: 10,
+        floorCountPerBuilding: 20,
+        unitCountPerFloor: 4,
+      },
+    };
+
+    beforeEach(() => {
+      (mockHashManager.hash as jest.Mock).mockResolvedValue('hashed');
+      (mockUow.doWork as jest.Mock).mockImplementation(async (work) => {
+        await work();
+      });
+    });
+
+    test('아파트와 관리자 계정을 생성한다', async () => {
+      // given
+      (mockApartmentRepo.create as jest.Mock).mockResolvedValue({ id: 'apt-1' });
+      (mockUserCommandRepo.create as jest.Mock).mockResolvedValue(undefined);
+
+      // when
+      await userCommandService.createAdmin(dto);
+
+      // then
+      expect(mockApartmentRepo.create).toHaveBeenCalled();
+      expect(mockUserCommandRepo.create).toHaveBeenCalled();
+    });
+
+    test.each([
+      [TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL, BusinessExceptionType.EMAIL_ALREADY_IN_USE],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+        BusinessExceptionType.USERNAME_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+        BusinessExceptionType.CONTACT_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_ADDRESS,
+        BusinessExceptionType.ADDRESS_ALREADY_IN_USE,
+      ],
+    ])('%s 발생 시 %s 예외를 던진다', async (technicalType, businessType) => {
+      // given
+      (mockUow.doWork as jest.Mock).mockRejectedValue(TechnicalException({ type: technicalType }));
+
+      // when & then
+      await expect(userCommandService.createAdmin(dto)).rejects.toMatchObject({
+        type: businessType,
+      });
+    });
+  });
+
+  describe('관리자 계정 수정 테스트(updateAdmin())', () => {
+    const dto: UpdateAdminDto = {
+      userId: 'admin-1',
+      adminId: 'admin-1',
+      name: '관리자 수정',
+      email: 'admin-update@test.com',
+      contact: '010-9999-0000',
+      adminOf: {
+        name: '수정 아파트',
+        address: '서울시 수정구',
+        description: '수정 설명',
+        officeNumber: '02-111-2222',
+      },
+    };
+
+    const adminUser: AdminAccountProps = {
+      id: 'admin-1',
+      username: 'admin01',
+      password: 'hashed',
+      name: '관리자',
+      email: 'admin01@test.com',
+      contact: '010-1111-2222',
+      role: Role.ADMIN,
+      joinedStatus: Status.PENDING,
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userApartmentLink: [{ apartmentId: 'apt-1' }],
+    };
+
+    beforeEach(() => {
+      (mockUow.doWork as jest.Mock).mockImplementation(async (work) => {
+        await work();
+      });
+    });
+
+    test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+
+      // when & then
+      await expect(userCommandService.updateAdmin(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+    });
+
+    test('아파트가 없으면 APARTMENT_NOT_FOUND 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(adminUser);
+      (mockApartmentRepo.findById as jest.Mock).mockResolvedValue(null);
+
+      // when & then
+      await expect(userCommandService.updateAdmin(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+      });
+    });
+
+    test('관리자 정보를 수정한다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(adminUser);
+      (mockApartmentRepo.findById as jest.Mock).mockResolvedValue({ id: 'apt-1' });
+      (mockUserCommandRepo.update as jest.Mock).mockResolvedValue(undefined);
+
+      // when
+      await userCommandService.updateAdmin(dto);
+
+      // then
+      expect(mockUserCommandRepo.update).toHaveBeenCalled();
+      expect(mockApartmentRepo.findById).toHaveBeenCalledWith('apt-1');
+    });
+
+    test.each([
+      [TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL, BusinessExceptionType.EMAIL_ALREADY_IN_USE],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+        BusinessExceptionType.USERNAME_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+        BusinessExceptionType.CONTACT_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.UNIQUE_VIOLATION_ADDRESS,
+        BusinessExceptionType.ADDRESS_ALREADY_IN_USE,
+      ],
+      [
+        TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
+        BusinessExceptionType.CONCURRENT_MODIFICATION,
+      ],
+    ])('%s 발생 시 %s 예외를 던진다', async (technicalType, businessType) => {
+      // given
+      (mockUow.doWork as jest.Mock).mockRejectedValue(TechnicalException({ type: technicalType }));
+
+      // when & then
+      await expect(userCommandService.updateAdmin(dto)).rejects.toMatchObject({
+        type: businessType,
+      });
+    });
+
+    test('알 수 없는 기술 예외는 UNKNOWN_ERROR로 변환한다', async () => {
+      // given
+      (mockUow.doWork as jest.Mock).mockRejectedValue(
+        TechnicalException({ type: TechnicalExceptionType.DB_ERROR }),
+      );
+
+      // when & then
+      await expect(userCommandService.updateAdmin(dto)).rejects.toMatchObject({
+        type: TechnicalExceptionType.UNKNOWN_ERROR,
+      });
+    });
+  });
+
+  describe('관리자 계정 가입 상태 일괄 변경 테스트(updateAdminJoinedStatuses())', () => {
+    const dto: UpdateAdminjoinedStatusesDto = {
+      userId: 'admin-1',
+      joinStatus: Status.APPROVED,
+    };
+
+    const pendingAdmins: AdminAccountProps[] = [
+      {
+        id: 'admin-1',
+        username: 'admin01',
+        password: 'hashed',
+        name: '관리자',
+        email: 'admin01@test.com',
+        contact: '010-1111-2222',
+        role: Role.ADMIN,
+        joinedStatus: Status.PENDING,
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    test('대기 중인 관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findPendingAdminUsers as jest.Mock).mockResolvedValue(null);
+
+      // when & then
+      await expect(userCommandService.updateAdminJoinedStatuses(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+
+      expect(mockUserCommandRepo.updateJoinedStatuses).not.toHaveBeenCalled();
+    });
+
+    test('대기 중인 관리자 계정이 있으면 가입 상태를 일괄 변경한다', async () => {
+      // given
+      (mockUserCommandRepo.findPendingAdminUsers as jest.Mock).mockResolvedValue(pendingAdmins);
+
+      // when
+      await userCommandService.updateAdminJoinedStatuses(dto);
+
+      // then
+      expect(mockUserCommandRepo.findPendingAdminUsers).toHaveBeenCalled();
+      expect(mockUserCommandRepo.updateJoinedStatuses).toHaveBeenCalledWith(expect.any(Array));
+    });
+
+    test('낙관적 락 실패 시 CONCURRENT_MODIFICATION 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findPendingAdminUsers as jest.Mock).mockResolvedValue(pendingAdmins);
+      (mockUserCommandRepo.updateJoinedStatuses as jest.Mock).mockRejectedValue(
+        TechnicalException({
+          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
+        }),
+      );
+
+      // when & then
+      await expect(userCommandService.updateAdminJoinedStatuses(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+      });
+    });
+  });
+
+  describe('관리자 계정 가입 상태 변경 테스트(updateAdminJoinedStatus())', () => {
+    const dto: UpdateAdminjoinedStatusDto = {
+      userId: 'admin-1',
+      id: 'admin-1',
+      joinStatus: Status.APPROVED,
+    };
+
+    test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+
+      // when & then
+      await expect(userCommandService.updateAdminJoinedStatus(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+    });
+
+    test('이미 승인된 관리자면 상태를 변경할 수 없다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+        joinedStatus: Status.APPROVED,
+      });
+
+      // when & then
+      await expect(userCommandService.updateAdminJoinedStatus(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS,
+      });
+    });
+
+    test('이미 거절된 관리자면 상태를 변경할 수 없다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+        joinedStatus: Status.REJECTED,
+      });
+
+      // when & then
+      await expect(userCommandService.updateAdminJoinedStatus(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.NOT_UPDATE_JOINEDSTATUS,
+      });
+    });
+
+    test('대기 상태 관리자면 가입 상태를 변경한다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+        joinedStatus: Status.PENDING,
+      });
+
+      // when
+      await userCommandService.updateAdminJoinedStatus(dto);
+
+      // then
+      expect(mockUserCommandRepo.updateJoinedStatus).toHaveBeenCalled();
+    });
+  });
+
+  describe('관리자 계정 삭제 테스트(deleteAdmin())', () => {
+    const dto: DeleteAdminDto = {
+      userId: 'admin-1',
+      adminId: 'admin-1',
+    };
+
+    test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+
+      // when & then
+      await expect(userCommandService.deleteAdmin(dto)).rejects.toMatchObject({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+    });
+
+    test('관리자 계정을 삭제한다', async () => {
+      // given
+      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+        id: 'admin-1',
+      });
+
+      // when
+      await userCommandService.deleteAdmin(dto);
+
+      // then
+      expect(mockUserCommandRepo.deleteUser).toHaveBeenCalledWith('admin-1');
+    });
+  });
+
+  describe('거절된 관리자 계정 삭제 테스트(deleteRejectedAdmins())', () => {
+    test('거절된 관리자 계정이 없으면 삭제하지 않는다', async () => {
+      // given
+      (mockUserCommandRepo.findRejectedAdminUsers as jest.Mock).mockResolvedValue(null);
+
+      // when
+      await userCommandService.deleteRejectedAdmins();
+
+      // then
+      expect(mockUserCommandRepo.deleteUsers).not.toHaveBeenCalled();
+    });
+
+    test('거절된 관리자 계정이 있으면 일괄 삭제한다', async () => {
+      // given
+      (mockUserCommandRepo.findRejectedAdminUsers as jest.Mock).mockResolvedValue([
+        { id: 'admin-1' },
+      ]);
+
+      // when
+      await userCommandService.deleteRejectedAdmins();
+
+      // then
+      expect(mockUserCommandRepo.deleteUsers).toHaveBeenCalled();
+    });
+  });
 
   // 입주민 계정
   describe('입주민 계정 생성 테스트(createResidentAccount())', () => {

@@ -73,8 +73,9 @@ export const createUserQueryService = (
     const residentAccountsUser = await redisLocker.doWork({
       key,
       lockKey: lock,
+      redisLock: false,
       // cacheTtlSeconds: 30,
-      // lockTtlSeconds: 3,
+      // lockTtlSeconds: 1,
       work: () => userQueryRepo.findResidentAccounts(dto),
     });
 

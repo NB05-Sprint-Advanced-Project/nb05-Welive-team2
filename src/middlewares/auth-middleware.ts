@@ -29,7 +29,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
     }
   };
 
-  const authSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const authSuperAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const cookie = req.cookies;
       const access_token = cookie['access_token'];

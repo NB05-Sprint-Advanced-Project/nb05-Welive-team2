@@ -20,7 +20,6 @@ import { UserQueryService } from '../service/user-query';
 import { Request, Response } from 'express';
 
 export const createUserHandlers = (
-  middlewares: Middlewares,
   userCommandService: UserCommandService,
   userQueryService: UserQueryService,
 ) => {

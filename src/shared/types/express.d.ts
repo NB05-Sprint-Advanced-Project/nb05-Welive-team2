@@ -4,7 +4,7 @@ import { Role } from '../../domain/user/entity/base-user';
 declare global {
   namespace Express {
     interface Request {
-      user?: {
+      user: {
         userId: string;
         role: string;
       }; // 현재 방식

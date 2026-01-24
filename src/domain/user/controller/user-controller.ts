@@ -12,7 +12,7 @@ export const createUserController = (
 ) => {
   const { path, router } = createBaseController('/api/v2/users');
 
-  const handlers = createUserHandlers(middlewares, userCommandService, userQueryService);
+  const handlers = createUserHandlers(userCommandService, userQueryService);
 
   registerUserRoutes(router, handlers, middlewares);
 

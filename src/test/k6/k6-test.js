@@ -18,24 +18,22 @@ export const options = {
 };
 // let vuCounter = 0;
 
-// export default () => {
-//   const res = http.get('http://localhost:4000/api/v2/apartments');
-//   check(res, { 'status was 200': (r) => r.status === 200 });
-//   sleep(1);
-// };
-
-/**
- * 가입한 입주자들 get 성능 테스트
- */
 export default () => {
-  // vuCounter += 1;
-  // console.log(`VU ${__VU} 요청 카운트: ${vuCounter}`);
-  const res = http.get('http://localhost:4000/api/v2/users/residents', {
-    headers: {
-      Cookie:
-        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZDE0MWViYy00YjUzLTQxNmEtOWY5MC1lOTA5YzBhMjgwNmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkyMjI4OTMsImV4cCI6MTc2OTI0NDQ5M30.ni4lsiVlGXKV4F2_YONbwwulJkqYg36yADGgNvRhLKs;',
-    },
-  });
+  const res = http.get('http://localhost:4000/api/v2/apartments');
   check(res, { 'status was 200': (r) => r.status === 200 });
   sleep(1);
 };
+
+// /**
+//  * 가입한 입주자들 get 성능 테스트
+//  */
+// export default () => {
+//   const res = http.get('http://localhost:4000/api/v2/users/residents', {
+//     headers: {
+//       Cookie:
+//         'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwMGM4ZDIwZC02ZjkzLTQ4ODgtYjk0NS1lZmE3OGQxOWMyMmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkxNjEyMzEsImV4cCI6MTc2OTE2MjEzMX0.pcd1DYNssEXF1FEu7ln0dYfrcRredqrHQyyFkPllmtA;',
+//     },
+//   });
+//   check(res, { 'status was 200': (r) => r.status === 200 });
+//   sleep(1);
+// };

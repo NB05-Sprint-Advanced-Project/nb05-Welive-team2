@@ -43,6 +43,7 @@ import { createResidentUserController } from './domain/user/controller/resident-
 import { createRedisLocker } from './managers/redis-locker';
 import { createNoticeBatchService } from './domain/notice/service/notice-batch';
 import { createNoticeScheduler } from './domain/notice/notice-scheduler';
+import { createWsServer } from './servers/ws-server';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
@@ -172,13 +173,12 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
 
   // Server
   const httpServer = createHttpServer(middlewares, controllers);
-
-  //  const wsServer = createWsServer(
-  //   httpServer.defaultHttpServer,
-  //   middlewares,
-  //   gateways,
-  //   utils,
-  // );
+  const wsServer = createWsServer(
+    httpServer.defaultHttpServer,
+    middlewares,
+    // gateways,
+    // utils,
+  );
 
   return {
     httpServer,
@@ -186,5 +186,6 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     noticeScheduler,
     // wsServer,
     hashManager,
+    wsServer,
   };
 };

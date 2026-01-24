@@ -5,8 +5,9 @@ import { RedisLockWork, IRedisLocker, RedisLockRequest } from '../shared/interfa
 const DEFAULT_OPTIONS = {
   cacheTtlSeconds: 3,
   lockTtlSeconds: 3,
-  retryCount: 10,
-  retryDelayMs: 1000,
+  retryCount: 5,
+  retryDelayMs: 1,
+  redisLock: true,
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -28,6 +29,7 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
       lockTtlSeconds = DEFAULT_OPTIONS.lockTtlSeconds,
       retryCount = DEFAULT_OPTIONS.retryCount,
       retryDelayMs = DEFAULT_OPTIONS.retryDelayMs,
+      redisLock = DEFAULT_OPTIONS.redisLock,
     } = request;
 
     const cache = await redisExternal.get(key);
@@ -37,29 +39,31 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
       result = JSON.parse(cache);
       // console.log("이미 캐시 있어서 리턴")
     } else {
-      for (let i = 0; i < retryCount; i++) {
-        // console.log("캐시가 없는 상태")
-        const lockToken = randomUUID();
-        const isLocked = await redisExternal.setIfNotExist(lockKey, lockToken, lockTtlSeconds);
+      if (redisLock) {
+        for (let i = 0; i < retryCount; i++) {
+          const lockToken = randomUUID();
+          const isLocked = await redisExternal.setIfNotExist(lockKey, lockToken, lockTtlSeconds);
 
-        if (isLocked) {
-          try {
-            // console.log("한명 락 잡음")
-            result = await resolveWork(work);
-            await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
-          } finally {
-            // console.log("한명 락 잡아서 캐시 발급 끝")
-            await redisExternal.delifmatch(lockKey, lockToken);
-          }
-        } else {
-          // console.log("대기 중인 사람들")
-          await sleep(retryDelayMs);
-          const cachedResult = await redisExternal.get(key);
-          if (cachedResult) {
-            result = JSON.parse(cachedResult);
+          if (isLocked) {
+            try {
+              result = await resolveWork(work);
+              await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
+            } finally {
+              await redisExternal.delifmatch(lockKey, lockToken);
+            }
             break;
+          } else {
+            await sleep(retryDelayMs);
+            const cachedResult = await redisExternal.get(key);
+            if (cachedResult) {
+              result = JSON.parse(cachedResult);
+              break;
+            }
           }
         }
+      } else {
+        result = await resolveWork(work);
+        await redisExternal.set(key, JSON.stringify(result), cacheTtlSeconds);
       }
     }
     return result;
