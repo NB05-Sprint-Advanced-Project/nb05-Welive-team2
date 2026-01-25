@@ -320,23 +320,21 @@ describe('complaint 통합 테스트', () => {
       });
     });
     describe('데이터 조회', () => {
-      it('민원 상세 내용을 반환하고 조회수가 1 증가한다', async () => {
+      it('민원 상세 내용을 반환하고 조회수가 캐시에서 1 증가한다', async () => {
         const complaint = await createComplaint({ viewsCount: 0 });
-        const before = await prisma.complaint.findUnique({
-          where: { id: complaint.id },
-        });
+        const viewCountKey = `complaint:${complaint.id}:viewCount`;
+        await redis.del(viewCountKey);
 
         const res = await request(app)
           .get(`/api/v2/complaints/${complaint.id}`)
           .set('Cookie', [`access_token=${residentToken}`]);
 
-        const after = await prisma.complaint.findUnique({
-          where: { id: complaint.id },
-        });
+        const cachedViewCount = await redis.get(viewCountKey);
 
         expect(res.status).toBe(200);
         expect(res.body.id).toBe(complaint.id);
-        expect(after?.viewsCount).toBe((before?.viewsCount ?? 0) + 1);
+        expect(res.body.viewsCount).toBe(1);
+        expect(cachedViewCount).toBe('1');
       });
     });
   });

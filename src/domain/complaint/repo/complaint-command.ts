@@ -24,7 +24,6 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
-          console.error('[P2003 meta]', err.meta);
           const fieldName = (err.meta as any)?.constraint;
           const targetConstraints = ['Complaint_apartmentId_fkey', 'Complaint_userId_fkey'];
 
@@ -138,7 +137,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
     const complaintIds = props.map((v) => v.complaintId);
     const cases = props.map((v) => Prisma.sql`WHEN ${v.complaintId} THEN ${v.viewsCount}`);
     let query = Prisma.sql`
-      UPDATE "COMPLAINT"
+      UPDATE "Complaint"
       SET "viewsCount" = CASE id ${Prisma.join(cases, ' ')} ELSE "viewsCount" END
       WHERE id IN (${Prisma.join(complaintIds)})
     `;

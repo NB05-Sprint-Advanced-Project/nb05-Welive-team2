@@ -5,59 +5,27 @@ import { isTechnicalException } from '../../../shared/exception/technical-except
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
-import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { randomUUID } from 'crypto';
+import { redisKeys } from '../../../utils/redis-keys';
+import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 
 export const createComplaintQueryService = (
+  redisLocker: IRedisLocker,
   redisExternal: IRedisExternal,
   complaintRepo: IComplaintQueryRepo,
 ) => {
   const getComplaint = async (complaintId: string): Promise<ComplaintView> => {
     try {
-      let complaint;
-      const key = `complaint:${complaintId}`;
-      const cachedComplaint = await redisExternal.get(key);
+      const { key, lock } = redisKeys.complaintById(complaintId);
 
-      if (cachedComplaint) {
-        complaint = JSON.parse(cachedComplaint);
-      } else {
-        for (let i = 0; i < 10; i++) {
-          const locktoken = randomUUID();
-          const isLocked = await redisExternal.setIfNotExist(
-            `lock:complaint:${complaintId}`,
-            locktoken,
-            3,
-          );
-          if (isLocked) {
-            try {
-              const foundComplaint = await complaintRepo.findById(complaintId);
-              await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
-              complaint = foundComplaint;
-            } finally {
-              await redisExternal.delifmatch(`lock:complaint:${complaintId}`, locktoken);
-            }
-            break;
-          } else {
-            await new Promise((resolve, reject) =>
-              setTimeout(() => {
-                resolve(0);
-              }, 100),
-            );
+      const complaint = await redisLocker.doWork({
+        key,
+        lockKey: lock,
+        work: () => complaintRepo.findById(complaintId),
+        cacheTtlSeconds: 60,
+      });
 
-            const cachedComplaint = await redisExternal.get(key);
-            if (cachedComplaint) {
-              complaint = JSON.parse(cachedComplaint);
-              break;
-            }
-          }
-        }
-      }
-
-      if (!complaint) {
-        const foundComplaint = await complaintRepo.findById(complaintId);
-        await redisExternal.setIfNotExist(key, JSON.stringify(foundComplaint), 3);
-        complaint = foundComplaint;
-      }
       if (!complaint) {
         throw BusinessException({
           type: BusinessExceptionType.COMPLAINT_NOT_FOUND,
@@ -95,8 +63,25 @@ export const createComplaintQueryService = (
     params: ComplaintListFilter & { page: number; limit: number },
   ): Promise<PageView<ComplaintView>> => {
     try {
-      const { page, limit, ...filter } = params;
-      const complaints = await complaintRepo.findAll(userId, page, limit, filter);
+      const { page, limit, status, isPublic, building, unit, searchKeyword } = params;
+
+      const hasExtaFilters = searchKeyword || building !== undefined || unit !== undefined;
+
+      if (hasExtaFilters) {
+        return await complaintRepo.findAll(userId, page, limit, { searchKeyword, building, unit });
+      }
+
+      const { key, lock } = redisKeys.complaintsList({ userId, page, limit, status, isPublic });
+
+      const complaints = await redisLocker.doWork({
+        key,
+        lockKey: lock,
+        work: () => complaintRepo.findAll(userId, page, limit, { status, isPublic }),
+      });
+
+      if (!complaints) {
+        return complaintRepo.findAll(userId, page, limit, { status, isPublic });
+      }
 
       return complaints;
     } catch (err) {

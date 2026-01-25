@@ -44,6 +44,8 @@ import { createRedisLocker } from './managers/redis-locker';
 import { createNoticeBatchService } from './domain/notice/service/notice-batch';
 import { createNoticeScheduler } from './domain/notice/notice-scheduler';
 import { createWsServer } from './servers/ws-server';
+import { createComplaintScheduler } from './domain/complaint/complaint-scheduler';
+import { createComplaintBatchService } from './domain/complaint/service/complaint-batch';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
@@ -109,11 +111,16 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const noticeBatchService = createNoticeBatchService(noticeCommandRepository, redisExternal);
 
   const complaintQueryService = createComplaintQueryService(
+    redisLocker,
     redisExternal,
     complaintQueryRepository,
   );
   const complaintCommandService = createComplaintCommandService(
     unitOfwork,
+    redisExternal,
+    complaintCommandRepository,
+  );
+  const complaintBatchService = createComplaintBatchService(
     redisExternal,
     complaintCommandRepository,
   );
@@ -170,6 +177,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
 
   // Scheduler
   const noticeScheduler = createNoticeScheduler(noticeBatchService);
+  const complaintScheduler = createComplaintScheduler(complaintBatchService);
 
   // Server
   const httpServer = createHttpServer(middlewares, controllers);
@@ -184,6 +192,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     httpServer,
     redisExternal,
     noticeScheduler,
+    complaintScheduler,
     // wsServer,
     hashManager,
     wsServer,

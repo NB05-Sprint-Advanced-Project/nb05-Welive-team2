@@ -1,10 +1,30 @@
 import { createSingleTaskScheduler } from '../../utils/scheduler-util';
-import { ComplaintCommandService } from './service/complaint-command';
+import { ComplaintBatchService } from './service/complaint-batch';
 
-export const complaintScheduler = (service: ComplaintCommandService) => {
+export const createComplaintScheduler = (service: ComplaintBatchService) => {
+  let intervalId: NodeJS.Timeout | null = null;
+  const intervalMs: number = 6000;
   const complaintRunner = createSingleTaskScheduler();
 
-  setInterval(() => {
+  const start = () => {
+    if (intervalId) return;
+
     complaintRunner(() => service.syncViewCounts());
-  }, 6000);
+
+    intervalId = setInterval(async () => {
+      complaintRunner(() => service.syncViewCounts());
+    }, intervalMs);
+
+    console.log('complaint scehduler 실행');
+  };
+
+  const stop = () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+    console.log('complaint scheduler 중지');
+  };
+
+  return { start, stop };
 };

@@ -8,9 +8,8 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryRepo => {
   const findById = async (complaintId: string): Promise<ComplaintView> => {
     try {
-      const complaint = await prisma.complaint.update({
+      const complaint = await prisma.complaint.findUnique({
         where: { id: complaintId },
-        data: { viewsCount: { increment: 1 } },
         include: {
           apartment: true,
           complainant: true,
@@ -19,6 +18,13 @@ export const createComplaintQueryRepo = (prisma: PrismaClient): IComplaintQueryR
           },
         },
       });
+
+      if (!complaint) {
+        throw TechnicalException({
+          type: TechnicalExceptionType.RECORD_NOT_FOUND,
+          meta: { id: complaintId },
+        });
+      }
 
       const commentCount = complaint._count.comment;
 

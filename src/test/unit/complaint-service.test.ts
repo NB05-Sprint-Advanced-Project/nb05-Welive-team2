@@ -5,6 +5,7 @@ import { IComplaintCommandRepo } from '../../domain/complaint/interface/i-compla
 import { ComplaintProps } from '../../domain/complaint/complaint-entity';
 import { ComplaintView } from '../../domain/complaint/dto/complaint-veiw';
 import { IRedisExternal } from '../../shared/interface/i-redis';
+import { IRedisLocker } from '../../shared/interface/i-redis-locker';
 import { IUnitOfWork } from '../../shared/interface/i-unit-of-work';
 import { BusinessExceptionType } from '../../shared/exception/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
@@ -17,22 +18,28 @@ describe('complaint service 단위 테스트', () => {
       findAll: jest.fn(),
     } as unknown as IComplaintQueryRepo;
 
+    const mockRedisLocker = {
+      doWork: jest.fn(),
+    } as unknown as IRedisLocker;
+
     const mockRedis = {
-      get: jest.fn(),
       setIfNotExist: jest.fn(),
-      delifmatch: jest.fn(),
       increase: jest.fn(),
       addToSet: jest.fn(),
     } as unknown as IRedisExternal;
 
-    const service = createComplaintQueryService(mockRedis, mockRepo);
+    const service = createComplaintQueryService(mockRedisLocker, mockRedis, mockRepo);
 
     beforeEach(() => {
-      (mockRedis.get as jest.Mock).mockResolvedValue(null);
       (mockRedis.setIfNotExist as jest.Mock).mockResolvedValue(true);
-      (mockRedis.delifmatch as jest.Mock).mockResolvedValue(true);
       (mockRedis.increase as jest.Mock).mockResolvedValue(6);
       (mockRedis.addToSet as jest.Mock).mockResolvedValue(1);
+      (mockRedisLocker.doWork as jest.Mock).mockImplementation(async ({ work }) => {
+        if (typeof work === 'function') {
+          return await work();
+        }
+        return await work;
+      });
     });
 
     afterEach(() => {
@@ -90,7 +97,10 @@ describe('complaint service 단위 테스트', () => {
 
         const result = await service.getAllComplaints('user-1', params);
 
-        expect(mockRepo.findAll).toHaveBeenCalledWith('user-1', 1, 10, {});
+        expect(mockRepo.findAll).toHaveBeenCalledWith('user-1', 1, 10, {
+          status: undefined,
+          isPublic: undefined,
+        });
         expect(result).toEqual(mockResult);
       });
 

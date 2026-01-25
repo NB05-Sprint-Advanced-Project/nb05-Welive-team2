@@ -1,3 +1,5 @@
+import { ComplaintStatus } from '../domain/complaint/complaint-entity';
+import { ComplaintListFilter } from '../domain/complaint/interface/i-complaint-query-repo';
 import { GetResidentAccountsReqDto } from '../domain/user/dto/user-request';
 
 export const redisKeys = {
@@ -33,5 +35,26 @@ export const redisKeys = {
   authAdminToken: (accessToken: string) => {
     const key = `auth:token:${accessToken}`;
     return key;
+  },
+
+  complaintById: (complaintId: string) => {
+    const key = `complaint:${complaintId}`;
+    const lock = `lock:complaint:${complaintId}`;
+    return { key, lock };
+  },
+
+  complaintsList: (params: {
+    userId: string;
+    page: number;
+    limit: number;
+    status?: ComplaintStatus;
+    isPublic?: boolean;
+  }) => {
+    const statusKey = params.status ?? 'ALL';
+    const publicKey = params.isPublic === undefined ? 'ALL' : params.isPublic ? '1' : '0';
+    const key = `complaints:list:${params.userId}:${params.page}:${params.limit}:status:${statusKey}:public:${publicKey}`;
+    const lock = `lock:complaints:list:${params.userId}:${params.page}:${params.limit}:status:${statusKey}:public:${publicKey}`;
+
+    return { key, lock };
   },
 };

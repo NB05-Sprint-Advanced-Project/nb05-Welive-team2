@@ -12,7 +12,7 @@ export type ComplaintListFilter = {
 export interface IComplaintQueryRepo {
   findById(complaintId: string): Promise<ComplaintView>;
   findAll(
-    apartmentId: string,
+    userId: string,
     page: number,
     limit: number,
     filter: ComplaintListFilter,
