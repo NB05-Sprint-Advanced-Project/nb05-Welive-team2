@@ -21,13 +21,12 @@ export default () => {
   const res = http.get('http://localhost:4000/api/v2/residents', {
     headers: {
       Cookie:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZDE0MWViYy00YjUzLTQxNmEtOWY5MC1lOTA5YzBhMjgwNmYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjkyMzc0ODYsImV4cCI6MTc2OTI1OTA4Nn0.QGoV6EEkf6PT-Uxt9cWnSO5aLI6LJgwkF6WOYc48b-A;',
+        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MmQ5ZjJlMC0xYTUzLTRjNTYtYmU5Mi1hOTE0ZWRhOGYxY2IiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njk0MTE5MDUsImV4cCI6MTc2OTQzMzUwNX0.we4hKjqfeqUv4NLrbBixuQV7lZCNsbV8I6mC5SjSyj4;',
     },
   });
   check(res, { 'status was 200': (r) => r.status === 200 });
   sleep(1);
 };
-
 
 // export default () => {
 

@@ -106,6 +106,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     userCommandRepo,
     apartmentCommandRepo,
     stateCommandRepo,
+    redisExternal,
   );
 
   const pollQuerService = createPollQueryService(pollQueryRepository, redisExternal, redisLocker);
