@@ -44,7 +44,7 @@ export const createUserCommandService = (
   uow: IUnitOfWork,
   hashManager: IHashManager,
   userCommandRepo: IUserCommandRepo,
-  apartCommandmentRepo: IApartmentCommandRepo,
+  apartmentCommandRepo: IApartmentCommandRepo,
 ) => {
   // 관리자
   const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
@@ -92,7 +92,7 @@ export const createUserCommandService = (
     try {
       await uow.doWork(
         async () => {
-          const apartment = await apartCommandmentRepo.create(apartmentEntity);
+          const apartment = await apartmentCommandRepo.create(apartmentEntity);
 
           // 2. 관리자 계정 생성
           const userEntity = await AdminAccountEntity.create({
@@ -159,7 +159,7 @@ export const createUserCommandService = (
           await userCommandRepo.update(updatedUserEntity);
 
           // // 3. 아파트 정보 조회
-          const foundApartment = await apartCommandmentRepo.findById(
+          const foundApartment = await apartmentCommandRepo.findById(
             foundUser.userApartmentLink![0].apartmentId,
           );
 
@@ -184,7 +184,7 @@ export const createUserCommandService = (
           //   officeNumber: dto.adminOf.officeNumber,
           // });
 
-          // await apartmentRepo.update(updatedApartmentEntity);
+          await apartmentCommandRepo.update(updatedApartmentEntity);
         },
         {
           transactionOptions: {

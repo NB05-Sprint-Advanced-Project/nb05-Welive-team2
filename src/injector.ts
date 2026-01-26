@@ -43,7 +43,12 @@ import { createResidentUserController } from './domain/user/controller/resident-
 import { createRedisLocker } from './managers/redis-locker';
 import { createNoticeBatchService } from './domain/notice/service/notice-batch';
 import { createNoticeScheduler } from './domain/notice/notice-scheduler';
-import { createWsServer } from './servers/ws-server';
+import { createNotificationController } from './domain/notification/controller/notification-controller';
+import { createNotificationQueryRepo } from './domain/notification/repo/notification-query';
+import { createNotificationQueryService } from './domain/notification/service/notification-query';
+import { no } from 'zod/v4/locales';
+import { createNotificationCommandService } from './domain/notification/service/notification-command';
+import { createNotificationCommandRepo } from './domain/notification/repo/notification-command';
 import { createComplaintScheduler } from './domain/complaint/complaint-scheduler';
 import { createComplaintBatchService } from './domain/complaint/service/complaint-batch';
 
@@ -83,6 +88,9 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
 
   const commentQueryRepository = createCommentQueryRepo(prisma);
   const commentCommandRepository = createCommentCommandRepo(prisma);
+
+  const notificationQueryRepository = createNotificationQueryRepo(prisma);
+  const notificationCommandRepository = createNotificationCommandRepo(prisma);
 
   // Service
   const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo, redisLocker);
@@ -129,6 +137,12 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const commentCommandService = createCommentCommandService(unitOfwork, commentCommandRepository);
   const authService = createAuthService(userQueryRepository, hashManager, tokenManager);
 
+  const notificationQueryService = createNotificationQueryService(notificationQueryRepository);
+
+  const notificationCommandService = createNotificationCommandService(
+    notificationCommandRepository,
+  );
+
   // Controller
   const residentController = createResidentUserController(
     middlewares,
@@ -162,6 +176,11 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   );
 
   const apartmentController = createApartmentController(apartmentQueryService);
+  const notificationController = createNotificationController(
+    notificationQueryService,
+    notificationCommandService,
+    middlewares,
+  );
 
   const controllers = {
     authController,
@@ -173,6 +192,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     commentController,
     apartmentController,
     residentController,
+    notificationController,
   };
 
   // Scheduler
@@ -181,12 +201,6 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
 
   // Server
   const httpServer = createHttpServer(middlewares, controllers);
-  const wsServer = createWsServer(
-    httpServer.defaultHttpServer,
-    middlewares,
-    // gateways,
-    // utils,
-  );
 
   return {
     httpServer,
@@ -195,6 +209,5 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     complaintScheduler,
     // wsServer,
     hashManager,
-    wsServer,
   };
 };
