@@ -206,8 +206,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     httpServer,
     redisExternal,
     noticeScheduler,
-    complaintScheduler,
-    // wsServer,
     hashManager,
+    complaintScheduler
   };
 };
