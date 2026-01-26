@@ -32,14 +32,14 @@ export const redisKeys = {
   },
 
   residentAccounts: (dto: GetResidentAccountsReqDto) => {
-    const key = `residentAccounts:${dto.page}:${dto.limit}`;
-    const lock = `lock:residentAccounts:${dto.page}:${dto.limit}`;
+    const key = 'residentAccounts:1:10'; // 기본 첫 페이지
+    const lock = 'lock:residentAccounts:1:10';
     return { key, lock };
   },
 
   residents: (dto: GetResidentsReqDto) => {
-    const key = `residents:${dto.page}:${dto.limit}`;
-    const lock = `lock:residents:${dto.page}:${dto.limit}`;
+    const key = 'residents:1:10';
+    const lock = 'lock:residents:1:10';
     return { key, lock };
   },
 

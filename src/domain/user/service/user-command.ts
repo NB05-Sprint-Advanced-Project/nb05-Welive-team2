@@ -43,6 +43,7 @@ import { INotificationCommandRepo } from '../../notification/interface/i-notific
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
 import { randomUUID } from 'crypto';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -50,6 +51,7 @@ export const createUserCommandService = (
   userCommandRepo: IUserCommandRepo,
   apartmentCommandRepo: IApartmentCommandRepo,
   stateCommandRepo: IStateCommandRepo,
+  redisExternal: IRedisExternal,
 ) => {
   // 관리자
   const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
@@ -321,6 +323,8 @@ export const createUserCommandService = (
             type: BusinessExceptionType.EMAIL_ALREADY_IN_USE,
           });
         }
+        redisExternal.del('residentAccounts:1:10');
+        redisExternal.del('residents:1:10');
       });
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -363,6 +367,9 @@ export const createUserCommandService = (
         await userCommandRepo.updateJoinedStatus(
           ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus),
         );
+
+        redisExternal.del('residentAccounts:1:10');
+        redisExternal.del('residents:1:10');
       });
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
@@ -391,6 +398,8 @@ export const createUserCommandService = (
         await userCommandRepo.updateJoinedStatuses(
           users.map((user) => ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
         );
+        redisExternal.del('residentAccounts:1:10');
+        redisExternal.del('residents:1:10');
       });
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
@@ -405,12 +414,15 @@ export const createUserCommandService = (
 
   const deleteResidentAccounts = async (): Promise<void> => {
     await userCommandRepo.deleteUsers();
+    redisExternal.del('residentAccounts:1:10');
+    redisExternal.del('residents:1:10');
   };
 
   // 입주민(가입한 입주민 + 미가입한 입주민)
   const createResident = async (dto: CreateResidentReqDto): Promise<void> => {
     try {
       await userCommandRepo.create(toResidentEntityFromDto(dto));
+      redisExternal.del('residents:1:10');
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL) {
@@ -440,6 +452,7 @@ export const createUserCommandService = (
         } else {
           await userCommandRepo.update(toUpdateResidentAccountEntityDataFromDto(dto, user));
         }
+        redisExternal.del('residents:1:10');
       });
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -458,6 +471,7 @@ export const createUserCommandService = (
 
   const deleteResident = async (dto: DeleteResidentReqDto): Promise<void> => {
     await userCommandRepo.deleteUser(dto.id);
+    redisExternal.del('residents:1:10');
   };
 
   // 기타
