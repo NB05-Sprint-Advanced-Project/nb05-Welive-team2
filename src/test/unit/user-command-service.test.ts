@@ -38,6 +38,7 @@ import {
 } from '../../domain/user/dto/resident-user-response';
 import * as userMapper from '../../domain/user/user-mapper';
 import { IStateCommandRepo } from '../../domain/state/interface/i-state-command-repo';
+import { IRedisExternal } from '../../shared/interface/i-redis';
 
 describe('user service 유닛 테스트', () => {
   let mockUow: IUnitOfWork;
@@ -46,6 +47,7 @@ describe('user service 유닛 테스트', () => {
   let mockApartmentRepo: IApartmentCommandRepo;
   let mockStateCommandRepo: IStateCommandRepo;
   let userCommandService: UserCommandService;
+  let mockRedisExternal: IRedisExternal;
 
   beforeAll(() => {});
 
@@ -57,6 +59,22 @@ describe('user service 유닛 테스트', () => {
     mockHashManager = {
       hash: jest.fn(),
       compare: jest.fn(),
+    };
+
+    mockRedisExternal = {
+      get: jest.fn(),
+      getMany: jest.fn(),
+      set: jest.fn(),
+      setIfNotExist: jest.fn(),
+      del: jest.fn(),
+      delifmatch: jest.fn(),
+      getMembersFromSet: jest.fn(),
+      addToSet: jest.fn(),
+      removeMemberFromSet: jest.fn(),
+      popFromSet: jest.fn(),
+      increase: jest.fn(),
+      decrease: jest.fn(),
+      quit: jest.fn(),
     };
 
     mockUserCommandRepo = {
@@ -103,6 +121,7 @@ describe('user service 유닛 테스트', () => {
       mockUserCommandRepo,
       mockApartmentRepo,
       mockStateCommandRepo,
+      mockRedisExternal,
     );
   });
 
