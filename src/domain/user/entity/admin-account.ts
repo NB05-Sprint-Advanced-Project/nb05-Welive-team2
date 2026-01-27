@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
-import { Role, Status, BaseUserProps } from './base-user';
+import { Role, Status, BaseAllUserProps } from './base-user';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
 
 export type AdminAccountProps = {
@@ -9,7 +9,7 @@ export type AdminAccountProps = {
   readonly role: Role.ADMIN | Role.SUPER_ADMIN;
   readonly joinedStatus: Status;
   readonly refreshToken?: string;
-} & BaseUserProps;
+} & BaseAllUserProps;
 
 export const AdminAccountEntity = {
   create: async (props: {

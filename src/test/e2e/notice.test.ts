@@ -3,6 +3,7 @@ import { Application } from 'express';
 import { createInjector } from '../../injector';
 import { TokenUtil } from '../../shared/utils/token-manager';
 import request from 'supertest';
+import { Role } from '../../domain/user/entity/base-user';
 
 describe('Notice 통합 테스트', () => {
   let app: Application;
@@ -144,7 +145,7 @@ describe('Notice 통합 테스트', () => {
     test('실패: role이 Admin이 아니면 에러: 403', async () => {
       const residentToken = TokenUtil().generateAccessToken({
         userId: 'some-resident-id',
-        role: 'RESIDENT',
+        role: Role.USER,
       });
 
       const data = {
@@ -240,7 +241,7 @@ describe('Notice 통합 테스트', () => {
     test('실패: role이 Admin이 아니면 에러: 403', async () => {
       const residentToken = TokenUtil().generateAccessToken({
         userId: 'some-resident-id',
-        role: 'RESIDENT',
+        role: Role.USER,
       });
 
       const data = {
@@ -303,7 +304,7 @@ describe('Notice 통합 테스트', () => {
     test('실패: 권한 없음 에러: 403', async () => {
       const residentToken = TokenUtil().generateAccessToken({
         userId: 'some-resident',
-        role: 'RESIDENT',
+        role: Role.USER,
       });
 
       const res = await request(app)

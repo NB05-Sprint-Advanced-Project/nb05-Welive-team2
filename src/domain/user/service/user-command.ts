@@ -39,12 +39,17 @@ import {
   UpdateResidentReqDto,
   DeleteResidentReqDto,
 } from '../dto/resident-user-response';
+import { INotificationCommandRepo } from '../../notification/interface/i-notification-command';
+import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
+import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { randomUUID } from 'crypto';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
   hashManager: IHashManager,
   userCommandRepo: IUserCommandRepo,
   apartmentCommandRepo: IApartmentCommandRepo,
+  stateCommandRepo: IStateCommandRepo,
 ) => {
   // 관리자
   const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
@@ -107,7 +112,19 @@ export const createUserCommandService = (
           });
 
           await userCommandRepo.create(userEntity);
-          // await notificationRepo.create()
+
+          // 알림 상태 데이터 생성
+          const stateEntity = StateEntity.create({
+            workType: WorkType.ALARM,
+            status: StatusType.PENDING,
+            payload: {
+              id: randomUUID(),
+              receiverType: Role.SUPER_ADMIN,
+              message: `[회원가입] 관리자 ${userEntity.name}님이 회원가입을 요청했습니다.`,
+            } as unknown as JSON,
+          });
+
+          await stateCommandRepo.create(stateEntity);
         },
         {
           transactionOptions: {
@@ -498,7 +515,7 @@ export const createUserCommandService = (
           await userCommandRepo.updatePassword(
             await AdminAccountEntity.updatePassword(user, dto.newPassword, hashManager),
           );
-        } else if (user.role === Role.RESIDENT) {
+        } else if (user.role === Role.USER) {
           await userCommandRepo.updatePassword(
             await ResidentAccountEntity.updatePassword(user, dto.newPassword, hashManager),
           );

@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { createInjector } from '../../injector';
 import { TokenUtil } from '../../shared/utils/token-manager';
+import { Role } from '../../domain/user/entity/base-user';
 
 describe('complaint 통합 테스트', () => {
   let app: Application;
@@ -102,7 +103,7 @@ describe('complaint 통합 테스트', () => {
         name: 'resident1',
         email: 'resident1@test.com',
         contact: '01011112221',
-        role: 'RESIDENT',
+        role: Role.USER,
         joinedStatus: 'APPROVED',
         version: 1,
         createdAt: new Date(),
@@ -123,7 +124,7 @@ describe('complaint 통합 테스트', () => {
         name: 'resident2',
         email: 'resident2@test.com',
         contact: '01011112222',
-        role: 'RESIDENT',
+        role: Role.USER,
         joinedStatus: 'APPROVED',
         version: 1,
         createdAt: new Date(),
@@ -158,11 +159,11 @@ describe('complaint 통합 테스트', () => {
     const tokenManager = TokenUtil();
     residentToken = tokenManager.generateAccessToken({
       userId: residentId,
-      role: 'RESIDENT',
+      role: Role.USER,
     });
     otherResidentToken = tokenManager.generateAccessToken({
       userId: otherResidentId,
-      role: 'RESIDENT',
+      role: Role.USER,
     });
     adminToken = tokenManager.generateAccessToken({
       userId: adminId,

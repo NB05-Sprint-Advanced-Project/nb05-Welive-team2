@@ -3,6 +3,7 @@ import { BusinessExceptionType } from '../../../shared/exception/business-except
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
+import { Role } from '../../user/entity/base-user';
 import { CommentEntity } from '../comment-entity';
 import { ICommentCommandRepo } from '../interface/i-comment-command-repo';
 
@@ -72,7 +73,7 @@ export const createCommentCommandService = (
           type: BusinessExceptionType.REQ_INFO_INVALID,
         });
       }
-      if (requesterRole === 'RESIDENT' && beforeContext.userId !== userId) {
+      if (requesterRole === Role.USER && beforeContext.userId !== userId) {
         throw BusinessException({
           type: BusinessExceptionType.FORBIDDEN,
         });

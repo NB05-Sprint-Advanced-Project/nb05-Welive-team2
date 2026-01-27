@@ -1,14 +1,14 @@
 import { randomUUID } from 'crypto';
-import { Role, BaseUserProps, Status } from './base-user';
+import { Role, BaseAllUserProps, Status } from './base-user';
 import { ResidentAddressProps } from './vo/resident-address';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
 import { SignUpResidentAccountReqDto } from '../dto/user-request';
 
 export type NotJoinedResidentProps = {
-  readonly role: Role.RESIDENT;
+  readonly role: Role.USER;
   readonly joinedStatus: Status.NOT_JOINED;
   readonly address: ResidentAddressProps;
-} & BaseUserProps;
+} & BaseAllUserProps;
 
 export const NotJoinedResidentEntity = {
   create: (props: {
@@ -23,7 +23,7 @@ export const NotJoinedResidentEntity = {
     return {
       ...props,
       id: randomUUID(),
-      role: Role.RESIDENT,
+      role: Role.USER,
       joinedStatus: Status.NOT_JOINED,
       version: 1,
       createdAt: now,
@@ -36,7 +36,7 @@ export const NotJoinedResidentEntity = {
     name: string;
     email: string;
     contact: string;
-    role: Role.RESIDENT;
+    role: Role.USER;
     joinedStatus: Status.NOT_JOINED;
     createdAt: Date;
     updatedAt: Date;

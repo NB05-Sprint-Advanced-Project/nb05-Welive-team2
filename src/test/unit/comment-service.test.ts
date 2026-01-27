@@ -7,6 +7,7 @@ import { BusinessExceptionType } from '../../shared/exception/business-exception
 import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
 import { TechnicalException as createTechnicalException } from '../../shared/exception/technical-exception/technical-exception';
 import { IUnitOfWork } from '../../shared/interface/i-unit-of-work';
+import { Role } from '../../domain/user/entity/base-user';
 
 describe('comment service 단위 테스트', () => {
   describe('QUERY service', () => {
@@ -203,11 +204,11 @@ describe('comment service 단위 테스트', () => {
       it('예외: 존재하지 않는 댓글이면 REQ_INFO_INVALID를 던진다', async () => {
         (mockRepo.findById as jest.Mock).mockResolvedValue(null);
 
-        await expect(
-          service.deleteComment('user-1', 'RESIDENT', 'comment-1'),
-        ).rejects.toMatchObject({
-          type: BusinessExceptionType.REQ_INFO_INVALID,
-        });
+        await expect(service.deleteComment('user-1', Role.USER, 'comment-1')).rejects.toMatchObject(
+          {
+            type: BusinessExceptionType.REQ_INFO_INVALID,
+          },
+        );
       });
 
       it('예외: 본인 댓글이 아니면 FORBIDDEN을 던진다', async () => {
@@ -216,11 +217,11 @@ describe('comment service 단위 테스트', () => {
           userId: 'other-user',
         });
 
-        await expect(
-          service.deleteComment('user-1', 'RESIDENT', 'comment-1'),
-        ).rejects.toMatchObject({
-          type: BusinessExceptionType.FORBIDDEN,
-        });
+        await expect(service.deleteComment('user-1', Role.USER, 'comment-1')).rejects.toMatchObject(
+          {
+            type: BusinessExceptionType.FORBIDDEN,
+          },
+        );
       });
 
       it('성공: 댓글을 삭제한다', async () => {

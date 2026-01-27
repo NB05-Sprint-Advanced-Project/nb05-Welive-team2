@@ -215,30 +215,19 @@ enum NoticeCategory {
   ETC
 }
 
-enum WorkType {
-  CSV
-  ALARM 
-}
-
-enum StatusType {
-  PENDING
-  PROCESSING
-  PROCESSED
-}
-
 model Notifications {
-  id       String     @id
+  id        String   @unique
   content   String
   isChecked Boolean
   createdAt DateTime
-  userId    String
-  receiver  User     @relation(fields: [userId], references: [id])
+  userId    String?
+  receiver  User?    @relation(fields: [userId], references: [id])
 }
 
 model State {
-  id      String     @id
-  type    WorkType
-  status  StatusType
+  id      String @id
+  type    String
+  status  String
   payload Json
 }
 

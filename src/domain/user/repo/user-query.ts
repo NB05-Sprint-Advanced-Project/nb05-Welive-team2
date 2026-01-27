@@ -94,7 +94,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       email: user.email,
       contact: user.contact,
       name: user.name,
-      role: user.role === Role.RESIDENT ? 'USER' : user.role,
+      role: user.role,
       avatar: user.avatarUrl || '',
       joinStatus: user.joinedStatus as Status,
       isActive: true,

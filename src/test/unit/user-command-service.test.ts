@@ -37,12 +37,14 @@ import {
   UpdateResidentReqDto,
 } from '../../domain/user/dto/resident-user-response';
 import * as userMapper from '../../domain/user/user-mapper';
+import { IStateCommandRepo } from '../../domain/state/interface/i-state-command-repo';
 
 describe('user service 유닛 테스트', () => {
   let mockUow: IUnitOfWork;
   let mockHashManager: IHashManager;
   let mockUserCommandRepo: IUserCommandRepo;
   let mockApartmentRepo: IApartmentCommandRepo;
+  let mockStateCommandRepo: IStateCommandRepo;
   let userCommandService: UserCommandService;
 
   beforeAll(() => {});
@@ -62,6 +64,7 @@ describe('user service 유닛 테스트', () => {
       findResidentAccountUserById: jest.fn(),
       findBaseUserById: jest.fn(),
       findJoinedUserById: jest.fn(),
+      findUserByRole: jest.fn(),
 
       findPendingAdminUsers: jest.fn(),
       findRejectedAdminUsers: jest.fn(),
@@ -88,11 +91,18 @@ describe('user service 유닛 테스트', () => {
       remove: jest.fn(),
     };
 
+    mockStateCommandRepo = {
+      create: jest.fn(),
+      findAllByStatus: jest.fn(),
+      bulkUpdate: jest.fn(),
+    };
+
     userCommandService = createUserCommandService(
       mockUow,
       mockHashManager,
       mockUserCommandRepo,
       mockApartmentRepo,
+      mockStateCommandRepo,
     );
   });
 
@@ -946,7 +956,7 @@ describe('user service 유닛 테스트', () => {
     const residentUser: ResidentAccountProps = {
       id: 'user-2',
       password: 'hashed-old-password',
-      role: Role.RESIDENT,
+      role: Role.USER,
     } as ResidentAccountProps;
 
     beforeEach(() => {

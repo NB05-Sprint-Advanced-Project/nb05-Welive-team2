@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
-import { Role, Status, BaseUserProps } from './base-user';
+import { Role, Status, BaseAllUserProps } from './base-user';
 import { ResidentAddressProps } from './vo/resident-address';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
 import { NotJoinedResidentProps } from './not-joined-resident';
@@ -9,12 +9,12 @@ import { SignUpResidentAccountReqDto } from '../dto/user-request';
 export type ResidentAccountProps = {
   readonly username: string;
   readonly password: string;
-  readonly role: Role.RESIDENT;
+  readonly role: Role.USER;
   readonly joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
   readonly refreshToken?: string;
 
   readonly address: ResidentAddressProps;
-} & BaseUserProps;
+} & BaseAllUserProps;
 
 export const ResidentAccountEntity = {
   create: async (props: {
@@ -34,7 +34,7 @@ export const ResidentAccountEntity = {
     return {
       ...rest,
       id: randomUUID(),
-      role: Role.RESIDENT,
+      role: Role.USER,
       joinedStatus: Status.PENDING,
       password: hashedPassword,
       version: 1,
@@ -51,7 +51,7 @@ export const ResidentAccountEntity = {
     email: string;
     contact: string;
     avatarUrl?: string;
-    role: Role.RESIDENT;
+    role: Role.USER;
     joinedStatus: Status.APPROVED | Status.PENDING | Status.REJECTED;
     refreshToken?: string;
     version: number;

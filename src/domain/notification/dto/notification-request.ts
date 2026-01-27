@@ -12,5 +12,18 @@ export const readNotificationSchema = z.object({
   notificationId: z.string(),
 });
 
+export const createNotificationSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  status: z.string(),
+  payload: z.object({
+    receiverType: z.string(),
+    apartmentId: z.string().optional(),
+    message: z.string(),
+    userId: z.array(z.string()).optional(),
+  }),
+});
+
 export type viewNotificationsDTO = z.infer<typeof getNotificationsSchema>;
 export type readNotificationDTO = z.infer<typeof readNotificationSchema>;
+export type createNotificationDTO = z.infer<typeof createNotificationSchema>;

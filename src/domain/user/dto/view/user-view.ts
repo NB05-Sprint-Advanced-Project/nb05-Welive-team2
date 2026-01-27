@@ -1,5 +1,3 @@
-import { Role, Status } from '../../entity/base-user';
-
 export interface UserView {
   id: string;
   username: string;

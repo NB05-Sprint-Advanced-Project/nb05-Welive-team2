@@ -4,6 +4,7 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
+import { Role } from '../../user/entity/base-user';
 import { ComplaintEntity, ComplaintStatus } from '../complaint-entity';
 import { IComplaintCommandRepo } from '../interface/i-complaint-command-repo';
 
@@ -102,7 +103,7 @@ export const createComplaintCommandService = (
           type: BusinessExceptionType.REQ_INFO_INVALID,
         });
       }
-      if (requesterRole === 'RESIDENT' && beforeContext.userId !== userId) {
+      if (requesterRole === Role.USER && beforeContext.userId !== userId) {
         throw BusinessException({
           type: BusinessExceptionType.FORBIDDEN,
         });

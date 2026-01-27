@@ -1,14 +1,16 @@
 import { AdminAccountProps } from '../entity/admin-account';
-import { BaseUserProps } from '../entity/base-user';
+import { BaseAllUserProps, Role } from '../entity/base-user';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { ResidentAccountProps } from '../entity/resident-account';
 
 export interface IUserCommandRepo {
+  findUserByRole: (role: Role) => Promise<BaseAllUserProps[]>;
+
   findAdminUserById: (id: string) => Promise<AdminAccountProps | null>;
 
   findResidentAccountUserById: (id: string) => Promise<ResidentAccountProps | null>;
 
-  findBaseUserById: (id: string) => Promise<BaseUserProps | null>;
+  findBaseUserById: (id: string) => Promise<BaseAllUserProps | null>;
 
   findJoinedUserById: (id: string) => Promise<AdminAccountProps | ResidentAccountProps | null>;
 
@@ -44,7 +46,7 @@ export interface IUserCommandRepo {
   /**
    *  @ throws OPTIMISTIC_LOCK_FAILED
    */
-  updateAvatar: (entity: BaseUserProps) => Promise<void>;
+  updateAvatar: (entity: BaseAllUserProps) => Promise<void>;
 
   /**
    *  단 건

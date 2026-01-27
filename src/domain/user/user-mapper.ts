@@ -1,4 +1,4 @@
-import { BaseUserEntity, BaseUserProps, Role, Status } from './entity/base-user';
+import { BaseUserEntity, BaseAllUserProps, Role, Status } from './entity/base-user';
 import { UserApartmentLinkVO } from './entity/vo/user-apartment-link';
 import { AdminAccountEntity, AdminAccountProps } from './entity/admin-account';
 import { Prisma } from '@prisma/client';
@@ -157,7 +157,7 @@ export const toUpdateNotJoinedResidentDBData = (
   };
 };
 
-export const toUpdateAvatarDBData = (entity: BaseUserProps): Prisma.UserUpdateInput => {
+export const toUpdateAvatarDBData = (entity: BaseAllUserProps): Prisma.UserUpdateInput => {
   return {
     avatarUrl: entity.avatarUrl!,
     version: entity.version,
@@ -217,7 +217,7 @@ export const toUpdateNotJoinedEntityDataFromDto = (
   });
 };
 
-export const toBaseUserEntity = (DBUserEntity: UserModel): BaseUserProps => {
+export const toBaseUserEntity = (DBUserEntity: UserModel): BaseAllUserProps => {
   return BaseUserEntity.restore({
     id: DBUserEntity.id,
     name: DBUserEntity.name,
@@ -263,7 +263,7 @@ export const toResidentAccountEntityFromDB = (DBUserEntity: UserModel): Resident
     email: DBUserEntity.email,
     contact: DBUserEntity.contact,
     avatarUrl: DBUserEntity.avatarUrl ?? undefined,
-    role: DBUserEntity.role as Role.RESIDENT,
+    role: DBUserEntity.role as Role.USER,
     joinedStatus: DBUserEntity.joinedStatus as Status.APPROVED | Status.PENDING | Status.REJECTED,
     version: DBUserEntity.version,
     createdAt: DBUserEntity.createdAt,
@@ -319,7 +319,7 @@ export const toNotJoinedResidentEntity = (DBUserEntity: UserModel): NotJoinedRes
     name: DBUserEntity.name,
     email: DBUserEntity.email,
     contact: DBUserEntity.contact,
-    role: DBUserEntity.role as Role.RESIDENT,
+    role: DBUserEntity.role as Role.USER,
     joinedStatus: DBUserEntity.joinedStatus as Status.NOT_JOINED,
     version: DBUserEntity.version,
     createdAt: DBUserEntity.createdAt,

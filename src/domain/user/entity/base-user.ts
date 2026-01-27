@@ -12,10 +12,10 @@ export enum Status {
 export enum Role {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
-  RESIDENT = 'RESIDENT',
+  USER = 'USER', // Resident
 }
 
-export type BaseUserProps = {
+export type BaseAllUserProps = {
   readonly id: string;
   readonly name: string;
   readonly email: string;
@@ -40,13 +40,13 @@ export const BaseUserEntity = {
     createdAt: Date;
     updatedAt: Date;
     userApartmentLink: UserApartmentLinkProps[];
-  }): BaseUserProps => {
+  }): BaseAllUserProps => {
     return {
       ...props,
     };
   },
 
-  updateAvatar: (user: BaseUserProps, newAvatarUrl: string): BaseUserProps => {
+  updateAvatar: (user: BaseAllUserProps, newAvatarUrl: string): BaseAllUserProps => {
     return {
       ...user,
       avatarUrl: newAvatarUrl,

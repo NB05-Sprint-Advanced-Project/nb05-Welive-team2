@@ -10,6 +10,7 @@ import { IUnitOfWork } from '../../shared/interface/i-unit-of-work';
 import { BusinessExceptionType } from '../../shared/exception/business-exception/exception-info';
 import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
 import { TechnicalException as createTechnicalException } from '../../shared/exception/technical-exception/technical-exception';
+import { Role } from '../../domain/user/entity/base-user';
 
 describe('complaint service 단위 테스트', () => {
   describe('QUERY service', () => {
@@ -289,7 +290,7 @@ describe('complaint service 단위 테스트', () => {
         (mockRepo.findById as jest.Mock).mockResolvedValue(null);
 
         await expect(
-          service.deleteComplaint('user-1', 'RESIDENT', 'complaint-1'),
+          service.deleteComplaint('user-1', Role.USER, 'complaint-1'),
         ).rejects.toMatchObject({ type: BusinessExceptionType.REQ_INFO_INVALID });
       });
 
@@ -300,7 +301,7 @@ describe('complaint service 단위 테스트', () => {
         });
 
         await expect(
-          service.deleteComplaint('user-1', 'RESIDENT', 'complaint-1'),
+          service.deleteComplaint('user-1', Role.USER, 'complaint-1'),
         ).rejects.toMatchObject({ type: BusinessExceptionType.FORBIDDEN });
       });
 
@@ -329,7 +330,7 @@ describe('complaint service 단위 테스트', () => {
     describe('updateComplaintStatus', () => {
       it('예외: 관리자만 상태를 변경할 수 있다', async () => {
         await expect(
-          service.updateComplaintStatus('RESIDENT', 'complaint-1', 'IN_PROGRESS'),
+          service.updateComplaintStatus(Role.USER, 'complaint-1', 'IN_PROGRESS'),
         ).rejects.toMatchObject({ type: BusinessExceptionType.FORBIDDEN });
       });
 

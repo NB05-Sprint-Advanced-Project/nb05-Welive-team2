@@ -17,7 +17,7 @@ export const registerNotificationRoutes = (
     catchHandler(handlers.markAsRead),
   );
 
-  router.get('/sse', middleware.auth.authAdmin, catchHandler(handlers.getNotification));
+  router.get('/sse', middleware.auth.authenticate, catchHandler(handlers.getNotification));
 
   return { path, router };
 };
