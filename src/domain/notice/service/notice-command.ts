@@ -9,17 +9,38 @@ import {
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
+import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { randomUUID } from 'crypto';
+import { Role } from '../../user/entity/base-user';
+import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 
-export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeCommandRepo) => {
+export const createNoticeCommandService = (
+  uow: IUnitOfWork,
+  noticeRepo: INoticeCommandRepo,
+  stateRepo: IStateCommandRepo,
+) => {
   const createNotice = async (dto: CreateNoticeDto, userId: string): Promise<NoticeProps> => {
     return await uow.doWork(
       async () => {
-        return await repo.create(
+        const notice = await noticeRepo.create(
           NoticeEntity.create({
             ...dto,
           }),
           userId,
         );
+
+        const stateEntity = StateEntity.create({
+          workType: WorkType.ALARM,
+          status: StatusType.PENDING,
+          payload: {
+            id: randomUUID(),
+            receiverType: Role.USER,
+            message: `[공지사항] ${notice.title} 등록됨`,
+          } as unknown as JSON,
+        });
+
+        await stateRepo.create(stateEntity);
+        return notice;
       },
       {
         transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
@@ -32,13 +53,13 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
     try {
       return await uow.doWork(async () => {
         const { noticeId, ...data } = dto;
-        const foundNotice = await repo.findById(noticeId);
+        const foundNotice = await noticeRepo.findById(noticeId);
         if (!foundNotice) {
           throw BusinessException({
             type: BusinessExceptionType.NOTICE_NOT_FOUND,
           });
         }
-        await repo.update(NoticeEntity.update(foundNotice, { ...data }));
+        await noticeRepo.update(NoticeEntity.update(foundNotice, { ...data }));
       });
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -59,7 +80,7 @@ export const createNoticeCommandService = (uow: IUnitOfWork, repo: INoticeComman
     return await uow.doWork(
       async () => {
         const { noticeId } = dto;
-        await repo.deleteNotice(noticeId);
+        await noticeRepo.deleteNotice(noticeId);
       },
       { transactionOptions: { useTransaction: false }, useOptimisticLock: false },
     );

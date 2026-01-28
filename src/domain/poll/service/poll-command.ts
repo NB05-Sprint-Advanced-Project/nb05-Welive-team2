@@ -9,22 +9,41 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { Prisma } from '@prisma/client';
+import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { randomUUID } from 'crypto';
+import { Role } from '../../user/entity/base-user';
+import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 
 export const createPollCommandService = (
   uow: IUnitOfWork,
   pollCommandRepo: IPollCommandRepo,
   userVoteOptionCommandRepo: IUserVoteOptionCommandRepo,
+  stateRepo: IStateCommandRepo,
 ) => {
   const createPoll = async (dto: CreatePollDto, userId: string): Promise<PollProps> => {
     try {
       return await uow.doWork(
         async () => {
-          return await pollCommandRepo.create(
+          const poll = await pollCommandRepo.create(
             PollEntity.create({
               ...dto,
             }),
             userId,
           );
+
+          const stateEntity = StateEntity.create({
+            workType: WorkType.ALARM,
+            status: StatusType.PENDING,
+            payload: {
+              id: randomUUID(),
+              receiverType: Role.USER,
+              message: `[투표] ${poll.title} 등록됨`,
+            } as unknown as JSON,
+          });
+
+          await stateRepo.create(stateEntity);
+
+          return poll;
         },
         {
           transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
