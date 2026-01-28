@@ -17,6 +17,7 @@ const envSchema = z.object({
   REDIS_PORT: z.coerce.number(),
   ENABLE_RESOURCE_MONITORING: z.coerce.boolean().default(false),
   BULK_NOTIFICATION_SIZE: z.coerce.number().default(100),
+  NOTIFICATION_SCHEDULER_INTERVAL_MS: z.coerce.number().default(1000),
 });
 
 type EnvParsed = z.infer<typeof envSchema>;

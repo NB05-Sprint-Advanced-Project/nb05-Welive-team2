@@ -38,8 +38,6 @@ model User {
   Notifications      Notifications[]
   Comment            Comment[]
   UserVoteOption     UserVoteOption[]
-  addressUserId      String?
-  addressApartmentId String?
 
   @@index([email])
   @@index([joinedStatus])

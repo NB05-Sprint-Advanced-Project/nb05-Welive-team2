@@ -7,6 +7,7 @@ declare global {
       user: {
         userId: string;
         role: string;
+        name: string;
       }; // 현재 방식
       userId?: string; // 기존 방식
     }

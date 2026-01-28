@@ -30,7 +30,7 @@ export const createNotificationCommandService = (
 
       for (const user of users) {
         const notification = NotificationEntity.create({
-          id: state.id,
+          id: state.payloadId + '-' + user.id,
           receiverId: user.id ? user.id : undefined,
           content: state.content,
         });
@@ -57,9 +57,31 @@ export const createNotificationCommandService = (
 
     // 각 클라이언트에게 알맞는 알림 전송 ( O (N^2) 문제 필요 )
     dtos.map((dto) => {
+      const payload = [
+        {
+          id: `${dto.payloadId}-${dto.receiverType}`,
+          createdAt: '2026-01-28T01:49:17.566Z',
+          content: `[SSE 실시간 알림 전송됨] ${dto.content}`,
+          isChecked: false,
+        },
+      ];
+
+      // const payload ={
+      //   type: "alarm",
+      //   data: [
+      //     {
+      //       id: "string",
+      //       createdAt: "2026-01-28T01:49:17.566Z",
+      //       content: "string",
+      //       isChecked: true
+      //     }
+      //   ]
+      // }
+
       if (dto.receiverType === Role.SUPER_ADMIN) {
         superAdmins?.forEach((connection, user) => {
-          connection.write(`event: ${WorkType.ALARM}\ndata: ${dto.content}\n\n`);
+          console.log('SSE 알림 전송 대상 : ', user);
+          connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(payload)}\n\n`);
         });
       } else if (dto.receiverType === Role.ADMIN) {
         admins?.forEach((connection, user) => {

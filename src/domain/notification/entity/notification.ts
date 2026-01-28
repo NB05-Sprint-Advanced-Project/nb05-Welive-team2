@@ -1,15 +1,21 @@
-import { randomUUID } from 'crypto';
+import { Role } from '../../user/entity/base-user';
 
 export type NotificationProps = {
   readonly id: string;
   readonly receiverId?: string;
+  readonly receiverType?: Role;
   readonly content: string;
   readonly isChecked: boolean;
   readonly createdAt: Date;
 };
 
 export const NotificationEntity = {
-  create: (props: { id: string; receiverId?: string; content: string }): NotificationProps => {
+  create: (props: {
+    id: string;
+    receiverId?: string;
+    receiverType?: Role;
+    content: string;
+  }): NotificationProps => {
     return {
       createdAt: new Date(),
       isChecked: false,
@@ -20,6 +26,7 @@ export const NotificationEntity = {
   restore: (props: {
     id: string;
     receiverId?: string;
+    receiverType?: Role;
     content: string;
     isChecked: boolean;
     createdAt: Date;

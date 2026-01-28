@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 
 export enum WorkType {
   CSV = 'CSV',
-  ALARM = 'ALARM',
+  ALARM = 'alarm',
 }
 
 export enum StatusType {
@@ -50,6 +50,10 @@ export const StateEntity = {
     return {
       id: randomUUID(),
       ...props,
+      payload: {
+        id: randomUUID(),
+        ...props.payload,
+      },
     };
   },
 

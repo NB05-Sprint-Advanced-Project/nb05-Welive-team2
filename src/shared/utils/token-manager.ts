@@ -7,12 +7,14 @@ import { BusinessException } from '../exception/business-exception/business-exce
 export type TokenPayload = {
   userId: string;
   role?: string;
+  name?: string;
   exp: number;
 };
 
 export type SecretTokenPayload = {
   userId: string;
   role: string;
+  name: string;
   exp: number;
 };
 

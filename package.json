@@ -15,7 +15,8 @@
     "test:e2e": "npm run test -- src/test/e2e --runInBand --detectOpenHandles",
     "test:it": "npm run test:db && npm run test -- --runInBand",
     "format:check": "prettier . --check",
-    "type:check": "tsc --noEmit"
+    "type:check": "tsc --noEmit",
+    "mock:user": "node src/test/mock/user.js"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}": [
@@ -53,6 +54,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "eventsource": "^4.1.0",
     "express": "^5.2.1",
     "ioredis": "^5.9.2",
     "morgan": "^1.10.1",

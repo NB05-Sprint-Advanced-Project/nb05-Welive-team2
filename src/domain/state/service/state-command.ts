@@ -13,13 +13,13 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
   const findPendingCsv = async (): Promise<CSVStateProps[]> => {
     const states = await stateCommandRepo.findAllByStatus(StatusType.PENDING);
 
-    states.map((state) => {
+    const filteredStates = states.filter((state) => {
       if (state.status === StatusType.PENDING && state.workType === WorkType.CSV) {
-        return states;
+        return state;
       }
     });
 
-    return states as CSVStateProps[];
+    return filteredStates as CSVStateProps[];
   };
 
   const findPendingNotification = async (): Promise<StateResponseDto[]> => {
@@ -37,7 +37,8 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
 
     return filteredStates.map((state) => ({
       // @ fiter는 배열을 걸러내는거고 map은 배열을 변환함
-      id: state.payload.id,
+      stateId: state.id,
+      payloadId: state.payload.id,
       userId: state.payload.userId,
       content: state.payload.message,
       apartmentId: state.payload.apartmentId,
@@ -45,8 +46,12 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
     }));
   };
 
-  const markAsProcessed = async (): Promise<void> => {
-    await stateCommandRepo.bulkUpdate();
+  const markAsProcessed = async (states: StateResponseDto[]): Promise<void> => {
+    const stateIds = states.map((state) => {
+      return state.stateId;
+    });
+
+    await stateCommandRepo.bulkUpdate(stateIds);
     return;
   };
 

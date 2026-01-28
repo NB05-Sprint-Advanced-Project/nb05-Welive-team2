@@ -33,10 +33,12 @@ export const createNotificationHandler = (
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    console.log(' SSE client connected', req.user.userId);
+    console.log(' SSE client connected', req.user.name, req.user.userId);
 
     // 초기 이벤트(선택)
-    res.write(`event: connected\ndata: ok\n\n`);
+    res.write(
+      `event: connected\ndata: [${req.user.role}] ${req.user.name}님이 SSE에 연결되었습니다. \n\n`,
+    );
 
     // setInterval(() => {
     //   const payload = JSON.stringify({ message: 'ping', ts: Date.now(), data: result });

@@ -9,11 +9,11 @@ export const registerNotificationRoutes = (
   middleware: Middlewares,
   handlers: NotificationHandlers,
 ) => {
-  router.get('/', middleware.auth.authAdmin, catchHandler(handlers.getNotifications));
+  router.get('/', middleware.auth.authenticate, catchHandler(handlers.getNotifications));
 
   router.patch(
     '/:notificationId/read',
-    middleware.auth.authAdmin,
+    middleware.auth.authenticate,
     catchHandler(handlers.markAsRead),
   );
 

@@ -50,7 +50,7 @@ export const toCreateSuperAdminAccountDBData = (
     email: entity.email,
     contact: entity.contact,
     role: entity.role,
-    joinedStatus: entity.joinedStatus,
+    joinedStatus: Status.APPROVED,
     version: entity.version,
     createdAt: entity.createdAt,
     updatedAt: entity.updatedAt,

@@ -206,6 +206,34 @@ describe('user service e2e 테스트', () => {
       expect(user!.joinedStatus).toBe(Status.PENDING);
     });
 
+    test('슈퍼 관리자 100명 생성 성공', async () => {
+      const dtos = Array.from({ length: 100 }, (_, index) => {
+        const i = index + 1;
+        return {
+          username: `superadmin-bulk-${i}`,
+          name: `슈퍼관리${i}`,
+          email: `superadmin-bulk-${i}@test.com`,
+          contact: `0108888${String(i).padStart(4, '0')}`,
+          password: '123123qwe!',
+        };
+      });
+
+      for (const dto of dtos) {
+        await request(app).post('/api/v2/users/super-admins').send(dto).expect(204);
+      }
+
+      const users = await prisma.user.findMany({
+        where: { email: { in: dtos.map((d) => d.email) } },
+      });
+
+      expect(users.length).toBe(dtos.length);
+      expect(users.every((u) => u.role === 'SUPER_ADMIN')).toBe(true);
+
+      await prisma.user.deleteMany({
+        where: { email: { in: dtos.map((d) => d.email) } },
+      });
+    });
+
     test('중복 이메일이면 409 반환', async () => {
       const dto = {
         username: 'superadmin3',

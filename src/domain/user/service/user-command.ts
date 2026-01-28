@@ -118,7 +118,6 @@ export const createUserCommandService = (
             workType: WorkType.ALARM,
             status: StatusType.PENDING,
             payload: {
-              id: randomUUID(),
               receiverType: Role.SUPER_ADMIN,
               message: `[회원가입] 관리자 ${userEntity.name}님이 회원가입을 요청했습니다.`,
             } as unknown as JSON,

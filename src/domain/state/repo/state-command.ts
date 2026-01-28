@@ -41,11 +41,10 @@ export const createStateCommandRepo = (prismaClient: PrismaClient): IStateComman
     return;
   };
 
-  const bulkUpdate = async (): Promise<void> => {
-    // Implement bulk update logic here
+  const bulkUpdate = async (ids: string[]): Promise<void> => {
     await prisma().state.updateMany({
       where: {
-        status: StatusType.PENDING,
+        id: { in: ids },
       },
       data: {
         status: StatusType.PROCESSED,
