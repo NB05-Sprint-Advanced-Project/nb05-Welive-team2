@@ -93,20 +93,49 @@ export const createNotificationCommandService = (
         });
       }
     });
+    //   const grouped = {
+    //     [Role.SUPER_ADMIN]: [] as StateResponseDto[],
+    //     [Role.ADMIN]: [] as StateResponseDto[],
+    //     [Role.USER]: [] as StateResponseDto[],
+    //   };
+
+    //   dtos.forEach((dto) => {
+    //     grouped[dto.receiverType]?.push(dto);
+    //   });
+
+    //   const send = (
+    //     connections: Map<string, any> | undefined,
+    //     payload: StateResponseDto[],
+    //   ) => {
+    //     if (!connections || payload.length === 0) return;
+
+    //     const now = new Date();
+
+    //     const message = {
+    //       type: 'alarm',
+    //       data: payload.map((dto) => ({
+    //         id: dto.id,
+    //         createdAt: now,
+    //         content: dto.content,
+    //         isChecked: false,
+    //       })),
+    //     };
+
+    //     const serialized = JSON.stringify(message);
+
+    //     connections.forEach((connection) => {
+    //       connection.write(
+    //         `event: ${WorkType.ALARM}\n` +
+    //         `data: ${serialized}\n\n`
+    //       );
+    //     });
+    //   };
+
+    //   send(superAdmins, grouped[Role.SUPER_ADMIN]);
+    //   send(admins, grouped[Role.ADMIN]);
+    //   send(residents, grouped[Role.USER]);
   };
-
-  // const create = async (dto: createNotificationDTO): Promise<void> => {
-  //   const notificationEntity = NotificationEntity.create({
-
-  //   })
-
-  //   await notificationCommandService.saveNotifications({
-
-  //   });
-
-  //   return;
-  // }
-
+  
   return {
     markAsRead,
     bulkSave,

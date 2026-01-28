@@ -8,6 +8,8 @@ import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
 import { UpdateResidentReqDto, CreateResidentReqDto } from './dto/resident-user-response';
 import { SignUpResidentAccountReqDto } from './dto/user-request';
 import { ResidentAddressVO } from './entity/vo/resident-address';
+import { StateEntity, StateProps, StatusType, WorkType } from '../state/entity/state';
+import { randomUUID } from 'crypto';
 
 export const userInclude = Prisma.validator<Prisma.UserInclude>()({
   Address: true,
@@ -331,6 +333,18 @@ export const toNotJoinedResidentEntity = (DBUserEntity: UserModel): NotJoinedRes
       isHouseholder: DBUserEntity.Address!.isHouseholder,
       building: DBUserEntity.Address!.building,
       unit: DBUserEntity.Address!.unit,
+    },
+  });
+};
+
+export const toAdminJoinRequestAlarmState = (residentEntity: ResidentAccountProps): StateProps => {
+  return StateEntity.create({
+    workType: WorkType.ALARM,
+    status: StatusType.PENDING,
+    payload: {
+      id: randomUUID(),
+      receiverType: Role.ADMIN,
+      message: `[회원가입] 입주민 ${residentEntity.name}님이 회원가입을 요청했습니다.`,
     },
   });
 };

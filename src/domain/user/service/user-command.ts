@@ -23,11 +23,12 @@ import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
 import { AdminAccountEntity } from '../entity/admin-account';
 import { BaseUserEntity, Role, Status } from '../entity/base-user';
-import { ResidentAccountEntity } from '../entity/resident-account';
+import { ResidentAccountEntity, ResidentAccountProps } from '../entity/resident-account';
 import { UserApartmentLinkVO } from '../entity/vo/user-apartment-link';
 import { ApartmentEntity } from '../../apartment/entity/apartment-entity';
 import { IApartmentCommandRepo } from '../../apartment/interface/i-apartment-command';
 import {
+  toAdminJoinRequestAlarmState,
   toResidentAccountEntityFromDto,
   toResidentEntityFromDto,
   toUpdateNotJoinedEntityDataFromDto,
@@ -306,23 +307,32 @@ export const createUserCommandService = (
   const createResidentAccount = async (dto: SignUpResidentAccountReqDto): Promise<void> => {
     try {
       await uow.doWork(async () => {
+        let residentEntity: ResidentAccountProps;
+
         const resident = await userCommandRepo.findNotJoinedResidentByEmail(dto.email);
 
         if (!resident) {
-          await userCommandRepo.create(await toResidentAccountEntityFromDto(dto, hashManager));
+          // 새로운 입주민이면 새로운 row 등록
+          residentEntity = await toResidentAccountEntityFromDto(dto, hashManager);
+          await userCommandRepo.create(residentEntity);
         } else {
-          // 미가입했던 입주민이면 가입 상태를 Pending으로 승격
+          // 미가입했던 입주민이면(입주민 관리에서 등록된 입주민) 가입 상태를 Pending으로 승격
           if (NotJoinedResidentEntity.isNotJoinedResident(dto, resident)) {
-            await userCommandRepo.update(
-              await ResidentAccountEntity.requestJoin(resident, dto, hashManager),
-            );
+            residentEntity = await ResidentAccountEntity.requestJoin(resident, dto, hashManager);
+
+            await userCommandRepo.update(residentEntity);
             return;
           }
-
+          // 새로운 입주민인데 이메일이 중복되었을 때
           throw BusinessException({
             type: BusinessExceptionType.EMAIL_ALREADY_IN_USE,
           });
         }
+
+        const stateEntity = toAdminJoinRequestAlarmState(residentEntity);
+
+        await stateCommandRepo.create(stateEntity);
+
         redisExternal.del('residentAccounts:1:10');
         redisExternal.del('residents:1:10');
       });
