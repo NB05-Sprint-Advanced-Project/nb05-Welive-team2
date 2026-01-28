@@ -39,7 +39,7 @@ export const createAuthService = (
     const accessToken = tokenManager.generateAccessToken({
       userId: user.id,
       role: user.role,
-      name: user.name,
+      // name: user.name,
     });
 
     const refreshToken = tokenManager.generateRefreshToken({

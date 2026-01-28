@@ -10,6 +10,13 @@ export enum StatusType {
   PROCESSED = 'PROCESSED',
 }
 
+export interface LiveNotificationPayload {
+  id: string;
+  createdAt: string;
+  content: string;
+  isChecked: boolean;
+}
+
 export interface NotificationPayload {
   id: string;
   userId?: string;

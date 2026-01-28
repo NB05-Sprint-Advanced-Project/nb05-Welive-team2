@@ -5,7 +5,12 @@ import {
   viewNotificationsDTO,
 } from '../dto/notification-request';
 import { INotificationCommandRepo } from '../interface/i-notification-command';
-import { NotificationStateProps, StateProps, WorkType } from '../../state/entity/state';
+import {
+  LiveNotificationPayload,
+  NotificationStateProps,
+  StateProps,
+  WorkType,
+} from '../../state/entity/state';
 import { ClientManager } from '../../../clients';
 import { Role } from '../../user/entity/base-user';
 import { StateResponseDto } from '../../state/dto/state-response';
@@ -55,57 +60,50 @@ export const createNotificationCommandService = (
     const admins = clients.get(Role.ADMIN);
     const residents = clients.get(Role.USER);
 
-    // 각 클라이언트에게 알맞는 알림 전송 ( O (N^2) 문제 필요 )
-    dtos.map((dto) => {
-      const payload = [
-        {
-          id: `${dto.payloadId}-${dto.receiverType}`,
-          createdAt: '2026-01-28T01:49:17.566Z',
-          content: `[SSE 실시간 알림 전송됨] ${dto.content}`,
-          isChecked: false,
-        },
-      ];
+    const superAdminPayloads: LiveNotificationPayload[] = [];
+    const adminPayloads: LiveNotificationPayload[] = [];
+    const userPayloads: LiveNotificationPayload[] = [];
 
-      // const payload ={
-      //   type: "alarm",
-      //   data: [
-      //     {
-      //       id: "string",
-      //       createdAt: "2026-01-28T01:49:17.566Z",
-      //       content: "string",
-      //       isChecked: true
-      //     }
-      //   ]
-      // }
+    const startTime = Date.now();
+    dtos.map((dto) => {
+      const payload = {
+        id: `${dto.payloadId}-${dto.receiverType}`,
+        createdAt: '2026-01-28T01:49:17.566Z',
+        content: `[SSE 실시간 알림 전송됨] ${dto.content}`,
+        isChecked: false,
+      };
 
       if (dto.receiverType === Role.SUPER_ADMIN) {
-        superAdmins?.forEach((connection, user) => {
-          console.log('SSE 알림 전송 대상 : ', user);
-          connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(payload)}\n\n`);
-        });
+        superAdminPayloads.push(payload);
       } else if (dto.receiverType === Role.ADMIN) {
-        admins?.forEach((connection, user) => {
-          connection.write(`event: ${WorkType.ALARM}\ndata: ${dto.content}\n\n`);
-        });
+        adminPayloads.push(payload);
       } else if (dto.receiverType === Role.USER) {
-        residents?.forEach((connection, user) => {
-          connection.write(`event: ${WorkType.ALARM}\ndata: ${dto.content}\n\n`);
-        });
+        userPayloads.push(payload);
       }
     });
+
+    if (superAdminPayloads.length !== 0) {
+      superAdmins?.forEach((connection, user) => {
+        connection.write(
+          `event: ${WorkType.ALARM}\ndata: ${JSON.stringify(superAdminPayloads)}\n\n`,
+        );
+      });
+    }
+
+    if (adminPayloads.length === 0 && userPayloads.length === 0) {
+      admins?.forEach((connection, user) => {
+        connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(adminPayloads)}\n\n`);
+      });
+    }
+
+    if (userPayloads.length === 0) {
+      residents?.forEach((connection, user) => {
+        connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(userPayloads)}\n\n`);
+      });
+    }
+    const endTime = Date.now();
+    console.log(`sendLiveNotifications 실행 시간: ${endTime - startTime}ms`);
   };
-
-  // const create = async (dto: createNotificationDTO): Promise<void> => {
-  //   const notificationEntity = NotificationEntity.create({
-
-  //   })
-
-  //   await notificationCommandService.saveNotifications({
-
-  //   });
-
-  //   return;
-  // }
 
   return {
     markAsRead,

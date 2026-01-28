@@ -11,6 +11,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
     try {
       const cookie = req.cookies;
       const access_token = cookie['access_token'];
+      console.log('access_token:', access_token);
       if (!access_token) {
         return next(BusinessException({ type: BusinessExceptionType.INVALID_AUTH }));
       }

@@ -20,6 +20,7 @@ export const createNotificationScheduler = (
 
     intervalId = setInterval(async () => {
       notificationRunner(async () => {
+        const startTime = Date.now();
         // 1. 상태 테이블을 읽어서 처리 대기중인 알림을 가져온다
         const pendingStatesDto = await stateCommandService.findPendingNotification();
 
@@ -31,6 +32,8 @@ export const createNotificationScheduler = (
 
         // 4. 상태 테이블 변경 (Processed)
         await stateCommandService.markAsProcessed(pendingStatesDto);
+        const endTime = Date.now();
+        console.log(`[알림 스캐쥴러 실행 시간] : ${endTime - startTime} ms`);
       });
     }, intervalMs);
 
