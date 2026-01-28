@@ -66,7 +66,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
       if (cached) {
         const payload = JSON.parse(cached);
 
-        if (payload.role !== Role.ADMIN) {
+        if (payload.role !== Role.SUPER_ADMIN) {
           return next(BusinessException({ type: BusinessExceptionType.NOT_SUPERADMIN }));
         }
         req.user = {
