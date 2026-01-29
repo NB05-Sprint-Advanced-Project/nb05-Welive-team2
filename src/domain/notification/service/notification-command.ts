@@ -29,6 +29,7 @@ export const createNotificationCommandService = (
 
   const bulkSave = async (states: StateResponseDto[]) => {
     const notifications: NotificationProps[] = [];
+    // @@@ 100관리자 *  1000 슈퍼관리자  = 알림 100,000개
 
     for (const state of states) {
       const users = await userCommandRepo.findUserByRole(state.receiverType);

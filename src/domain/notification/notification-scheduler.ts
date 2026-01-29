@@ -18,6 +18,9 @@ export const createNotificationScheduler = (
   const start = async () => {
     if (intervalId) return;
 
+    // @@@ 서버가 꺼졌을떄 (원자성 문제)
+    // - uow 만들어야되나?
+    // - 중복 생성 문제 (알림id 충돌) -> id에 uuid붙이기
     intervalId = setInterval(async () => {
       notificationRunner(async () => {
         const startTime = Date.now();
@@ -25,7 +28,7 @@ export const createNotificationScheduler = (
         const pendingStatesDto = await stateCommandService.findPendingNotification();
 
         //  2. 알림 테이블에 알림을 저장한다
-        await notificationCommandService.bulkSave(pendingStatesDto);
+        await notificationCommandService.bulkSave(pendingStatesDto); // <== @ 에러 처리 필요
 
         // 3. payload 내용으로 SSE 알림을 전송한다
         await notificationCommandService.sendLiveNotifications(pendingStatesDto);
