@@ -23,6 +23,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         req.user = {
           userId: payload.userId,
           role: payload.role,
+          name: payload.name,
         };
         req.userId = payload.userId;
         return next();
@@ -34,6 +35,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         JSON.stringify({
           userId: payload.userId,
           role: payload.role,
+          name: payload.name,
         }),
         300,
       );
@@ -71,6 +73,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         req.user = {
           userId: payload.userId,
           role: payload.role,
+          name: payload.name,
         };
         req.userId = payload.userId;
         return next();
@@ -82,6 +85,7 @@ export const createAuthMiddleware = (tokenUtil: ITokenUtil, redisExternal: IRedi
         JSON.stringify({
           userId: payload.userId,
           role: payload.role,
+          name: payload.name,
         }),
         300,
       );

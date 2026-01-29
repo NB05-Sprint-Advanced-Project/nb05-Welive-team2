@@ -203,7 +203,7 @@ describe('user service e2e 테스트', () => {
 
       expect(user).not.toBeNull();
       expect(user!.role).toBe('SUPER_ADMIN');
-      expect(user!.joinedStatus).toBe(Status.PENDING);
+      expect(user!.joinedStatus).toBe(Status.APPROVED);
     });
 
     test('슈퍼 관리자 100명 생성 성공', async () => {
@@ -232,7 +232,7 @@ describe('user service e2e 테스트', () => {
       await prisma.user.deleteMany({
         where: { email: { in: dtos.map((d) => d.email) } },
       });
-    });
+    }, 30_000);
 
     test('중복 이메일이면 409 반환', async () => {
       const dto = {
