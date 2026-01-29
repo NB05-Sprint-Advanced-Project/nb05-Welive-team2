@@ -22,12 +22,16 @@ export const registerResidentUserRoutes = (
     catchHandler(middlewares.auth.authAdmin),
     catchHandler(handlers.deleteResident),
   );
+
   // router.get('/file/template',
   // catchHandler(middlewares.auth.authAdmin),
   // );
-  // router.post('/file/import'
-  // catchHandler(middlewares.auth.authAdmin),
-  // );
+  router.post(
+    '/file/import',
+    catchHandler(middlewares.auth.authAdmin),
+    catchHandler(middlewares.multer.handlerCsvFile()),
+    catchHandler(handlers.importResidentsFromCsv),
+  );
   // router.get('/file/export'
   // catchHandler(middlewares.auth.authAdmin),
   // );

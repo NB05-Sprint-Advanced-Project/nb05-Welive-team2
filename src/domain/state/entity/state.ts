@@ -18,34 +18,46 @@ export interface LiveNotificationPayload {
 }
 
 export interface NotificationPayload {
-  id: string;
   userId?: string;
   message: string;
   apartmentId?: string;
   receiverType: string;
 }
 
-export interface CSVPayload {}
+export interface CSVPayload {
+  userId: string;
+  filePaths: string[];
+}
+
+export type CSVPayloadPersist = CSVPayload & {
+  id: string;
+};
+
+export type NotificationPayloadPersist = NotificationPayload & {
+  id: string;
+};
+
+export type PayloadPersist = NotificationPayloadPersist | CSVPayloadPersist;
 
 export type StateProps = {
   readonly id: string;
   readonly workType: WorkType;
   readonly status: StatusType;
-  readonly payload: NotificationPayload | CSVPayload;
+  readonly payload: PayloadPersist;
 };
 
 export type NotificationStateProps = {
   readonly id: string;
   readonly workType: WorkType;
   readonly status: StatusType;
-  readonly payload: NotificationPayload;
+  readonly payload: NotificationPayloadPersist;
 };
 
 export type CSVStateProps = {
   readonly id: string;
   readonly workType: WorkType;
   readonly status: StatusType;
-  readonly payload: CSVPayload;
+  readonly payload: CSVPayloadPersist;
 };
 
 export const StateEntity = {
@@ -68,7 +80,7 @@ export const StateEntity = {
     id: string;
     workType: WorkType;
     status: StatusType;
-    payload: NotificationPayload | CSVPayload;
+    payload: NotificationPayloadPersist | CSVPayloadPersist;
   }): StateProps => {
     return {
       ...props,

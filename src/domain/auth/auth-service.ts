@@ -1,7 +1,7 @@
+import { ITokenUtil } from '../../managers/token-manager';
 import { BusinessException } from '../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../shared/exception/business-exception/exception-info';
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
-import { ITokenUtil } from '../../shared/utils/token-manager';
 import { IUserQueryRepo } from '../user/interface/i-user-query-repo';
 import { CookieTokenDTO, LoginDTO } from './dto/auth-request';
 

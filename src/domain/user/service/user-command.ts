@@ -34,17 +34,20 @@ import {
   toUpdateNotJoinedEntityDataFromDto,
   toUpdateResidentAccountEntityDataFromDto,
 } from '../user-mapper';
-import { NotJoinedResidentEntity } from '../entity/not-joined-resident';
+import { NotJoinedResidentEntity, NotJoinedResidentProps } from '../entity/not-joined-resident';
 import {
   CreateResidentReqDto,
   UpdateResidentReqDto,
   DeleteResidentReqDto,
 } from '../dto/resident-user-response';
-import { INotificationCommandRepo } from '../../notification/interface/i-notification-command';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
-import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
-import { randomUUID } from 'crypto';
+import { CSVStateProps, StateEntity, StatusType, WorkType } from '../../state/entity/state';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
+import { IFileStream } from '../../../utils/i-fileStream';
+import readline from 'readline';
+import { ResidentAddressVO } from '../entity/vo/resident-address';
+import { IWorkerExternal } from '../../../utils/externals/i-worker';
+import path from 'path/posix';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -53,6 +56,8 @@ export const createUserCommandService = (
   apartmentCommandRepo: IApartmentCommandRepo,
   stateCommandRepo: IStateCommandRepo,
   redisExternal: IRedisExternal,
+  fileStream: IFileStream,
+  workerExternal: IWorkerExternal,
 ) => {
   // 관리자
   const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
@@ -123,7 +128,7 @@ export const createUserCommandService = (
             payload: {
               receiverType: Role.SUPER_ADMIN,
               message: `[회원가입] 관리자 ${userEntity.name}님이 회원가입을 요청했습니다.`,
-            } as unknown as JSON,
+            },
           });
 
           await stateCommandRepo.create(stateEntity);
@@ -484,6 +489,23 @@ export const createUserCommandService = (
     redisExternal.del('residents:1:10');
   };
 
+  const importResidentsFromCsv = async (
+    userId: string,
+    files: Express.Multer.File[],
+  ): Promise<void> => {
+    // CSV 업로드 상태 데이터 생성  @@@ 추가 기능으로 알림 설정
+    const stateEntity = StateEntity.create({
+      workType: WorkType.CSV,
+      status: StatusType.PENDING,
+      payload: {
+        userId,
+        filePaths: files.map((file) => file.path),
+      },
+    });
+
+    await stateCommandRepo.create(stateEntity);
+  };
+
   // 기타
   const updateAvatarUrl = async (dto: UpdateAvatarUrlReqDto): Promise<void> => {
     try {
@@ -555,7 +577,65 @@ export const createUserCommandService = (
     }
   };
 
+  const createResidentBulk = async (dtos: CSVStateProps[]) => {
+    const dto = dtos[0];
+    const apartmentId = (await userCommandRepo.findAdminUserById(dto.payload.userId))!
+      .userApartmentLink![0].apartmentId;
+    // const apartmentId = await apartmentCommandRepo.findApartmentIdByAdminId(userId); @@@ 나중에 구현하기
+
+    const readStream = await fileStream.readStream(dto.payload.filePaths[0]);
+    const rl = readline.createInterface({
+      input: readStream,
+    });
+
+    let isHeaderPassed = false;
+    let batchEntities = [];
+    let processCount = 0;
+    for await (const line of rl) {
+      if (isHeaderPassed === false) {
+        isHeaderPassed = true;
+        continue;
+      }
+
+      // "동","호수","이름","연락처","이메일","세대주여부"
+      const [building, unit, name, contact, email, isHouseholder] = line.split(',');
+
+      batchEntities.push(
+        NotJoinedResidentEntity.create({
+          name,
+          email,
+          contact,
+          address: ResidentAddressVO.create({
+            isHouseholder: Boolean(isHouseholder),
+            building: Number(building),
+            unit: Number(unit),
+          }),
+          userApartmentLink: [UserApartmentLinkVO.create(apartmentId)],
+        }),
+      );
+      if (batchEntities.length === 1000) {
+        await userCommandRepo.createManyBulk(batchEntities);
+        processCount += 1000;
+        console.log(`${processCount} 벌크 크리에이트 완료`);
+        batchEntities = [];
+      }
+    }
+
+    // 544268개 처리 완료
+    await userCommandRepo.createManyBulk(batchEntities);
+    console.log(`${processCount + batchEntities.length} 벌크 크리에이트 완료`);
+    batchEntities = [];
+  };
+
+  const processCSVFiles = async (csvStatesProps: CSVStateProps[]): Promise<void> => {
+    const workerScriptPath = path.join(__dirname, '../../../utils/workers/csv-worker.ts');
+    await workerExternal.register(workerScriptPath, {
+      csvStatesProps,
+    });
+  };
+
   return {
+    importResidentsFromCsv,
     createSuperAdmin,
     createAdmin,
     updateAdmin,
@@ -572,6 +652,8 @@ export const createUserCommandService = (
     deleteResident,
     updateAvatarUrl,
     updatePassword,
+    createResidentBulk,
+    processCSVFiles,
   };
 };
 

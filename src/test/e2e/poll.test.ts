@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Application } from 'express';
-import { TokenUtil } from '../../shared/utils/token-manager';
 import { createInjector } from '../../injector';
 import request from 'supertest';
 import { Role } from '../../domain/user/entity/base-user';
+import { TokenUtil } from '../../managers/token-manager';
 
 describe('Poll 통합 테스트', () => {
   let app: Application;

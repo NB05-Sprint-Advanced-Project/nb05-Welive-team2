@@ -3,8 +3,8 @@ import { Application } from 'express';
 import { randomUUID } from 'node:crypto';
 import request from 'supertest';
 import { createInjector } from '../../injector';
-import { TokenUtil } from '../../shared/utils/token-manager';
 import { Role } from '../../domain/user/entity/base-user';
+import { TokenUtil } from '../../managers/token-manager';
 
 describe('comment 통합 테스트', () => {
   let app: Application;
