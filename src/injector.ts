@@ -95,7 +95,8 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
 
   const notificationQueryRepository = createNotificationQueryRepo(prisma);
   const notificationCommandRepository = createNotificationCommandRepo(prisma);
-  const stateCommandRepo = createStateCommandRepo(prisma);
+  const stateCommandRepository = createStateCommandRepo(prisma);
+
   // Service
   const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo, redisLocker);
 
@@ -105,7 +106,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     hashManager,
     userCommandRepo,
     apartmentCommandRepo,
-    stateCommandRepo,
+    stateCommandRepository,
     redisExternal,
   );
 
@@ -138,12 +139,13 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     unitOfwork,
     redisExternal,
     complaintCommandRepository,
+    stateCommandRepository,
   );
   const complaintBatchService = createComplaintBatchService(
     redisExternal,
     complaintCommandRepository,
   );
-  const stateCommandService = createStateCommandService(stateCommandRepo);
+  const stateCommandService = createStateCommandService(stateCommandRepository);
 
   const commentQueryService = createCommentQueryService(commentQueryRepository);
   const commentCommandService = createCommentCommandService(unitOfwork, commentCommandRepository);

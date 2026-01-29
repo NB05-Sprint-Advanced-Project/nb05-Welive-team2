@@ -4,6 +4,8 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
+import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { Role } from '../../user/entity/base-user';
 import { ComplaintEntity, ComplaintStatus } from '../complaint-entity';
 import { IComplaintCommandRepo } from '../interface/i-complaint-command-repo';
@@ -12,6 +14,7 @@ export const createComplaintCommandService = (
   uow: IUnitOfWork,
   redisExternal: IRedisExternal,
   complaintRepo: IComplaintCommandRepo,
+  stateCommandRepo: IStateCommandRepo,
 ) => {
   const createComplaint = async (
     userId: string,
@@ -28,7 +31,20 @@ export const createComplaintCommandService = (
         userId: userId,
       });
 
-      return await complaintRepo.create(entity);
+      const result = await complaintRepo.create(entity);
+
+      const stateEntity = StateEntity.create({
+        workType: WorkType.ALARM,
+        status: StatusType.PENDING,
+        payload: {
+          receiverType: Role.ADMIN,
+          message: `[민원 알림] 새 민원이 등록되었습니다. '${entity.title}' `,
+        } as unknown as JSON,
+      });
+
+      await stateCommandRepo.create(stateEntity);
+
+      return result;
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.FOREIGN_KEY_VIOLATION) {
@@ -160,9 +176,30 @@ export const createComplaintCommandService = (
             });
           }
         }
+
         const entity = ComplaintEntity.updateStatus(beforeContext, { status });
         await complaintRepo.updateStatus(entity);
         await redisExternal.del(`complaint:${complaintId}`);
+
+        let updateStatus;
+        if (entity.status === 'IN_PROGRESS') {
+          updateStatus = '처리 중';
+        } else if (entity.status === 'RESOLVED') {
+          updateStatus = '처리 완료';
+        } else {
+          ('처리 거부');
+        }
+
+        const stateEntity = StateEntity.create({
+          workType: WorkType.ALARM,
+          status: StatusType.PENDING,
+          payload: {
+            receiverType: Role.USER,
+            message: `[민원 알림] 민원이 '${updateStatus}'입니다. `,
+          } as unknown as JSON,
+        });
+
+        await stateCommandRepo.create(stateEntity);
       });
     } catch (err) {
       if (isTechnicalException(err)) {

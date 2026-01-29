@@ -11,10 +11,11 @@ import { BusinessExceptionType } from '../../shared/exception/business-exception
 import { TechnicalExceptionType } from '../../shared/exception/technical-exception/exception-info';
 import { TechnicalException as createTechnicalException } from '../../shared/exception/technical-exception/technical-exception';
 import { Role } from '../../domain/user/entity/base-user';
+import { IStateCommandRepo } from '../../domain/state/interface/i-state-command-repo';
 
 describe('complaint service 단위 테스트', () => {
   describe('QUERY service', () => {
-    const mockRepo = {
+    const mockComplaintRepo = {
       findById: jest.fn(),
       findAll: jest.fn(),
     } as unknown as IComplaintQueryRepo;
@@ -29,7 +30,7 @@ describe('complaint service 단위 테스트', () => {
       addToSet: jest.fn(),
     } as unknown as IRedisExternal;
 
-    const service = createComplaintQueryService(mockRedisLocker, mockRedis, mockRepo);
+    const service = createComplaintQueryService(mockRedisLocker, mockRedis, mockComplaintRepo);
 
     beforeEach(() => {
       (mockRedis.setIfNotExist as jest.Mock).mockResolvedValue(true);
@@ -63,16 +64,16 @@ describe('complaint service 단위 테스트', () => {
           commentCount: 0,
         };
 
-        (mockRepo.findById as jest.Mock).mockResolvedValue(foundComplaint);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(foundComplaint);
 
         const result = await service.getComplaint('complaint-1');
 
-        expect(mockRepo.findById).toHaveBeenCalledWith('complaint-1');
+        expect(mockComplaintRepo.findById).toHaveBeenCalledWith('complaint-1');
         expect(result.id).toBe('complaint-1');
       });
 
       it('예외: 민원이 존재하지 않으면 COMPLAINT_NOT_FOUND를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(null);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(null);
 
         await expect(service.getComplaint('not-exist')).rejects.toMatchObject({
           type: BusinessExceptionType.COMPLAINT_NOT_FOUND,
@@ -94,11 +95,11 @@ describe('complaint service 단위 테스트', () => {
           limit: 10,
           hasNext: false,
         };
-        (mockRepo.findAll as jest.Mock).mockResolvedValue(mockResult);
+        (mockComplaintRepo.findAll as jest.Mock).mockResolvedValue(mockResult);
 
         const result = await service.getAllComplaints('user-1', params);
 
-        expect(mockRepo.findAll).toHaveBeenCalledWith('user-1', 1, 10, {
+        expect(mockComplaintRepo.findAll).toHaveBeenCalledWith('user-1', 1, 10, {
           status: undefined,
           isPublic: undefined,
         });
@@ -106,7 +107,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: FOREIGN_KEY_VIOLATION이면 COMPLAINTS_LIST_NOT_FOUND를 던진다', async () => {
-        (mockRepo.findAll as jest.Mock).mockRejectedValue(
+        (mockComplaintRepo.findAll as jest.Mock).mockRejectedValue(
           createTechnicalException({ type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION }),
         );
 
@@ -118,7 +119,7 @@ describe('complaint service 단위 테스트', () => {
   });
 
   describe('COMMAND service', () => {
-    const mockRepo = {
+    const mockComplaintRepo = {
       findById: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -126,6 +127,12 @@ describe('complaint service 단위 테스트', () => {
       updateStatus: jest.fn(),
       updateViewCountBulk: jest.fn(),
     } as unknown as IComplaintCommandRepo;
+
+    const mockStateRepo = {
+      create: jest.fn(),
+      findAllByStatus: jest.fn(),
+      bulkUpdate: jest.fn(),
+    } as unknown as IStateCommandRepo;
 
     const mockUow = {
       doWork: jest.fn().mockImplementation(async (work) => await work()),
@@ -135,7 +142,12 @@ describe('complaint service 단위 테스트', () => {
       del: jest.fn(),
     } as unknown as IRedisExternal;
 
-    const service = createComplaintCommandService(mockUow, mockRedis, mockRepo);
+    const service = createComplaintCommandService(
+      mockUow,
+      mockRedis,
+      mockComplaintRepo,
+      mockStateRepo,
+    );
 
     const baseComplaint: ComplaintProps = {
       id: 'complaint-1',
@@ -158,7 +170,7 @@ describe('complaint service 단위 테스트', () => {
     describe('createComplaint', () => {
       it('성공: 생성된 민원을 반환한다', async () => {
         const saved = { ...baseComplaint };
-        (mockRepo.create as jest.Mock).mockResolvedValue(saved);
+        (mockComplaintRepo.create as jest.Mock).mockResolvedValue(saved);
 
         const result = await service.createComplaint('user-1', {
           title: 'title',
@@ -167,7 +179,7 @@ describe('complaint service 단위 테스트', () => {
           apartmentId: 'apt-1',
         });
 
-        expect(mockRepo.create).toHaveBeenCalledWith(
+        expect(mockComplaintRepo.create).toHaveBeenCalledWith(
           expect.objectContaining({
             title: 'title',
             content: 'content',
@@ -180,7 +192,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: FOREIGN_KEY_VIOLATION이면 FAIL_SAVE_COMPALINT를 던진다', async () => {
-        (mockRepo.create as jest.Mock).mockRejectedValue(
+        (mockComplaintRepo.create as jest.Mock).mockRejectedValue(
           createTechnicalException({ type: TechnicalExceptionType.FOREIGN_KEY_VIOLATION }),
         );
 
@@ -199,7 +211,7 @@ describe('complaint service 단위 테스트', () => {
 
     describe('updateComplaint', () => {
       it('예외: 존재하지 않는 민원이면 REQ_INFO_INVALID를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(null);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(null);
 
         await expect(
           service.updateComplaint('user-1', 'complaint-1', {
@@ -213,7 +225,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: 작성자가 아니면 FORBIDDEN을 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue({
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue({
           ...baseComplaint,
           userId: 'other-user',
         });
@@ -230,7 +242,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: 접수된 민원은 수정할 수 없다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue({
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue({
           ...baseComplaint,
           status: 'IN_PROGRESS',
         });
@@ -247,8 +259,8 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('성공: 민원을 수정하고 캐시를 삭제한다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
-        (mockRepo.update as jest.Mock).mockResolvedValue(undefined);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
+        (mockComplaintRepo.update as jest.Mock).mockResolvedValue(undefined);
         (mockRedis.del as jest.Mock).mockResolvedValue(1);
 
         await service.updateComplaint('user-1', 'complaint-1', {
@@ -257,7 +269,7 @@ describe('complaint service 단위 테스트', () => {
           isPublic: false,
         });
 
-        expect(mockRepo.update).toHaveBeenCalledWith(
+        expect(mockComplaintRepo.update).toHaveBeenCalledWith(
           expect.objectContaining({
             id: 'complaint-1',
             title: 'new',
@@ -268,8 +280,8 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: RECORD_NOT_FOUND면 FAIL_SAVE_COMPALINT를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
-        (mockRepo.update as jest.Mock).mockRejectedValue(
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
+        (mockComplaintRepo.update as jest.Mock).mockRejectedValue(
           createTechnicalException({ type: TechnicalExceptionType.RECORD_NOT_FOUND }),
         );
 
@@ -287,7 +299,7 @@ describe('complaint service 단위 테스트', () => {
 
     describe('deleteComplaint', () => {
       it('예외: 존재하지 않는 민원이면 REQ_INFO_INVALID를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(null);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(null);
 
         await expect(
           service.deleteComplaint('user-1', Role.USER, 'complaint-1'),
@@ -295,7 +307,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: 작성자가 아니면 FORBIDDEN을 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue({
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue({
           ...baseComplaint,
           userId: 'other-user',
         });
@@ -306,18 +318,18 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('성공: 민원을 삭제하고 캐시를 삭제한다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
-        (mockRepo.delete as jest.Mock).mockResolvedValue(undefined);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
+        (mockComplaintRepo.delete as jest.Mock).mockResolvedValue(undefined);
         (mockRedis.del as jest.Mock).mockResolvedValue(1);
 
         await service.deleteComplaint('user-1', 'ADMIN', 'complaint-1');
 
-        expect(mockRepo.delete).toHaveBeenCalledWith('complaint-1');
+        expect(mockComplaintRepo.delete).toHaveBeenCalledWith('complaint-1');
       });
 
       it('예외: RECORD_NOT_FOUND면 DELETED를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
-        (mockRepo.delete as jest.Mock).mockRejectedValue(
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
+        (mockComplaintRepo.delete as jest.Mock).mockRejectedValue(
           createTechnicalException({ type: TechnicalExceptionType.RECORD_NOT_FOUND }),
         );
 
@@ -335,7 +347,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: 존재하지 않는 민원이면 REQ_INFO_INVALID를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(null);
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(null);
 
         await expect(
           service.updateComplaintStatus('ADMIN', 'complaint-1', 'IN_PROGRESS'),
@@ -343,7 +355,7 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: IN_PROGRESS에서 PENDING으로 변경 불가', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue({
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue({
           ...baseComplaint,
           status: 'IN_PROGRESS',
         });
@@ -354,16 +366,16 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('성공: 상태를 변경하고 캐시를 삭제한다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue({
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue({
           ...baseComplaint,
           status: 'PENDING',
         });
-        (mockRepo.updateStatus as jest.Mock).mockResolvedValue(undefined);
+        (mockComplaintRepo.updateStatus as jest.Mock).mockResolvedValue(undefined);
         (mockRedis.del as jest.Mock).mockResolvedValue(1);
 
         await service.updateComplaintStatus('ADMIN', 'complaint-1', 'IN_PROGRESS');
 
-        expect(mockRepo.updateStatus).toHaveBeenCalledWith(
+        expect(mockComplaintRepo.updateStatus).toHaveBeenCalledWith(
           expect.objectContaining({
             id: 'complaint-1',
             status: 'IN_PROGRESS',
@@ -372,8 +384,8 @@ describe('complaint service 단위 테스트', () => {
       });
 
       it('예외: RECORD_NOT_FOUND면 FAIL_SAVE_COMPALINT를 던진다', async () => {
-        (mockRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
-        (mockRepo.updateStatus as jest.Mock).mockRejectedValue(
+        (mockComplaintRepo.findById as jest.Mock).mockResolvedValue(baseComplaint);
+        (mockComplaintRepo.updateStatus as jest.Mock).mockRejectedValue(
           createTechnicalException({ type: TechnicalExceptionType.RECORD_NOT_FOUND }),
         );
 
