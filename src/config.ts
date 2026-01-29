@@ -17,7 +17,7 @@ const envSchema = z.object({
   REDIS_PORT: z.coerce.number(),
   ENABLE_RESOURCE_MONITORING: z.coerce.boolean().default(false),
   BULK_NOTIFICATION_SIZE: z.coerce.number().default(100),
-  NOTIFICATION_SCHEDULER_INTERVAL_MS: z.coerce.number().default(1000),
+  NOTIFICATION_SCHEDULER_INTERVAL_MS: z.coerce.number().default(5000),
   AWS_REGION: z.string(),
   AWS_ACCESS_KEY_ID: z.string(),
   AWS_SECRET_ACCESS_KEY: z.string(),
