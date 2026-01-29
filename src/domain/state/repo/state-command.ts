@@ -5,6 +5,7 @@ import { IStateCommandRepo } from '../interface/i-state-command-repo';
 import {
   NotificationPayload,
   NotificationStateProps,
+  PayloadPersist,
   StateProps,
   StatusType,
   WorkType,
@@ -20,11 +21,12 @@ export const createStateCommandRepo = (prismaClient: PrismaClient): IStateComman
       },
     });
 
+    // @@@ 매퍼로 분리해서 타입 검증하기
     return states.map((state) => ({
       id: state.id,
       workType: state.type as WorkType,
       status: state.status as StatusType,
-      payload: state.payload as unknown as JSON,
+      payload: state.payload as unknown as PayloadPersist,
     }));
   };
 

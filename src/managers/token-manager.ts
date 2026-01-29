@@ -1,8 +1,8 @@
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import crypto from 'crypto';
-import { getEnv } from '../../config';
-import { BusinessExceptionType } from '../exception/business-exception/exception-info';
-import { BusinessException } from '../exception/business-exception/business-exception';
+import { getEnv } from '../config';
+import { BusinessException } from '../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 
 export type TokenPayload = {
   userId: string;

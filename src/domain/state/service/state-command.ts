@@ -10,7 +10,7 @@ import {
 import { IStateCommandRepo } from '../interface/i-state-command-repo';
 
 export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) => {
-  const findPendingCsv = async (): Promise<CSVStateProps[]> => {
+  const findPendingCSV = async (): Promise<CSVStateProps[]> => {
     const states = await stateCommandRepo.findAllByStatus(StatusType.PENDING);
 
     const filteredStates = states.filter((state) => {
@@ -55,9 +55,19 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
     return;
   };
 
+  const markAsProcessedTest = async (states: CSVStateProps[]): Promise<void> => {
+    const stateIds = states.map((state) => {
+      return state.id;
+    });
+
+    await stateCommandRepo.bulkUpdate(stateIds);
+    return;
+  };
+
   return {
+    findPendingCSV,
+    markAsProcessedTest,
     markAsProcessed,
-    findPendingCsv,
     findPendingNotification,
   };
 };

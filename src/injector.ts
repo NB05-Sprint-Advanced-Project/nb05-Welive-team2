@@ -17,7 +17,6 @@ import { createNoticeCommandService } from './domain/notice/service/notice-comma
 import { createGlobalErrorMiddleware } from './middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
-import { TokenUtil } from './shared/utils/token-manager';
 import { createUserController } from './domain/user/controller/user-controller';
 import { createAuthController } from './domain/auth/controller/auth-controller';
 import { createAuthService } from './domain/auth/auth-service';
@@ -38,22 +37,26 @@ import { createApartmentController } from './domain/apartment/controller/apartme
 import { createNoticeController } from './domain/notice/controller/notice-controller';
 import { createPollController } from './domain/poll/controller/poll-controller';
 import { createAuthMiddleware } from './middlewares/auth-middleware';
-import { createRedisExternal } from './redis';
 import { createResidentUserController } from './domain/user/controller/resident-user-controller';
 import { createRedisLocker } from './managers/redis-locker';
 import { createNoticeBatchService } from './domain/notice/service/notice-batch';
-import { createNoticeScheduler } from './domain/notice/notice-scheduler';
 import { createNotificationController } from './domain/notification/controller/notification-controller';
 import { createNotificationQueryRepo } from './domain/notification/repo/notification-query';
 import { createNotificationQueryService } from './domain/notification/service/notification-query';
 import { createNotificationCommandService } from './domain/notification/service/notification-command';
 import { createNotificationCommandRepo } from './domain/notification/repo/notification-command';
-import { createComplaintScheduler } from './domain/complaint/complaint-scheduler';
 import { createComplaintBatchService } from './domain/complaint/service/complaint-batch';
 import { createStateCommandRepo } from './domain/state/repo/state-command';
-import { createNotificationScheduler } from './domain/notification/notification-scheduler';
 import { createStateCommandService } from './domain/state/service/state-command';
 import { createMulterMiddleware } from './middlewares/multer-middleware';
+import { createNotificationScheduler } from './utils/scheduler/notification-scheduler';
+import { createComplaintScheduler } from './utils/scheduler/complaint-scheduler';
+import { createNoticeScheduler } from './utils/scheduler/notice-scheduler';
+import { createCSVScheduler } from './utils/scheduler/csv-scheduler';
+import { createFileStream } from './utils/fileStream';
+import { createWorkerExternal } from './utils/externals/worker';
+import { TokenUtil } from './managers/token-manager';
+import { createRedisExternal } from './utils/externals/redis';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
@@ -62,16 +65,18 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const tokenManager = TokenUtil();
   const redisExternal = createRedisExternal();
   const redisLocker = createRedisLocker(redisExternal);
+  const workerExternal = createWorkerExternal();
 
   // Middleware
   const middlewares = {
     globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
     auth: createAuthMiddleware(tokenManager, redisExternal),
-    // multer: createMulterMiddleware(),
+    multer: createMulterMiddleware(),
   };
 
   const hashManager = createBcryptHashManager();
+  const fileStream = createFileStream(); // IFileStream 구현체 생성
 
   // Repository
   const userQueryRepository = createUserQueryRepo(prisma);
@@ -96,6 +101,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const notificationQueryRepository = createNotificationQueryRepo(prisma);
   const notificationCommandRepository = createNotificationCommandRepo(prisma);
   const stateCommandRepo = createStateCommandRepo(prisma);
+
   // Service
   const apartmentQueryService = createApartmentQueryService(apartmentQueryRepo, redisLocker);
 
@@ -107,6 +113,8 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     apartmentCommandRepo,
     stateCommandRepo,
     redisExternal,
+    fileStream,
+    workerExternal,
   );
 
   const pollQuerService = createPollQueryService(pollQueryRepository, redisExternal, redisLocker);
@@ -211,6 +219,12 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     notificationCommandService,
   );
 
+  const csvScheduler = createCSVScheduler(
+    stateCommandService,
+    userCommandService,
+    notificationCommandService,
+  );
+
   // Server
   const httpServer = createHttpServer(middlewares, controllers);
 
@@ -221,5 +235,6 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     hashManager,
     complaintScheduler,
     notificationScheduler,
+    csvScheduler,
   };
 };

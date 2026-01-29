@@ -1,11 +1,8 @@
 import { ClientManager } from '../../clients';
 import { getEnv } from '../../config';
+import { NotificationCommandService } from '../../domain/notification/service/notification-command';
+import { StateCommandService } from '../../domain/state/service/state-command';
 import { createSingleTaskScheduler } from '../../utils/scheduler-util';
-import { StateProps, StatusType } from '../state/entity/state';
-import { StateCommandRepo } from '../state/repo/state-command';
-import { StateCommandService } from '../state/service/state-command';
-import { Role } from '../user/entity/base-user';
-import { NotificationCommandService } from './service/notification-command';
 
 export const createNotificationScheduler = (
   stateCommandService: StateCommandService,

@@ -4,6 +4,8 @@ import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { ResidentAccountProps } from '../entity/resident-account';
 
 export interface IUserCommandRepo {
+  createManyBulk(entities: NotJoinedResidentProps[]): Promise<number>;
+
   findUserByRole: (role: Role) => Promise<BaseAllUserProps[]>;
 
   findAdminUserById: (id: string) => Promise<AdminAccountProps | null>;

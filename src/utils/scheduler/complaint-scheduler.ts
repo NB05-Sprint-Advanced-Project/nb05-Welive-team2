@@ -1,21 +1,21 @@
+import { ComplaintBatchService } from '../../domain/complaint/service/complaint-batch';
 import { createSingleTaskScheduler } from '../../utils/scheduler-util';
-import { NoticeBatchService } from './service/notice-batch';
 
-export const createNoticeScheduler = (service: NoticeBatchService) => {
+export const createComplaintScheduler = (service: ComplaintBatchService) => {
   let intervalId: NodeJS.Timeout | null = null;
   const intervalMs: number = 6000;
-  const noticeRunner = createSingleTaskScheduler();
+  const complaintRunner = createSingleTaskScheduler();
 
   const start = () => {
     if (intervalId) return;
 
-    noticeRunner(() => service.syncViewCounts());
+    complaintRunner(() => service.syncViewCounts());
 
     intervalId = setInterval(async () => {
-      noticeRunner(() => service.syncViewCounts());
+      complaintRunner(() => service.syncViewCounts());
     }, intervalMs);
 
-    console.log('notice scehduler 실행');
+    console.log('complaint scehduler 실행');
   };
 
   const stop = () => {
@@ -23,7 +23,7 @@ export const createNoticeScheduler = (service: NoticeBatchService) => {
       clearInterval(intervalId);
       intervalId = null;
     }
-    console.log('notice scheduler 중지');
+    console.log('complaint scheduler 중지');
   };
 
   return { start, stop };

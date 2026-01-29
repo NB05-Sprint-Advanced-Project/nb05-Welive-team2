@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Application } from 'express';
 import { createInjector } from '../../injector';
-import { TokenUtil } from '../../shared/utils/token-manager';
 import request from 'supertest';
 import { Role } from '../../domain/user/entity/base-user';
+import { TokenUtil } from '../../managers/token-manager';
 
 describe('Notice 통합 테스트', () => {
   let app: Application;

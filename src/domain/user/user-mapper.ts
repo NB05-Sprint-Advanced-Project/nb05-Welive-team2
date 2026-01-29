@@ -342,7 +342,6 @@ export const toAdminJoinRequestAlarmState = (residentEntity: ResidentAccountProp
     workType: WorkType.ALARM,
     status: StatusType.PENDING,
     payload: {
-      id: randomUUID(),
       receiverType: Role.ADMIN,
       message: `[회원가입] 입주민 ${residentEntity.name}님이 회원가입을 요청했습니다.`,
     },
