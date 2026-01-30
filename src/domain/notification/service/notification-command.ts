@@ -90,13 +90,13 @@ export const createNotificationCommandService = (
       });
     }
 
-    if (adminPayloads.length === 0 && userPayloads.length === 0) {
+    if (adminPayloads.length !== 0 && userPayloads.length !== 0) {
       admins?.forEach((connection, user) => {
         connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(adminPayloads)}\n\n`);
       });
     }
 
-    if (userPayloads.length === 0) {
+    if (userPayloads.length !== 0) {
       residents?.forEach((connection, user) => {
         connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(userPayloads)}\n\n`);
       });

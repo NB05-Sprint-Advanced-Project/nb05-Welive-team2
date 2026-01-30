@@ -18,10 +18,10 @@ const envSchema = z.object({
   ENABLE_RESOURCE_MONITORING: z.coerce.boolean().default(false),
   BULK_NOTIFICATION_SIZE: z.coerce.number().default(100),
   NOTIFICATION_SCHEDULER_INTERVAL_MS: z.coerce.number().default(5000),
-  AWS_REGION: z.string(),
-  AWS_ACCESS_KEY_ID: z.string(),
-  AWS_SECRET_ACCESS_KEY: z.string(),
-  AWS_S3_BUCKET_NAME: z.string(),
+  // AWS_REGION: z.string(),
+  // AWS_ACCESS_KEY_ID: z.string(),
+  // AWS_SECRET_ACCESS_KEY: z.string(),
+  // AWS_S3_BUCKET_NAME: z.string(),
 });
 
 type EnvParsed = z.infer<typeof envSchema>;
