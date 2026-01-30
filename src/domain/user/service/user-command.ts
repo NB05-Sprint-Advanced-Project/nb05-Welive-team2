@@ -48,7 +48,7 @@ import { randomUUID } from 'crypto';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import readline from 'readline';
 import { ResidentAddressVO } from '../entity/vo/resident-address';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../../utils/s3-client';
 import { Readable } from 'stream';
 import { clean, importResidentRowSchema } from '../dto/import-resident-row-dto';

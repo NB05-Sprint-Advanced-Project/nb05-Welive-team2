@@ -30,7 +30,7 @@ export const registerResidentUserRoutes = (
   router.post(
     '/file/import',
     catchHandler(middlewares.auth.authAdmin),
-    catchHandler(middlewares.multer.csv()),
+    // catchHandler(middlewares.multer.csv()),
     catchHandler(handlers.importResidentsFromCsv),
   );
   router.get(

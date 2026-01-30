@@ -68,7 +68,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     globalError: createGlobalErrorMiddleware(),
     notFound: createNotFoundMiddleware(),
     auth: createAuthMiddleware(tokenManager, redisExternal),
-    multer: createMulterMiddleware(),
+    // multer: createMulterMiddleware(),
   };
 
   const hashManager = createBcryptHashManager();
@@ -115,7 +115,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     unitOfwork,
     pollCommandRepository,
     userVoteOptionCommandRepository,
-    stateCommandRepo,
+    stateCommandRepository,
   );
 
   const noticeQueryService = createNoticeQueryService(
@@ -126,7 +126,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const noticeCommandService = createNoticeCommandService(
     unitOfwork,
     noticeCommandRepository,
-    stateCommandRepo,
+    stateCommandRepository,
   );
   const noticeBatchService = createNoticeBatchService(noticeCommandRepository, redisExternal);
 
