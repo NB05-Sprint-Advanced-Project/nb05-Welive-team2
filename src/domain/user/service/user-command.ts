@@ -51,6 +51,7 @@ import { ResidentAddressVO } from '../entity/vo/resident-address';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../../utils/s3-client';
 import { Readable } from 'stream';
+import { clean, importResidentRowSchema } from '../dto/import-resident-row-dto';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -514,17 +515,60 @@ export const createUserCommandService = (
       crlfDelay: Infinity,
     });
 
-    let isHeaderPassed = false;
     let batchEntities = [];
     let processCount = 0;
+
+    const apartmentInfo = await apartmentCommandRepo.findById(apartmentId);
+
+    if (!apartmentInfo) {
+      throw BusinessException({
+        type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+      });
+    }
+    const { buildingNumberTo, buildingNumberFrom, floorCountPerBuilding, unitCountPerFloor } =
+      apartmentInfo;
+
     for await (const line of rl) {
-      if (isHeaderPassed === false) {
-        isHeaderPassed = true;
+      // "동","호수","이름","연락처","이메일","세대주여부"
+      const [buildingRaw, unitRaw, nameRaw, contactRaw, emailRaw, isHouseholderRaw] =
+        line.split(',');
+
+      const rawRow = {
+        building: clean(buildingRaw),
+        unit: clean(unitRaw),
+        name: clean(nameRaw),
+        contact: clean(contactRaw),
+        email: clean(emailRaw),
+        isHouseholder: clean(isHouseholderRaw),
+      };
+
+      // 데이터 형식 검증
+      const parsed = importResidentRowSchema.safeParse(rawRow);
+
+      if (!parsed.success) {
         continue;
       }
 
-      // "동","호수","이름","연락처","이메일","세대주여부"
-      const [building, unit, name, contact, email, isHouseholder] = line.split(',');
+      const { building, unit, name, contact, email, isHouseholder } = parsed.data;
+
+      // 비즈니즈 검증
+      const buildingNumber = Number(building);
+      const unitNumber = Number(unit);
+
+      if (buildingNumber < buildingNumberFrom || buildingNumber > buildingNumberTo) {
+        continue;
+      }
+
+      const floor = Math.floor(unitNumber / 100);
+      const unitInFloor = unitNumber % 100;
+
+      if (floor < 1 || floor > floorCountPerBuilding) {
+        continue;
+      }
+
+      if (unitInFloor < 1 || unitInFloor > unitCountPerFloor) {
+        continue;
+      }
 
       batchEntities.push(
         NotJoinedResidentEntity.create({
@@ -532,7 +576,7 @@ export const createUserCommandService = (
           email,
           contact,
           address: ResidentAddressVO.create({
-            isHouseholder: Boolean(isHouseholder),
+            isHouseholder: isHouseholder,
             building: Number(building),
             unit: Number(unit),
           }),

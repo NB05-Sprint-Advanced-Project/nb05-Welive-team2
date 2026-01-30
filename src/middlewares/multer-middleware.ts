@@ -32,7 +32,9 @@ export const createMulterMiddleware = () => {
           callback(null, `${dir}/${filename}`);
         },
       }),
-
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 최대 10메가까지
+      },
       fileFilter: (req, file, cb) => {
         if (type === 'image') {
           if (!file.mimetype.startsWith('image/')) {

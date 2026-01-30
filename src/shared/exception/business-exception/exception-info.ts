@@ -42,6 +42,7 @@ export enum BusinessExceptionType {
   UNAUTORIZED_REQUEST,
   NOT_IMAGE_FILE,
   NOT_CSV_FILE,
+  FILE_SIZE_EXCEEDED,
 }
 
 export const BusinessExceptionTable: Record<
@@ -232,5 +233,9 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.TEMPORARY_UNAVAILABLE]: {
     statusCode: 503,
     message: '잠시 후 다시 시도해주세요.',
+  },
+  [BusinessExceptionType.FILE_SIZE_EXCEEDED]: {
+    statusCode: 503,
+    message: '파일 용량이 너무 큽니다. 다시 업로드해주세요',
   },
 };

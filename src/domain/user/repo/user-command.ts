@@ -30,11 +30,19 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
   // const prisma = BaseRepo(prismaClient)
 
   const findUserByRole = async (role: Role): Promise<BaseAllUserProps[]> => {
+    const userIncludeWithApartment = Prisma.validator<Prisma.UserInclude>()({
+      Address: true,
+      UserApartmentLink: {
+        include: {
+          apartment: true,
+        },
+      },
+    });
     const users = await prisma().user.findMany({
       where: {
         role,
       },
-      include: userInclude,
+      include: userIncludeWithApartment,
     });
 
     return users.map((user) => toBaseUserEntity(user));

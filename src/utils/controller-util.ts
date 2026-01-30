@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { z } from 'zod';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
+import multer from 'multer';
 
 export const createBaseController = (basePath: string) => {
   const path: string = basePath;
@@ -26,6 +27,14 @@ export const catchHandler = (handler: RequestHandler) => {
     try {
       await handler(req, res, next);
     } catch (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          throw BusinessException({
+            type: BusinessExceptionType.FILE_SIZE_EXCEEDED,
+          });
+        }
+      }
+
       next(err);
     }
   };
