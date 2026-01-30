@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { validate } from '../../../utils/controller-util';
-import { getNotificationsSchema, readNotificationSchema } from '../dto/notification-request';
+import { getNotificationsSchema, markNotificationSchema } from '../dto/notification-request';
 import { NotificationCommandService } from '../service/notification-command';
 import { NotificationQueryService } from '../service/notification-query';
 import { ClientManager } from '../../../clients';
@@ -47,7 +47,7 @@ export const createNotificationHandler = (
   };
 
   const markAsRead = async (req: Request, res: Response) => {
-    const dto = validate(readNotificationSchema, {
+    const dto = validate(markNotificationSchema, {
       ...req.user,
       ...req.params,
     });

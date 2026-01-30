@@ -1,4 +1,5 @@
 export enum BusinessExceptionType {
+  NOTIFICATION_NOT_FOUND,
   APARTMENT_NOT_FOUND,
   POLL_NOT_FOUND,
   NOTICE_NOT_FOUND,
@@ -49,6 +50,11 @@ export const BusinessExceptionTable: Record<
   BusinessExceptionType,
   { statusCode: number; message?: string }
 > = {
+  [BusinessExceptionType.NOTIFICATION_NOT_FOUND]: {
+    statusCode: 404,
+    message: '알림을 찾을 수 없습니다.',
+  },
+
   [BusinessExceptionType.INVALID_CREDENTIALS]: {
     statusCode: 401,
     message: '비밀번호가 올바르지 않습니다.',

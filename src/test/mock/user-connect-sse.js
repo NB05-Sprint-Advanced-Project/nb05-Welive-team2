@@ -8,61 +8,6 @@ const ADMIN_CREATE = `${BASE}/api/v2/users/admins`;
 const LOGIN = `${BASE}/api/v2/auth/login`;
 const SSE = `${BASE}/api/v2/notifications/sse`;
 
-// 관리자 계정 생성
-async function createSuperAdmin(i) {
-  const dto = {
-    username: `superadmin${i}`,
-    email: `superadmin${i}@gmail.com`,
-    contact: `0101111${String(i).padStart(4, '0')}`,
-    name: `superadmin${i}`,
-    password: `superadmin${i}!`,
-  };
-
-  const res = await fetch(SUPERADMIN_CREATE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`i=${i} failed: ${res.status} ${body}`);
-  }
-}
-
-async function createAdmin(i) {
-  const dto = {
-    username: `admin111${i}`,
-    email: `admin111${i}@welive.test`,
-    contact: `0103030${String(i).padStart(4, '0')}`,
-    name: `admin111${i}`,
-    password: `admin111${i}!!`,
-    adminOf: {
-      name: `아파트 ${i}`,
-      address: `서울특별시 테스트구 테스트로 ${i}`,
-      description: '아파트 설명',
-      officeNumber: `302-${String(i).padStart(2, '0')}`,
-      buildingNumberFrom: 1,
-      buildingNumberTo: 30,
-      floorCountPerBuilding: 3,
-      unitCountPerFloor: 30,
-    },
-  };
-
-  const res = await fetch(ADMIN_CREATE, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(dto),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`admin${i} failed: ${res.status} ${body}`);
-  }
-}
-
 // 로그인 및 SSE 연결
 function extractCookie(setCookie, name) {
   return setCookie
@@ -108,12 +53,12 @@ function connectSSE(i, accessTokenPair) {
 //  ======== 알림 테스트 시나리오 ========
 //  슈퍼 관리자 1000명 생성 -> 슈퍼 관리자 1000명 로그인 및 SSE 연결 -> 관리자 100명 생성
 (async () => {
-  // 1. 슈퍼 관리자 1000명 생성
-  console.log('슈퍼 관리자 1000명 생성 시작');
-  for (let i = 1; i <= 1000; i++) {
-    await createSuperAdmin(i);
-  }
-  console.log('슈퍼 관리자 1000명 생성 완료');
+  // // 1. 슈퍼 관리자 1000명 생성
+  // console.log('슈퍼 관리자 1000명 생성 시작');
+  // for (let i = 1; i <= 1000; i++) {
+  //   await createSuperAdmin(i);
+  // }
+  // console.log('슈퍼 관리자 1000명 생성 완료');
 
   // 2. 슈퍼 관리자 1000명 로그인 및 SSE 연결
   console.log('슈퍼 관리자 1000명 로그인 및 SSE 연결 시작');
@@ -122,13 +67,6 @@ function connectSSE(i, accessTokenPair) {
     connectSSE(i, token);
   }
   console.log('슈퍼 관리자 1000명 로그인 및 SSE 연결 완료');
-
-  // 3. 관리자 100명 생성
-  console.log('관리자 100명 생성 시작');
-  for (let i = 102; i <= 202; i++) {
-    await createAdmin(i);
-  }
-  console.log('관리자 100명 생성 완료');
 })();
 
 // @@@@@@@@@@@ 성능 테스트 기록 @@@@@@@@@@@

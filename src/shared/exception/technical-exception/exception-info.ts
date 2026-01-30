@@ -12,6 +12,7 @@ export enum TechnicalExceptionType {
   FOREIGN_KEY_VIOLATION,
   RECORD_NOT_FOUND,
   USER_NOT_FOUND,
+  UNIQUE_VIOLATION_NOTIFICATION,
 }
 
 export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
@@ -33,4 +34,6 @@ export const TechnicalExceptionTable: Record<TechnicalExceptionType, string> = {
   [TechnicalExceptionType.FOREIGN_KEY_VIOLATION]: '참조 대상이 존재하지 않습니다.',
   [TechnicalExceptionType.RECORD_NOT_FOUND]: '해당 레코드를 찾을 수 없습니다.',
   [TechnicalExceptionType.USER_NOT_FOUND]: '해당하는 유저가 없습니다.',
+  [TechnicalExceptionType.UNIQUE_VIOLATION_NOTIFICATION]:
+    '알림 유니크 제약 조건 위반 에러가 발생했습니다.',
 };

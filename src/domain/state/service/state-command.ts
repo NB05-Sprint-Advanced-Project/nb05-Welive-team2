@@ -1,4 +1,5 @@
 import { Role } from '../../user/entity/base-user';
+import { StateRequestDto } from '../dto/state-request';
 import { StateResponseDto } from '../dto/state-response';
 import { CSVStateProps, NotificationStateProps, StatusType, WorkType } from '../entity/state';
 import { IStateCommandRepo } from '../interface/i-state-command-repo';
@@ -32,7 +33,7 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
     }));
   };
 
-  const markAsProcessed = async (states: StateResponseDto[]): Promise<void> => {
+  const markAsProcessed = async (states: StateRequestDto[]): Promise<void> => {
     const stateIds = states.map((state) => {
       return state.stateId;
     });
