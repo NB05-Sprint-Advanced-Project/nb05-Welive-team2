@@ -5,6 +5,7 @@ import {
   getResidentSchema,
   updateResidentSchema,
   deleteResidentSchema,
+  exportResidentsSchema,
 } from '../dto/resident-user-response';
 import { UserCommandService } from '../service/user-command';
 import { UserQueryService } from '../service/user-query';
@@ -50,12 +51,52 @@ export const createResidentUserHandlers = (
     return res.sendStatus(204);
   };
 
+  const importResidentsFromCsv = async (req: Request, res: Response) => {
+    const registeredResidentCount = await userCommandService.createResidentBulk({
+      userId: req.userId!,
+      bucket: req.file!.bucket,
+      key: req.file!.key,
+    });
+
+    return res.json(registeredResidentCount);
+  };
+
+  const exportResidentTemplate = async (req: Request, res: Response) => {
+    const { stream, contentType, contentLength, fileName } =
+      await userQueryService.exportResidentTemplate();
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+    if (contentLength) {
+      res.setHeader('Content-Length', contentLength.toString());
+    }
+
+    stream.pipe(res);
+  };
+
+  const exportResidents = async (req: Request, res: Response) => {
+    const reqDto = validate(exportResidentsSchema, req.query);
+    const { stream, contentType, fileName } = await userQueryService.exportResidents(
+      reqDto,
+      req.userId!,
+    );
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+    stream.pipe(res);
+  };
+
   return {
     createResident,
     getResidents,
     getResident,
     updateResident,
     deleteResident,
+    importResidentsFromCsv,
+    exportResidentTemplate,
+    exportResidents,
   };
 };
 

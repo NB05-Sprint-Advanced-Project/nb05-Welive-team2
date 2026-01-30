@@ -301,16 +301,18 @@ export const toResidentAccountEntityFromDto = async (
   });
 };
 
-export const toResidentEntityFromDto = (dto: CreateResidentReqDto): NotJoinedResidentProps => {
+export const toNotJoinedResidentEntityFromDto = (
+  dto: CreateResidentReqDto,
+): NotJoinedResidentProps => {
   return NotJoinedResidentEntity.create({
     name: dto.name,
     email: dto.email,
     contact: dto.contact,
-    address: {
+    address: ResidentAddressVO.create({
       isHouseholder: dto.isHouseholder,
       building: dto.building,
       unit: dto.unit,
-    },
+    }),
     userApartmentLink: [UserApartmentLinkVO.create(dto.apartmentId)],
   });
 };

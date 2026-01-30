@@ -54,8 +54,17 @@ export const getResidentSchema = z.object({
   id: userIdSchema,
 });
 
+export const exportResidentsSchema = z.object({
+  searchKeyword: residentSearchKeyword,
+  building: buildingFilterSchema,
+  unit: unitFilterSchema,
+  isHouseholder: isHouseholderFilterSchema,
+  isRegistered: isRegisteredFilterSchema,
+});
+
 export type CreateResidentReqDto = z.infer<typeof createResidentUserSchema>;
 export type UpdateResidentReqDto = z.infer<typeof updateResidentSchema>;
 export type DeleteResidentReqDto = z.infer<typeof deleteResidentSchema>;
 export type GetResidentsReqDto = z.infer<typeof getResidentsSchema>;
 export type GetResidentReqDto = z.infer<typeof getResidentSchema>;
+export type ExportResidentsReqDto = z.infer<typeof exportResidentsSchema>;

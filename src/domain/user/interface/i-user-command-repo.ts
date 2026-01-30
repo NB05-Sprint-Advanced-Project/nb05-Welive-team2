@@ -34,6 +34,8 @@ export interface IUserCommandRepo {
     entity: AdminAccountProps | ResidentAccountProps | NotJoinedResidentProps,
   ) => Promise<void>;
 
+  createManyBulk(entities: NotJoinedResidentProps[]): Promise<number>;
+
   /**
    *  @ throws OPTIMISTIC_LOCK_FAILED
    *  @ throws UNIQUE_VIOLATION_USERNAME

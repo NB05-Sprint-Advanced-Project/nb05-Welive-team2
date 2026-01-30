@@ -1,9 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { Role, Status } from '../entity/base-user';
-import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
+import {
+  ResidentAccountView,
+  ResidentsView,
+  ResidentView,
+  ResidentViewForCSV,
+} from '../dto/view/resident';
 import { userInclude } from '../user-mapper';
-import { GetResidentsReqDto } from '../dto/resident-user-response';
+import { ExportResidentsReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 import { LoginView } from '../../auth/controller/view/log-in';
 
@@ -220,6 +225,48 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
+  const findResidentsForExport = async (
+    dto: ExportResidentsReqDto,
+  ): Promise<ResidentViewForCSV[]> => {
+    const joinedStatus =
+      dto.isRegistered === undefined
+        ? { in: [Status.NOT_JOINED, Status.APPROVED] }
+        : dto.isRegistered
+          ? Status.APPROVED
+          : Status.NOT_JOINED;
+    const where = {
+      joinedStatus,
+      Address: {
+        is: {
+          ...(dto.building !== undefined && { building: dto.building }),
+          ...(dto.unit !== undefined && { unit: dto.unit }),
+          ...(dto.isHouseholder !== undefined && { isHouseholder: dto.isHouseholder }),
+        },
+      },
+      ...(dto.searchKeyword && {
+        OR: [
+          { name: { contains: dto.searchKeyword } },
+          { contact: { contains: dto.searchKeyword } },
+          { email: { contains: dto.searchKeyword } },
+        ],
+      }),
+    };
+
+    const residents = await prisma.user.findMany({
+      where,
+      include: userInclude,
+    });
+
+    return residents.map((resident) => ({
+      name: resident.name,
+      contact: resident.contact,
+      email: resident.email,
+      building: resident.Address!.building,
+      unit: resident.Address!.unit,
+      isHouseholder: resident.Address!.isHouseholder,
+    }));
+  };
+
   const findResidentAccounts = async (
     dto: GetResidentAccountsReqDto,
   ): Promise<ResidentAccountView> => {
@@ -287,5 +334,6 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     findResidentById,
     findResidents,
     findResidentAccounts,
+    findResidentsForExport,
   };
 };

@@ -1,7 +1,12 @@
 import { Status } from '../entity/base-user';
 import { AdministratorView } from '../dto/view/administrator';
-import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
-import { GetResidentsReqDto } from '../dto/resident-user-response';
+import {
+  ResidentAccountView,
+  ResidentsView,
+  ResidentView,
+  ResidentViewForCSV,
+} from '../dto/view/resident';
+import { ExportResidentsReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 import { LoginView } from '../../auth/controller/view/log-in';
 
@@ -22,4 +27,6 @@ export interface IUserQueryRepo {
   findResidents: (dto: GetResidentsReqDto) => Promise<ResidentsView>;
 
   findResidentAccounts: (dto: GetResidentAccountsReqDto) => Promise<ResidentAccountView>;
+
+  findResidentsForExport: (dto: ExportResidentsReqDto) => Promise<ResidentViewForCSV[]>;
 }

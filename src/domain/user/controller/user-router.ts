@@ -76,7 +76,7 @@ export const registerUserRoutes = (
   router.patch(
     '/me/avatar',
     catchHandler(middlewares.auth.authenticate),
-    // catchHandler(middlewares.multer.handlerImage('avatarImage')),
+    catchHandler(middlewares.multer.image()),
     catchHandler(handlers.updateAvatarUrl),
   );
   router.patch(

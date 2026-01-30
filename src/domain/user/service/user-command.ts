@@ -30,7 +30,7 @@ import { IApartmentCommandRepo } from '../../apartment/interface/i-apartment-com
 import {
   toAdminJoinRequestAlarmState,
   toResidentAccountEntityFromDto,
-  toResidentEntityFromDto,
+  toNotJoinedResidentEntityFromDto,
   toUpdateNotJoinedEntityDataFromDto,
   toUpdateResidentAccountEntityDataFromDto,
 } from '../user-mapper';
@@ -39,12 +39,18 @@ import {
   CreateResidentReqDto,
   UpdateResidentReqDto,
   DeleteResidentReqDto,
+  ExportResidentsReqDto,
 } from '../dto/resident-user-response';
 import { INotificationCommandRepo } from '../../notification/interface/i-notification-command';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
 import { randomUUID } from 'crypto';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
+import readline from 'readline';
+import { ResidentAddressVO } from '../entity/vo/resident-address';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { s3 } from '../../../utils/s3-client';
+import { Readable } from 'stream';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -431,7 +437,7 @@ export const createUserCommandService = (
   // 입주민(가입한 입주민 + 미가입한 입주민)
   const createResident = async (dto: CreateResidentReqDto): Promise<void> => {
     try {
-      await userCommandRepo.create(toResidentEntityFromDto(dto));
+      await userCommandRepo.create(toNotJoinedResidentEntityFromDto(dto));
       redisExternal.del('residents:1:10');
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -482,6 +488,72 @@ export const createUserCommandService = (
   const deleteResident = async (dto: DeleteResidentReqDto): Promise<void> => {
     await userCommandRepo.deleteUser(dto.id);
     redisExternal.del('residents:1:10');
+  };
+
+  const createResidentBulk = async (s3Dto: { userId: string; bucket: string; key: string }) => {
+    const apartmentId = (await userCommandRepo.findAdminUserById(s3Dto.userId))!
+      .userApartmentLink![0].apartmentId;
+
+    if (!apartmentId) {
+      throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
+    }
+
+    const command = new GetObjectCommand({
+      Bucket: s3Dto.bucket,
+      Key: s3Dto.key,
+    });
+
+    const { Body } = await s3.send(command);
+
+    if (!Body || typeof Body === 'string') {
+      throw BusinessException({ type: BusinessExceptionType.NOT_CSV_FILE });
+    }
+
+    const rl = readline.createInterface({
+      input: Body as NodeJS.ReadableStream,
+      crlfDelay: Infinity,
+    });
+
+    let isHeaderPassed = false;
+    let batchEntities = [];
+    let processCount = 0;
+    for await (const line of rl) {
+      if (isHeaderPassed === false) {
+        isHeaderPassed = true;
+        continue;
+      }
+
+      // "동","호수","이름","연락처","이메일","세대주여부"
+      const [building, unit, name, contact, email, isHouseholder] = line.split(',');
+
+      batchEntities.push(
+        NotJoinedResidentEntity.create({
+          name,
+          email,
+          contact,
+          address: ResidentAddressVO.create({
+            isHouseholder: Boolean(isHouseholder),
+            building: Number(building),
+            unit: Number(unit),
+          }),
+          userApartmentLink: [UserApartmentLinkVO.create(apartmentId)],
+        }),
+      );
+      if (batchEntities.length === 1000) {
+        await userCommandRepo.createManyBulk(batchEntities);
+        processCount += 1000;
+        console.log(`${processCount} 벌크 크리에이트 완료`);
+        batchEntities = [];
+      }
+    }
+
+    await userCommandRepo.createManyBulk(batchEntities);
+    console.log(`${processCount + batchEntities.length} 벌크 크리에이트 완료`);
+    batchEntities = [];
+
+    return {
+      count: processCount + batchEntities.length,
+    };
   };
 
   // 기타
@@ -572,6 +644,7 @@ export const createUserCommandService = (
     deleteResident,
     updateAvatarUrl,
     updatePassword,
+    createResidentBulk,
   };
 };
 

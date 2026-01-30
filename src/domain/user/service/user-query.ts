@@ -1,12 +1,25 @@
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
-import { GetResidentReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
+import {
+  ExportResidentsReqDto,
+  GetResidentReqDto,
+  GetResidentsReqDto,
+} from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
-import { ResidentAccountView, ResidentsView, ResidentView } from '../dto/view/resident';
+import {
+  ResidentAccountView,
+  ResidentsView,
+  ResidentView,
+  ResidentViewForCSV,
+} from '../dto/view/resident';
 import { Status } from '../entity/base-user';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { redisKeys } from '../../../utils/redis-keys';
 import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { s3 } from '../../../utils/s3-client';
+import { Readable } from 'stream';
+
 /**
  *  전제 - 한 아파트에 관리자가 1명인 프로젝트
  *  하지만 성능 부하 테스트 공부를 위해서 동시에 여러 명이 요청 올 수 있다고 가정했음(1초에 최대 20000명 요청)
@@ -106,12 +119,73 @@ export const createUserQueryService = (
     return residentAccountsUser;
   };
 
+  const exportResidentTemplate = async () => {
+    const command = new GetObjectCommand({
+      Bucket: process.env.AWS_TEMPLATE_BUCKET!,
+      Key: 'templates/resident_bulk_template.csv',
+    });
+
+    const response = await s3.send(command);
+
+    if (!response.Body || typeof response.Body === 'string') {
+      throw BusinessException({ type: BusinessExceptionType.NOT_CSV_FILE });
+    }
+
+    return {
+      stream: response.Body as NodeJS.ReadableStream,
+      contentType: response.ContentType ?? 'text/csv',
+      contentLength: response.ContentLength,
+      fileName: 'resident_bulk_template.csv',
+    };
+  };
+
+  const exportResidents = async (dto: ExportResidentsReqDto, userId: string) => {
+    const residents = await userQueryRepo.findResidentsForExport(dto);
+
+    if (residents.length === 0) {
+      throw BusinessException({
+        type: BusinessExceptionType.USER_NOT_FOUND,
+      });
+    }
+
+    const stream = new Readable({
+      read() {},
+    });
+
+    stream.push(`"동","호수","이름","연락처","이메일","세대주여부"\n`);
+
+    const toResidentCsvLine = (resident: ResidentViewForCSV): string => {
+      return [
+        resident.building,
+        resident.unit,
+        `"${resident.name}"`,
+        `"${resident.contact}"`,
+        `"${resident.email}"`,
+        resident.isHouseholder,
+      ].join(',');
+    };
+
+    for (const resident of residents) {
+      stream.push(toResidentCsvLine(resident) + '\n');
+    }
+
+    stream.push(null);
+
+    return {
+      stream,
+      contentType: 'text/csv; charset=utf-8',
+      fileName: 'residents.csv',
+    };
+  };
+
   return {
     getAdministrators,
     getResidentByEmail,
     getResidentById,
     getResidents,
     getResidentAccounts,
+    exportResidentTemplate,
+    exportResidents,
   };
 };
 

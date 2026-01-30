@@ -11,5 +11,14 @@ declare global {
       }; // 현재 방식
       userId?: string; // 기존 방식
     }
+
+    namespace Multer {
+      interface File {
+        bucket: string;
+        key: string;
+        location: string;
+        etag: string;
+      }
+    }
   }
 }

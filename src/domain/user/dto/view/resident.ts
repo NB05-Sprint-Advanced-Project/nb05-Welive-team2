@@ -38,3 +38,12 @@ export interface ResidentAccountView {
   limit: number;
   hasNext: boolean;
 }
+
+export interface ResidentViewForCSV {
+  name: string;
+  contact: string;
+  email: string;
+  building: number;
+  unit: number;
+  isHouseholder: boolean;
+}

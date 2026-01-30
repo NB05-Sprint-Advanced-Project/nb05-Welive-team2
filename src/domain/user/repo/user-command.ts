@@ -231,6 +231,51 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     }
   };
 
+  const createManyBulk = async (entities: NotJoinedResidentProps[]): Promise<number> => {
+    try {
+      // let보단 즉시 실행 함수(IIFE)함
+      // 이유 - 반복적 if()문 사용으로 let으로 할당하는 것보다 깔끔하고 default로 할당 안 한 잡는 걸 안 해도 됨(컴파일 타임에서 잡아줌)
+      const createUserData = entities.map((entity) => {
+        return toCreateNotJoinedResidentDBData(entity);
+      });
+
+      const datas = await prisma().user.createMany({
+        data: createUserData,
+      });
+
+      return datas.count;
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        const target = (err.meta as any)?.target;
+        if (target?.includes('email')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
+          });
+        }
+
+        if (target?.includes('username')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
+            error: err,
+          });
+        }
+
+        if (target?.includes('contact')) {
+          throw TechnicalException({
+            type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
+            error: err,
+          });
+        }
+
+        throw TechnicalException({
+          type: TechnicalExceptionType.UNKNOWN_ERROR,
+          error: err,
+        });
+      }
+      throw err;
+    }
+  };
+
   const update = async (
     entity: AdminAccountProps | NotJoinedResidentProps | ResidentAccountProps,
   ): Promise<void> => {
@@ -423,6 +468,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     findNotJoinedResidentByEmail,
     findResidentById,
     create,
+    createManyBulk,
     update,
     updateAvatar,
     updateJoinedStatus,

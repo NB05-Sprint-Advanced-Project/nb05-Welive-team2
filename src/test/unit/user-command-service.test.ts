@@ -100,6 +100,8 @@ describe('user service 유닛 테스트', () => {
 
       deleteUser: jest.fn(),
       deleteUsers: jest.fn(),
+
+      createManyBulk: jest.fn(),
     };
 
     mockApartmentRepo = {

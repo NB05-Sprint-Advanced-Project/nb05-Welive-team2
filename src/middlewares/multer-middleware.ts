@@ -6,6 +6,8 @@ import path from 'path';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 
+type UploadType = 'image' | 'csv';
+
 export const createMulterMiddleware = () => {
   const s3Client = new S3Client({
     region: getEnv().AWS_REGION,
@@ -15,35 +17,50 @@ export const createMulterMiddleware = () => {
     },
   });
 
-  const S3Storage = multerS3({
-    s3: s3Client,
-    bucket: getEnv().AWS_S3_BUCKET_NAME,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: 'public-read',
-    key: (req, file, callback) => {
-      const ext = path.extname(file.originalname);
-      const filename = `${path.basename(file.originalname, ext)}.${Date.now()}${ext}`;
+  const createUploader = (type: UploadType) =>
+    multer({
+      storage: multerS3({
+        s3: s3Client,
+        bucket: getEnv().AWS_S3_BUCKET_NAME,
+        contentType: multerS3.AUTO_CONTENT_TYPE,
+        acl: type === 'image' ? 'public-read' : 'private',
+        key: (req, file, callback) => {
+          const ext = path.extname(file.originalname);
+          const filename = `${path.basename(file.originalname, ext)}.${Date.now()}${ext}`;
+          const dir = type === 'image' ? 'images' : 'csv';
 
-      callback(null, `images/${filename}`);
-    },
-  });
+          callback(null, `${dir}/${filename}`);
+        },
+      }),
 
-  const uploader = multer({
-    storage: S3Storage,
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.startsWith('image/')) {
-        cb(
-          BusinessException({
-            type: BusinessExceptionType.NOT_IMAGE_FILE,
-          }),
-        );
-      }
-      cb(null, true);
-    },
-  });
+      fileFilter: (req, file, cb) => {
+        if (type === 'image') {
+          if (!file.mimetype.startsWith('image/')) {
+            return cb(
+              BusinessException({
+                type: BusinessExceptionType.NOT_IMAGE_FILE,
+              }),
+            );
+          }
+        }
+
+        if (type === 'csv') {
+          if (file.mimetype !== 'text/csv') {
+            return cb(
+              BusinessException({
+                type: BusinessExceptionType.NOT_CSV_FILE,
+              }),
+            );
+          }
+        }
+
+        cb(null, true);
+      },
+    });
 
   return {
-    handlerImage: (key: string) => uploader.single(key),
+    image: () => createUploader('image').single('image'),
+    csv: () => createUploader('csv').single('csv'),
   };
 };
 
