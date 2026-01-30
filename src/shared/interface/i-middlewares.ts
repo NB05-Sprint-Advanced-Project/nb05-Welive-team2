@@ -7,5 +7,5 @@ export type Middlewares = {
   globalError: GlobalErrorMiddleware;
   notFound: NotFoundMiddleware;
   auth: AuthMiddleware;
-  // multer: MulterMiddleware;
+  multer: MulterMiddleware;
 };

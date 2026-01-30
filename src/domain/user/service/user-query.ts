@@ -122,7 +122,7 @@ export const createUserQueryService = (
   const exportResidentTemplate = async () => {
     const command = new GetObjectCommand({
       Bucket: process.env.AWS_TEMPLATE_BUCKET!,
-      Key: 'templates/resident_bulk_template.csv',
+      Key: 'CSV-form/입주민_업로드_양식.csv',
     });
 
     const response = await s3.send(command);
