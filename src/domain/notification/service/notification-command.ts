@@ -1,16 +1,6 @@
-import { State } from '@prisma/client';
-import {
-  createNotificationDTO,
-  readNotificationDTO,
-  viewNotificationsDTO,
-} from '../dto/notification-request';
+import { readNotificationDTO } from '../dto/notification-request';
 import { INotificationCommandRepo } from '../interface/i-notification-command';
-import {
-  LiveNotificationPayload,
-  NotificationStateProps,
-  StateProps,
-  WorkType,
-} from '../../state/entity/state';
+import { LiveNotificationPayload, WorkType } from '../../state/entity/state';
 import { ClientManager } from '../../../clients';
 import { Role } from '../../user/entity/base-user';
 import { StateResponseDto } from '../../state/dto/state-response';
@@ -30,6 +20,7 @@ export const createNotificationCommandService = (
   const bulkSave = async (states: StateResponseDto[]) => {
     const notifications: NotificationProps[] = [];
 
+    // @@@ n제곱 문제
     for (const state of states) {
       const users = await userCommandRepo.findUserByRole(state.receiverType);
 
@@ -83,7 +74,7 @@ export const createNotificationCommandService = (
     });
 
     if (superAdminPayloads.length !== 0) {
-      superAdmins?.forEach((connection, user) => {
+      superAdmins?.forEach((connection) => {
         connection.write(
           `event: ${WorkType.ALARM}\ndata: ${JSON.stringify(superAdminPayloads)}\n\n`,
         );
@@ -91,13 +82,13 @@ export const createNotificationCommandService = (
     }
 
     if (adminPayloads.length !== 0 && userPayloads.length !== 0) {
-      admins?.forEach((connection, user) => {
+      admins?.forEach((connection) => {
         connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(adminPayloads)}\n\n`);
       });
     }
 
     if (userPayloads.length !== 0) {
-      residents?.forEach((connection, user) => {
+      residents?.forEach((connection) => {
         connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(userPayloads)}\n\n`);
       });
     }

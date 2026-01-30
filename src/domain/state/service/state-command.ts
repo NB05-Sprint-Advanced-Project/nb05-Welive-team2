@@ -1,12 +1,6 @@
 import { Role } from '../../user/entity/base-user';
 import { StateResponseDto } from '../dto/state-response';
-import {
-  CSVStateProps,
-  NotificationStateProps,
-  StateProps,
-  StatusType,
-  WorkType,
-} from '../entity/state';
+import { CSVStateProps, NotificationStateProps, StatusType, WorkType } from '../entity/state';
 import { IStateCommandRepo } from '../interface/i-state-command-repo';
 
 export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) => {
@@ -27,15 +21,7 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
       StatusType.PENDING,
     )) as NotificationStateProps[];
 
-    const filteredStates = states.filter((state) => {
-      return state.status === StatusType.PENDING && state.workType === WorkType.ALARM;
-    });
-
-    if (!filteredStates || filteredStates.length === 0) {
-      return [];
-    }
-
-    return filteredStates.map((state) => ({
+    return states.map((state) => ({
       // @ fiter는 배열을 걸러내는거고 map은 배열을 변환함
       stateId: state.id,
       payloadId: state.payload.id,

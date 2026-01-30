@@ -1,10 +1,6 @@
-import { ClientManager } from '../../clients';
 import { getEnv } from '../../config';
 import { createSingleTaskScheduler } from '../../utils/scheduler-util';
-import { StateProps, StatusType } from '../state/entity/state';
-import { StateCommandRepo } from '../state/repo/state-command';
 import { StateCommandService } from '../state/service/state-command';
-import { Role } from '../user/entity/base-user';
 import { NotificationCommandService } from './service/notification-command';
 
 export const createNotificationScheduler = (
@@ -12,7 +8,7 @@ export const createNotificationScheduler = (
   notificationCommandService: NotificationCommandService,
 ) => {
   let intervalId: NodeJS.Timeout | null = null;
-  const intervalMs: number = getEnv().NOTIFICATION_SCHEDULER_INTERVAL_MS; // 30초
+  const intervalMs: number = getEnv().NOTIFICATION_SCHEDULER_INTERVAL_MS;
   const notificationRunner = createSingleTaskScheduler();
 
   const start = async () => {

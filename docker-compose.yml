@@ -1,0 +1,45 @@
+networks:
+  welive-proxy-net:
+    driver: bridge
+  welive-internal-net:
+    driver: bridge
+
+volumes:
+  certs:
+  html:
+  vhost:
+  acme:
+  public:
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    restart: always
+    networks:
+      - welive-proxy-net
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  server:
+    depends_on:
+      - redis
+    image: ${ECR_SERVER_URI}:latest
+    restart: always
+    networks:
+      - welive-proxy-net
+      - welive-internal-net
+    environment:
+      - VIRTUAL_HOST=3.36.64.10
+      - VIRTUAL_PORT=4000
+    env_file: .env.prod
+
+  redis:
+    image: redis:alpine
+    restart: 'always'
+    networks:
+      - welive-internal-net
+    expose:
+      - '6379'

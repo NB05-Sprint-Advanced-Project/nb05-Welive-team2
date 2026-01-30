@@ -6,6 +6,7 @@
     "start": "node ./build/main.js",
     "build": "tsc",
     "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/index.ts",
+    "prod": "cross-env NODE_ENV=production node ./dist/index.js",
     "k6-test": "k6 run --no-connection-reuse=false src/test/k6/k6-test.js",
     "prepare": "husky",
     "format": "prettier . --write",
@@ -16,10 +17,15 @@
     "test:it": "npm run test:db && npm run test -- --runInBand",
     "format:check": "prettier . --check",
     "type:check": "tsc --noEmit",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "mock:user": "node src/test/mock/user.js"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}": [
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css,scss}": [
       "prettier --write"
     ]
   },
@@ -37,6 +43,8 @@
     "@types/supertest": "^6.0.3",
     "cross-env": "^10.1.0",
     "dotenv-cli": "^11.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jsonwebtoken": "^9.0.3",
@@ -47,6 +55,8 @@
     "prettier": "^3.7.4",
     "prisma": "^6.19.1",
     "supertest": "^7.1.4",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
