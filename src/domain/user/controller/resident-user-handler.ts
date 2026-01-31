@@ -77,10 +77,7 @@ export const createResidentUserHandlers = (
 
   const exportResidents = async (req: Request, res: Response) => {
     const reqDto = validate(exportResidentsSchema, req.query);
-    const { stream, contentType, fileName } = await userQueryService.exportResidents(
-      reqDto,
-      req.userId!,
-    );
+    const { stream, contentType, fileName } = await userQueryService.exportResidents(reqDto);
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);

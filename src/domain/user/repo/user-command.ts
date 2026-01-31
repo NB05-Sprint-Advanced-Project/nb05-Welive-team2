@@ -241,83 +241,85 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
   };
 
   const createManyBulk = async (entities: NotJoinedResidentProps[]): Promise<number> => {
-    const userParams: any[] = [];
-    const userPlaceholders: string[] = [];
+    if (entities.length === 0) return 0;
 
-    const addrParams: any[] = [];
-    const addrPlaceholders: string[] = [];
-
-    const linkParams: any[] = [];
-    const linkPlaceholders: string[] = [];
-    let linkParamIdx = 1;
-
-    entities.forEach((e, idx) => {
-      // --- user ---
-      const userBaseIdx = idx * 9;
-      userPlaceholders.push(
-        `($${userBaseIdx + 1}, $${userBaseIdx + 2}, $${userBaseIdx + 3}, $${userBaseIdx + 4}, $${userBaseIdx + 5}, $${userBaseIdx + 6}, $${userBaseIdx + 7}, $${userBaseIdx + 8}, $${userBaseIdx + 9})`,
-      );
-      userParams.push(
-        e.id,
-        e.name,
-        e.email,
-        e.contact,
-        e.role,
-        e.version,
-        e.joinedStatus,
-        e.createdAt,
-        e.updatedAt,
-      );
-
-      // --- address ---
-      const addrBaseIdx = idx * 4;
-      addrPlaceholders.push(
-        `($${addrBaseIdx + 1}, $${addrBaseIdx + 2}, $${addrBaseIdx + 3}, $${addrBaseIdx + 4})`,
-      );
-      addrParams.push(e.id, e.address.building, e.address.unit, e.address.isHouseholder);
-
-      // --- user_apartment_link ---
-      e.userApartmentLink?.forEach((link) => {
-        linkPlaceholders.push(`($${linkParamIdx}, $${linkParamIdx + 1})`);
-        linkParams.push(e.id, link.apartmentId);
-        linkParamIdx += 2;
-      });
-    });
-
-    // --- 합치기 ---
-    const combinedSQL = `
-    INSERT INTO "User"
-      ("id","name","email","contact","role","version","joinedStatus","createdAt","updatedAt")
-    VALUES ${userPlaceholders.join(',')}
-    ON CONFLICT("email") DO NOTHING;
-
-    INSERT INTO "Address"
-      ("userId","building","unit","isHouseholder")
-    VALUES ${addrPlaceholders.join(',')}
-    ON CONFLICT("userId") DO NOTHING;
-
-    ${
-      linkPlaceholders.length > 0
-        ? `
-    INSERT INTO "UserApartmentLink"
-      ("userId","apartmentId")
-    VALUES ${linkPlaceholders.join(',')}
-    ON CONFLICT("userId","apartmentId") DO NOTHING;
-    `
-        : ''
-    }
-  `;
-
-    const count = await prisma().$executeRawUnsafe(
-      combinedSQL,
-      ...userParams,
-      ...addrParams,
-      ...linkParams,
+    const userValues = entities.map(
+      (e) =>
+        Prisma.sql`(
+      ${e.id},
+      ${e.name},
+      ${e.email},
+      ${e.contact},
+      ${e.role},
+      ${e.version},
+      ${e.joinedStatus},
+      ${e.createdAt},
+      ${e.updatedAt}
+    )`,
     );
 
-    console.log(count);
+    const addressRows = entities.map(
+      (e) =>
+        Prisma.sql`(
+      ${e.id},
+      ${e.address.building},
+      ${e.address.unit},
+      ${e.address.isHouseholder}
+    )`,
+    );
 
-    return count;
+    const linkRows = entities.flatMap(
+      (e) => e.userApartmentLink?.map((l) => Prisma.sql`(${e.id}, ${l.apartmentId})`) ?? [],
+    );
+
+    // --- 합치기 ---
+    const sql = Prisma.sql`
+WITH inserted_users AS (
+  INSERT INTO "User"
+    ("id","name","email","contact","role","version","joinedStatus","createdAt","updatedAt")
+  VALUES ${Prisma.join(userValues)}
+  ON CONFLICT DO NOTHING
+  RETURNING "id"
+),
+src_address("userId","building","unit","isHouseholder") AS (
+  VALUES ${Prisma.join(addressRows)}
+),
+inserted_address AS (
+  INSERT INTO "Address"
+    ("userId","building","unit","isHouseholder")
+  SELECT
+    u.id,
+    a."building",
+    a."unit",
+    a."isHouseholder"
+  FROM inserted_users u
+  JOIN src_address a ON a."userId" = u.id
+  ON CONFLICT("userId") DO NOTHING
+)
+${
+  linkRows.length > 0
+    ? Prisma.sql`,
+src_link("userId","apartmentId") AS (
+  VALUES ${Prisma.join(linkRows)}
+),
+inserted_link AS (
+  INSERT INTO "UserApartmentLink"
+    ("userId","apartmentId")
+  SELECT
+    u.id,
+    l."apartmentId"
+  FROM inserted_users u
+  JOIN src_link l ON l."userId" = u.id
+  ON CONFLICT("userId","apartmentId") DO NOTHING
+)`
+    : Prisma.empty
+}
+SELECT COUNT(*)::int AS count FROM inserted_users;
+`;
+
+    const result = await prisma().$queryRaw<{ count: number }[]>(sql);
+
+    return result[0]?.count ?? 0;
   };
 
   const update = async (

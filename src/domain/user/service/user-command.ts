@@ -510,11 +510,6 @@ export const createUserCommandService = (
 
     const lines = csvText.split(/\r?\n/);
 
-    // const rl = readline.createInterface({
-    //   input: Body as NodeJS.ReadableStream,
-    //   crlfDelay: Infinity,
-    // });
-
     let batchEntities = [];
     let processCount = 0;
 
@@ -529,17 +524,12 @@ export const createUserCommandService = (
       apartmentInfo;
 
     let isFirstLine = true;
-    // console.log("0")
 
     for await (const line of lines) {
-      // const cleanedLine = line.replace(/^\uFEFF/, '');
-
-      // const cols = cleanedLine.split(',');
       if (isFirstLine) {
         isFirstLine = false;
         continue;
       }
-      console.log('1');
       // "동","호수","이름","연락처","이메일","세대주여부"
       const [buildingRaw, unitRaw, nameRaw, contactRaw, emailRaw, isHouseholderRaw] =
         line.split(',');
@@ -554,13 +544,11 @@ export const createUserCommandService = (
       };
       // 데이터 형식 검증
       const parsed = importResidentRowSchema.safeParse(rawRow);
-      console.log('2');
       if (!parsed.success) {
         console.log('schema fail:', parsed.error.flatten().fieldErrors, rawRow);
         continue;
       }
 
-      console.log('3');
       const { building, unit, name, contact, email, isHouseholder } = parsed.data;
 
       // 비즈니즈 검증
@@ -575,7 +563,6 @@ export const createUserCommandService = (
       }
       const floor = Math.floor(unitNumber / 100);
       const unitInFloor = unitNumber % 100;
-      console.log('4');
       if (floor < 1 || floor > floorCountPerBuilding) {
         continue;
       }
@@ -583,7 +570,6 @@ export const createUserCommandService = (
       if (unitInFloor < 1 || unitInFloor > unitCountPerFloor) {
         continue;
       }
-      console.log('5');
       batchEntities.push(
         NotJoinedResidentEntity.create({
           name,
@@ -605,12 +591,12 @@ export const createUserCommandService = (
       }
     }
 
-    await userCommandRepo.createManyBulk(batchEntities);
-    console.log(`${processCount + batchEntities.length} 벌크 크리에이트 완료`);
+    const residentCount = await userCommandRepo.createManyBulk(batchEntities);
+    console.log(`${processCount + residentCount} 벌크 크리에이트 완료`);
     batchEntities = [];
 
     return {
-      count: processCount + batchEntities.length,
+      count: processCount + residentCount,
     };
   };
 

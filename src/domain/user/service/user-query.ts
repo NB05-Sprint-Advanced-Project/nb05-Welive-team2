@@ -16,9 +16,10 @@ import { Status } from '../entity/base-user';
 import { IUserQueryRepo } from '../interface/i-user-query-repo';
 import { redisKeys } from '../../../utils/redis-keys';
 import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../../utils/s3-client';
 import { Readable } from 'stream';
+import { getEnv } from '../../../config';
 
 /**
  *  전제 - 한 아파트에 관리자가 1명인 프로젝트
@@ -91,7 +92,6 @@ export const createUserQueryService = (
         type: BusinessExceptionType.TEMPORARY_UNAVAILABLE,
       });
     }
-    // const residentsUser = userQueryRepo.findResidents(dto);
     return residentsUser;
   };
 
@@ -114,15 +114,15 @@ export const createUserQueryService = (
       });
     }
 
-    // // 캐시 안한 로직
+    // 캐시 안한 로직
     // const residentAccountsUser =userQueryRepo.findResidentAccounts(dto)
     return residentAccountsUser;
   };
 
   const exportResidentTemplate = async () => {
     const command = new GetObjectCommand({
-      Bucket: process.env.AWS_TEMPLATE_BUCKET!,
-      Key: 'CSV-form/입주민_업로드_양식.csv',
+      Bucket: getEnv().AWS_S3_BUCKET_NAME,
+      Key: 'CSV-form/resident_upload_form.csv',
     });
 
     const response = await s3.send(command);
@@ -139,7 +139,7 @@ export const createUserQueryService = (
     };
   };
 
-  const exportResidents = async (dto: ExportResidentsReqDto, userId: string) => {
+  const exportResidents = async (dto: ExportResidentsReqDto) => {
     const residents = await userQueryRepo.findResidentsForExport(dto);
 
     if (residents.length === 0) {
