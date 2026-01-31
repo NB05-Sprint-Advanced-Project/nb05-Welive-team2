@@ -98,12 +98,12 @@ export const BusinessExceptionTable: Record<
     message: '새 비밀번호가 이전 비밀번호하고 동일합니다.',
   },
   [BusinessExceptionType.NOT_IMAGE_FILE]: {
-    statusCode: 401,
-    message: '이미지 파일이 아닙니다.',
+    statusCode: 404,
+    message: '이미지 파일이 아니거나 없습니다.',
   },
   [BusinessExceptionType.NOT_CSV_FILE]: {
-    statusCode: 401,
-    message: '이미지 파일이 아닙니다.',
+    statusCode: 404,
+    message: 'CSV 파일이 아니거나 없습니다.',
   },
 
   [BusinessExceptionType.DONT_MODIFY_PENDING]: {
