@@ -10,7 +10,7 @@ export const registerComplaintRouters = (
 ) => {
   /**
    * @openapi
-   * /complaints/{complaintId}:
+   * /api/v2/complaints/{complaintId}:
    *   get:
    *     summary: 민원 상세 조회
    *     tags: [Complaint]
@@ -56,7 +56,7 @@ export const registerComplaintRouters = (
 
   /**
    * @openapi
-   * /complaints:
+   * /api/v2/complaints:
    *   get:
    *     summary: 민원 목록 조회
    *     tags: [Complaint]
@@ -152,7 +152,7 @@ export const registerComplaintRouters = (
 
   /**
    * @openapi
-   * /complaints:
+   * /api/v2/complaints:
    *   post:
    *     summary: 민원 생성
    *     tags: [Complaint]
@@ -212,7 +212,7 @@ export const registerComplaintRouters = (
 
   /**
    * @openapi
-   * /complaints/{complaintId}:
+   * /api/v2/complaints/{complaintId}:
    *   patch:
    *     summary: 민원 수정
    *     tags: [Complaint]
@@ -258,7 +258,7 @@ export const registerComplaintRouters = (
 
   /**
    * @openapi
-   * /complaints/{complaintId}:
+   * /api/v2/complaints/{complaintId}:
    *   delete:
    *     summary: 민원 삭제
    *     tags: [Complaint]
@@ -287,9 +287,9 @@ export const registerComplaintRouters = (
 
   /**
    * @openapi
-   * /complaints/{complaintId}/status:
+   * /api/v2/complaints/{complaintId}/status:
    *   patch:
-   *     summary: 민원 상태 수정
+   *     summary: "[관리자 권한 필요] 민원 상태 수정"
    *     tags: [Complaint]
    *     parameters:
    *       - in: path

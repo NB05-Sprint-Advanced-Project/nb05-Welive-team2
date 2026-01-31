@@ -10,7 +10,7 @@ export const registerNoticeRoutes = (
 ) => {
   /**
    * @openapi
-   * /notices/{noticeId}:
+   * /api/v2/notices/{noticeId}:
    *   get:
    *     summary: "공지사항 상세 조회"
    *     tags:
@@ -63,7 +63,7 @@ export const registerNoticeRoutes = (
 
   /**
    * @openapi
-   * /notices:
+   * /api/v2/notices:
    *   get:
    *     summary: "공지사항 목록 조회"
    *     tags:
@@ -151,7 +151,7 @@ export const registerNoticeRoutes = (
 
   /**
    * @openapi
-   * /notices:
+   * /api/v2/notices:
    *   post:
    *     summary: "[관리자 권한 필요] 공지사항 등록"
    *     tags:
@@ -231,7 +231,7 @@ export const registerNoticeRoutes = (
 
   /**
    * @openapi
-   * /notices/{noticeId}:
+   * /api/v2/notices/{noticeId}:
    *   patch:
    *     summary: "[관리자 권한 필요] 공지사항 수정"
    *     tags:
@@ -292,7 +292,7 @@ export const registerNoticeRoutes = (
 
   /**
    * @openapi
-   * /notices/{noticeId}:
+   * /api/v2/notices/{noticeId}:
    *   delete:
    *     summary: "[관리자 권한 필요] 공지사항 삭제"
    *     tags:
@@ -321,7 +321,7 @@ export const registerNoticeRoutes = (
 
   /**
    * @openapi
-   * /events:
+   * /api/v2/events:
    *   get:
    *     summary: "이벤트 목록 조회"
    *     tags:

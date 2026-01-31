@@ -10,7 +10,7 @@ export const registerPollRoutes = (
 ) => {
   /**
    * @openapi
-   * /polls/{pollId}:
+   * /api/v2/polls/{pollId}:
    *   get:
    *     summary: "투표 글 상세 조회"
    *     tags:
@@ -63,7 +63,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls:
+   * /api/v2/polls:
    *   get:
    *     summary: "투표 글 전체 조회"
    *     tags:
@@ -147,7 +147,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls:
+   * /api/v2/polls:
    *   post:
    *     summary: "[관리자 권한 필요] 투표 글 생성"
    *     tags:
@@ -263,7 +263,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls/{pollId}:
+   * /api/v2/polls/{pollId}:
    *   patch:
    *     summary: "[관리자 권한 필요] 투표 글 수정"
    *     tags:
@@ -323,7 +323,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls/{pollId}:
+   * /api/v2/polls/{pollId}:
    *   delete:
    *     summary: "[관리자 권한 필요] 투표 글 삭제"
    *     tags:
@@ -352,7 +352,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls/{pollId}/options/{optionId}/vote:
+   * /api/v2/polls/{pollId}/options/{optionId}/vote:
    *   post:
    *     summary: "투표하기"
    *     tags:
@@ -386,7 +386,7 @@ export const registerPollRoutes = (
 
   /**
    * @openapi
-   * /polls/{pollId}/options/{optionId}/vote:
+   * /api/v2/polls/{pollId}/options/{optionId}/vote:
    *   delete:
    *     summary: "투표 취소"
    *     tags:

@@ -10,7 +10,7 @@ export const registerCommentRouters = (
 ) => {
   /**
    * @openapi
-   * /comments:
+   * /api/v2/comments:
    *   get:
    *     summary: 댓글 목록 조회
    *     tags: [Comment]
@@ -104,7 +104,7 @@ export const registerCommentRouters = (
 
   /**
    * @openapi
-   * /comments:
+   * /api/v2/comments:
    *   post:
    *     summary: 댓글 생성
    *     tags: [Comment]
@@ -177,7 +177,7 @@ export const registerCommentRouters = (
 
   /**
    * @openapi
-   * /comments/{commentId}:
+   * /api/v2/comments/{commentId}:
    *   patch:
    *     summary: 댓글 수정
    *     tags: [Comment]
@@ -218,7 +218,7 @@ export const registerCommentRouters = (
 
   /**
    * @openapi
-   * /comments/{commentId}:
+   * /api/v2/comments/{commentId}:
    *   delete:
    *     summary: 댓글 삭제
    *     tags: [Comment]
