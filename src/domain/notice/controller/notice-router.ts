@@ -8,6 +8,9 @@ export const registerNoticeRoutes = (
   handler: NoticeHandler,
   middleware: Middlewares,
 ) => {
+  /**
+   *
+   */
   router.get(
     '/notices/:noticeId',
     catchHandler(middleware.auth.authenticate),
