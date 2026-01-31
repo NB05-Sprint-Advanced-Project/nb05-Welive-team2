@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseAllUserProps, Role, Status } from '../entity/base-user';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
@@ -240,48 +241,83 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
   };
 
   const createManyBulk = async (entities: NotJoinedResidentProps[]): Promise<number> => {
-    try {
-      // let보단 즉시 실행 함수(IIFE)함
-      // 이유 - 반복적 if()문 사용으로 let으로 할당하는 것보다 깔끔하고 default로 할당 안 한 잡는 걸 안 해도 됨(컴파일 타임에서 잡아줌)
-      const createUserData = entities.map((entity) => {
-        return toCreateNotJoinedResidentDBData(entity);
+    const userParams: any[] = [];
+    const userPlaceholders: string[] = [];
+
+    const addrParams: any[] = [];
+    const addrPlaceholders: string[] = [];
+
+    const linkParams: any[] = [];
+    const linkPlaceholders: string[] = [];
+    let linkParamIdx = 1;
+
+    entities.forEach((e, idx) => {
+      // --- user ---
+      const userBaseIdx = idx * 9;
+      userPlaceholders.push(
+        `($${userBaseIdx + 1}, $${userBaseIdx + 2}, $${userBaseIdx + 3}, $${userBaseIdx + 4}, $${userBaseIdx + 5}, $${userBaseIdx + 6}, $${userBaseIdx + 7}, $${userBaseIdx + 8}, $${userBaseIdx + 9})`,
+      );
+      userParams.push(
+        e.id,
+        e.name,
+        e.email,
+        e.contact,
+        e.role,
+        e.version,
+        e.joinedStatus,
+        e.createdAt,
+        e.updatedAt,
+      );
+
+      // --- address ---
+      const addrBaseIdx = idx * 4;
+      addrPlaceholders.push(
+        `($${addrBaseIdx + 1}, $${addrBaseIdx + 2}, $${addrBaseIdx + 3}, $${addrBaseIdx + 4})`,
+      );
+      addrParams.push(e.id, e.address.building, e.address.unit, e.address.isHouseholder);
+
+      // --- user_apartment_link ---
+      e.userApartmentLink?.forEach((link) => {
+        linkPlaceholders.push(`($${linkParamIdx}, $${linkParamIdx + 1})`);
+        linkParams.push(e.id, link.apartmentId);
+        linkParamIdx += 2;
       });
+    });
 
-      const datas = await prisma().user.createMany({
-        data: createUserData,
-      });
+    // --- 합치기 ---
+    const combinedSQL = `
+    INSERT INTO "User"
+      ("id","name","email","contact","role","version","joinedStatus","createdAt","updatedAt")
+    VALUES ${userPlaceholders.join(',')}
+    ON CONFLICT("email") DO NOTHING;
 
-      return datas.count;
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-        const target = (err.meta as any)?.target;
-        if (target?.includes('email')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL,
-          });
-        }
+    INSERT INTO "Address"
+      ("userId","building","unit","isHouseholder")
+    VALUES ${addrPlaceholders.join(',')}
+    ON CONFLICT("userId") DO NOTHING;
 
-        if (target?.includes('username')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_USERNAME,
-            error: err,
-          });
-        }
-
-        if (target?.includes('contact')) {
-          throw TechnicalException({
-            type: TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
-            error: err,
-          });
-        }
-
-        throw TechnicalException({
-          type: TechnicalExceptionType.UNKNOWN_ERROR,
-          error: err,
-        });
-      }
-      throw err;
+    ${
+      linkPlaceholders.length > 0
+        ? `
+    INSERT INTO "UserApartmentLink"
+      ("userId","apartmentId")
+    VALUES ${linkPlaceholders.join(',')}
+    ON CONFLICT("userId","apartmentId") DO NOTHING;
+    `
+        : ''
     }
+  `;
+
+    const count = await prisma().$executeRawUnsafe(
+      combinedSQL,
+      ...userParams,
+      ...addrParams,
+      ...linkParams,
+    );
+
+    console.log(count);
+
+    return count;
   };
 
   const update = async (

@@ -39,19 +39,15 @@ import {
   CreateResidentReqDto,
   UpdateResidentReqDto,
   DeleteResidentReqDto,
-  ExportResidentsReqDto,
 } from '../dto/resident-user-response';
-import { INotificationCommandRepo } from '../../notification/interface/i-notification-command';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
-import { randomUUID } from 'crypto';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
-import readline from 'readline';
 import { ResidentAddressVO } from '../entity/vo/resident-address';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../../utils/s3-client';
-import { Readable } from 'stream';
 import { clean, importResidentRowSchema } from '../dto/import-resident-row-dto';
+import { streamToString } from '../../../utils/stream-to-string';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -510,10 +506,14 @@ export const createUserCommandService = (
       throw BusinessException({ type: BusinessExceptionType.NOT_CSV_FILE });
     }
 
-    const rl = readline.createInterface({
-      input: Body as NodeJS.ReadableStream,
-      crlfDelay: Infinity,
-    });
+    const csvText = await streamToString(Body);
+
+    const lines = csvText.split(/\r?\n/);
+
+    // const rl = readline.createInterface({
+    //   input: Body as NodeJS.ReadableStream,
+    //   crlfDelay: Infinity,
+    // });
 
     let batchEntities = [];
     let processCount = 0;
@@ -528,7 +528,18 @@ export const createUserCommandService = (
     const { buildingNumberTo, buildingNumberFrom, floorCountPerBuilding, unitCountPerFloor } =
       apartmentInfo;
 
-    for await (const line of rl) {
+    let isFirstLine = true;
+    // console.log("0")
+
+    for await (const line of lines) {
+      // const cleanedLine = line.replace(/^\uFEFF/, '');
+
+      // const cols = cleanedLine.split(',');
+      if (isFirstLine) {
+        isFirstLine = false;
+        continue;
+      }
+      console.log('1');
       // "동","호수","이름","연락처","이메일","세대주여부"
       const [buildingRaw, unitRaw, nameRaw, contactRaw, emailRaw, isHouseholderRaw] =
         line.split(',');
@@ -541,27 +552,30 @@ export const createUserCommandService = (
         email: clean(emailRaw),
         isHouseholder: clean(isHouseholderRaw),
       };
-
       // 데이터 형식 검증
       const parsed = importResidentRowSchema.safeParse(rawRow);
-
+      console.log('2');
       if (!parsed.success) {
+        console.log('schema fail:', parsed.error.flatten().fieldErrors, rawRow);
         continue;
       }
 
+      console.log('3');
       const { building, unit, name, contact, email, isHouseholder } = parsed.data;
 
       // 비즈니즈 검증
       const buildingNumber = Number(building);
       const unitNumber = Number(unit);
-
+      console.log('building' + buildingNumber);
+      console.log('unit' + unitNumber);
+      console.log('from' + buildingNumberFrom);
+      console.log('to' + buildingNumberTo);
       if (buildingNumber < buildingNumberFrom || buildingNumber > buildingNumberTo) {
         continue;
       }
-
       const floor = Math.floor(unitNumber / 100);
       const unitInFloor = unitNumber % 100;
-
+      console.log('4');
       if (floor < 1 || floor > floorCountPerBuilding) {
         continue;
       }
@@ -569,7 +583,7 @@ export const createUserCommandService = (
       if (unitInFloor < 1 || unitInFloor > unitCountPerFloor) {
         continue;
       }
-
+      console.log('5');
       batchEntities.push(
         NotJoinedResidentEntity.create({
           name,
