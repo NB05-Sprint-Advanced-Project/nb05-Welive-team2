@@ -17,7 +17,6 @@ import { createNoticeCommandService } from './domain/notice/service/notice-comma
 import { createGlobalErrorMiddleware } from './middlewares/global-error-middleware';
 import { createNotFoundMiddleware } from './middlewares/not-found-middleware';
 import { createHttpServer } from './servers/http-server';
-import { TokenUtil } from './shared/utils/token-manager';
 import { createUserController } from './domain/user/controller/user-controller';
 import { createAuthController } from './domain/auth/controller/auth-controller';
 import { createAuthService } from './domain/auth/auth-service';
@@ -54,6 +53,7 @@ import { createStateCommandRepo } from './domain/state/repo/state-command';
 import { createNotificationScheduler } from './domain/notification/notification-scheduler';
 import { createStateCommandService } from './domain/state/service/state-command';
 import { createMulterMiddleware } from './middlewares/multer-middleware';
+import { TokenUtil } from './shared/utils/token-manager';
 
 export const createInjector = (mockPrisma?: PrismaClient) => {
   const prisma = mockPrisma ?? new PrismaClient();
