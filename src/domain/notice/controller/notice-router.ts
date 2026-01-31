@@ -12,7 +12,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /notices/{noticeId}:
    *   get:
-   *     summary: 공지사항 상세 조회
+   *     summary: "공지사항 상세 조회"
    *     tags:
    *       - Notice
    *     parameters:
@@ -47,13 +47,13 @@ export const registerNoticeRoutes = (
    *                 startDate: 2026-01-31T06:27:35.370Z
    *                 endDate: 2026-01-31T06:27:35.370Z
    *       400:
-   *         description: 잘못된 요청
+   *         description: 잘못된 요청(필수사항 누락 또는 잘못된 입력값)입니다.
    *       401:
-   *         description: 권한 오류
+   *         description: 권한과 관련된 오류입니다.
    *       404:
-   *         description: 존재하지 않음
+   *         description: 공지사항이 존재하지 않습니다.
    *       500:
-   *         description: 서버 오류
+   *         description: 알 수 없는 오류입니다.
    */
   router.get(
     '/notices/:noticeId',
@@ -65,7 +65,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /notices:
    *   get:
-   *     summary: 공지사항 목록 조회
+   *     summary: "공지사항 목록 조회"
    *     tags:
    *       - Notice
    *     parameters:
@@ -153,7 +153,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /notices:
    *   post:
-   *     summary: [관리자 권한 필요] 공지사항 등록
+   *     summary: "[관리자 권한 필요] 공지사항 등록"
    *     tags:
    *       - Notice
    *     security:
@@ -233,7 +233,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /notices/{noticeId}:
    *   patch:
-   *     summary: [관리자 권한 필요] 공지사항 수정
+   *     summary: "[관리자 권한 필요] 공지사항 수정"
    *     tags:
    *       - Notice
    *     parameters:
@@ -294,7 +294,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /notices/{noticeId}:
    *   delete:
-   *     summary: [관리자 권한 필요] 공지사항 삭제
+   *     summary: "[관리자 권한 필요] 공지사항 삭제"
    *     tags:
    *       - Notice
    *     parameters:
@@ -323,7 +323,7 @@ export const registerNoticeRoutes = (
    * @openapi
    * /events:
    *   get:
-   *     summary: 이벤트 목록 조회
+   *     summary: "이벤트 목록 조회"
    *     tags:
    *       - Event
    *     parameters:

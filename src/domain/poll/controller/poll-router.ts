@@ -12,7 +12,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls/{pollId}:
    *   get:
-   *     summary: 투표 글 상세 조회
+   *     summary: "투표 글 상세 조회"
    *     tags:
    *       - Poll
    *     parameters:
@@ -47,13 +47,13 @@ export const registerPollRoutes = (
    *                   voteCount: 0
    *               optionIdVotedByMe: string
    *       400:
-   *         description: 잘못된 요청
+   *         description: 잘못된 요청(필수사항 누락 또는 잘못된 입력값)입니다.
    *       401:
-   *         description: 권한 오류
+   *         description: 권한과 관련된 오류입니다.
    *       404:
-   *         description: 존재하지 않음
+   *         description: 투표 글이 존재하지 않습니다.
    *       500:
-   *         description: 서버 오류
+   *         description: 알 수 없는 오류입니다.
    */
   router.get(
     '/:pollId',
@@ -65,7 +65,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls:
    *   get:
-   *     summary: 투표 글 전체 조회
+   *     summary: "투표 글 전체 조회"
    *     tags:
    *       - Poll
    *     parameters:
@@ -137,13 +137,11 @@ export const registerPollRoutes = (
    *               limit: 0
    *               hasNext: true
    *       400:
-   *         description: 잘못된 요청
+   *         description: 잘못된 요청(필수사항 누락 또는 잘못된 입력값)입니다.
    *       401:
-   *         description: 권한 오류
-   *       404:
-   *         description: 존재하지 않음
+   *         description: 권한과 관련된 오류입니다.
    *       500:
-   *         description: 서버 오류
+   *         description: 알 수 없는 오류입니다.
    */
   router.get('/', catchHandler(middlewares.auth.authenticate), catchHandler(handler.getAllPolls));
 
@@ -151,7 +149,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls:
    *   post:
-   *     summary: [관리자 권한 필요] 투표 글 생성
+   *     summary: "[관리자 권한 필요] 투표 글 생성"
    *     tags:
    *       - Poll
    *     requestBody:
@@ -267,7 +265,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls/{pollId}:
    *   patch:
-   *     summary: [관리자 권한 필요] 투표 글 수정
+   *     summary: "[관리자 권한 필요] 투표 글 수정"
    *     tags:
    *       - Poll
    *     parameters:
@@ -327,7 +325,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls/{pollId}:
    *   delete:
-   *     summary: [관리자 권한 필요] 투표 글 삭제
+   *     summary: "[관리자 권한 필요] 투표 글 삭제"
    *     tags:
    *       - Poll
    *     parameters:
@@ -356,7 +354,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls/{pollId}/options/{optionId}/vote:
    *   post:
-   *     summary: 투표하기
+   *     summary: "투표하기"
    *     tags:
    *       - Poll
    *     parameters:
@@ -390,7 +388,7 @@ export const registerPollRoutes = (
    * @openapi
    * /polls/{pollId}/options/{optionId}/vote:
    *   delete:
-   *     summary: 투표 취소
+   *     summary: "투표 취소"
    *     tags:
    *       - Poll
    *     parameters:
