@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, NextFunction, RequestHandler, Router } from 'express';
 import { z } from 'zod';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
@@ -6,7 +6,7 @@ import multer from 'multer';
 
 export const createBaseController = (basePath: string) => {
   const path: string = basePath;
-  const router = require('express').Router();
+  const router = Router();
   return { path, router };
 };
 

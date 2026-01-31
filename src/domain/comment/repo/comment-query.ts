@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ICommentQueryRepo } from '../interface/i-comment-query-repo';
 import { CommentView } from '../dto/comment-view';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ComplaintListFilter, IComplaintQueryRepo } from '../interface/i-complaint-query-repo';
 import { ComplaintView } from '../dto/complaint-veiw';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
 import { BaseRepo } from '../../../shared/base-command-repo';
@@ -22,7 +23,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       if (!notice) {
         return null;
       }
-      const { event, ...data } = notice;
+      const { ...data } = notice;
 
       return {
         ...data,
@@ -52,7 +53,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       if (notices.length === 0) {
         return null;
       }
-      const { event_id, event_startDate, event_endDate, apartmentId, ...noticeData } = notices[0];
+      const { event_id, event_startDate, event_endDate, ...noticeData } = notices[0];
       return {
         ...noticeData,
         event: event_id
@@ -67,7 +68,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
   };
 
   const create = async (props: NoticeProps, userId: string): Promise<NoticeProps> => {
-    const { comments, event, ...data } = props;
+    const { event, ...data } = props;
     try {
       const notice = await prisma().notices.create({
         data: {
@@ -105,18 +106,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
     }
   };
   const update = async (props: NoticeProps): Promise<void> => {
-    const {
-      comments,
-      event,
-      apartmentId,
-      userId,
-      event_id,
-      event_startDate,
-      event_endDate,
-      event_startdate,
-      event_enddate,
-      ...data
-    } = props as any;
+    const { event, ...data } = props as any;
     try {
       await prisma().notices.update({
         where: { id: data.id, version: props.version },
@@ -161,7 +151,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
 
     const noticeIds = props.map((v) => v.noticeId);
     const cases = props.map((v) => Prisma.sql`WHEN ${v.noticeId} THEN ${v.viewCount}`);
-    let query = Prisma.sql`
+    const query = Prisma.sql`
       UPDATE "NOTICES"
       SET "viewCount" = GREATEST("viewCount", CASE id ${Prisma.join(cases, ' ')} ELSE "viewCount" END)
       WHERE id IN (${Prisma.join(noticeIds)})

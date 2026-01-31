@@ -8,6 +8,7 @@ export const createComplaintBatchService = (
   const syncViewCounts = async () => {
     const key = `dirty:complaintIds`;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const dirtyComplaintIds = await redisExternal.popFromSet(key, 50);
       if (dirtyComplaintIds.length === 0) {

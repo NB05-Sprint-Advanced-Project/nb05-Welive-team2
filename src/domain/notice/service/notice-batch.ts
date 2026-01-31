@@ -8,6 +8,7 @@ export const createNoticeBatchService = (
   const syncViewCounts = async () => {
     const dirtyKey = `dirty:noticeIds`;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const noticeIds = await redisExternal.popFromSet(dirtyKey, 100);
       if (!noticeIds || noticeIds.length === 0) return;

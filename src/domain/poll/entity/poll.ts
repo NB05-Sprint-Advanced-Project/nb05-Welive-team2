@@ -30,7 +30,7 @@ export const PollEntity = {
   }): PollProps => {
     const { options, ...data } = props;
     const version = 1;
-    let newOptions: OptionProps[] = [];
+    const newOptions: OptionProps[] = [];
 
     for (const title of options) {
       newOptions.push(OptionEntity.create(title));

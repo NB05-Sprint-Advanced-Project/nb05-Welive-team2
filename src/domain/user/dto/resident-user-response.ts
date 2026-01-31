@@ -6,7 +6,6 @@ import {
   emailSchema,
   isHouseholderFilterSchema,
   isRegisteredFilterSchema,
-  joinedStatusSchema,
   limitSchema,
   nameSchema,
   pageSchema,

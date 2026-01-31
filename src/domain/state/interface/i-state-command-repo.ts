@@ -1,4 +1,4 @@
-import { NotificationStateProps, StateProps, StatusType } from '../entity/state';
+import { StateProps, StatusType } from '../entity/state';
 
 export interface IStateCommandRepo {
   create(entity: StateProps): Promise<void>;

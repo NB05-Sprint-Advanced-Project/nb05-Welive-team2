@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient } from '@prisma/client';
 import { Application } from 'express';
 import { TokenUtil } from '../../shared/utils/token-manager';
@@ -203,7 +204,7 @@ describe('Poll 통합 테스트', () => {
   });
 
   describe('PATCH /polls API', () => {
-    let patchPollId = 'patch-poll-id';
+    const patchPollId = 'patch-poll-id';
     beforeEach(async () => {
       const poll = await mockPrisma.polls.upsert({
         where: { id: patchPollId },
@@ -279,10 +280,10 @@ describe('Poll 통합 테스트', () => {
   });
 
   describe('DELETE /polls API', () => {
-    let deleteTargetId = 'delete-poll-id';
+    const deleteTargetId = 'delete-poll-id';
 
     beforeEach(async () => {
-      const poll = await mockPrisma.polls.upsert({
+      await mockPrisma.polls.upsert({
         where: {
           id: deleteTargetId,
         },
@@ -346,12 +347,12 @@ describe('Poll 통합 테스트', () => {
   });
 
   describe('POST /polls/vote API', () => {
-    let votePollId = 'vote-poll-id';
-    let mockOptionId1 = 'test-optioin-id1';
-    let mockOptionId2 = 'test-optioin-id2';
+    const votePollId = 'vote-poll-id';
+    const mockOptionId1 = 'test-optioin-id1';
+    const mockOptionId2 = 'test-optioin-id2';
 
     beforeEach(async () => {
-      const poll = await mockPrisma.polls.upsert({
+      await mockPrisma.polls.upsert({
         where: { id: votePollId },
         update: {},
         create: {
@@ -403,12 +404,12 @@ describe('Poll 통합 테스트', () => {
   });
 
   describe('DELETE /polls/vote API', () => {
-    let canclePollId = 'cancle-poll-id';
-    let mockOptionId1 = 'test-optioin-id1';
-    let mockOptionId2 = 'test-optioin-id2';
+    const canclePollId = 'cancle-poll-id';
+    const mockOptionId1 = 'test-optioin-id1';
+    const mockOptionId2 = 'test-optioin-id2';
 
     beforeEach(async () => {
-      const poll = await mockPrisma.polls.upsert({
+      await mockPrisma.polls.upsert({
         where: { id: canclePollId },
         update: {},
         create: {

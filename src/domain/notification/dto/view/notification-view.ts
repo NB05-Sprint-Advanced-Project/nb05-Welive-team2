@@ -3,7 +3,7 @@ export interface NotificationView {
     id: string;
     createdAt: Date;
     content: string;
-    isChecked: Boolean;
+    isChecked: boolean;
   }[];
 
   totalCount: number;

@@ -2,13 +2,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 import { BaseRepo } from '../../../shared/base-command-repo';
 import { IStateCommandRepo } from '../interface/i-state-command-repo';
-import {
-  NotificationPayload,
-  NotificationStateProps,
-  StateProps,
-  StatusType,
-  WorkType,
-} from '../entity/state';
+import { NotificationStateProps, StateProps, StatusType, WorkType } from '../entity/state';
 
 export const createStateCommandRepo = (prismaClient: PrismaClient): IStateCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);

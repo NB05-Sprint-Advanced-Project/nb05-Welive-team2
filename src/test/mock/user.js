@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { EventSource } = require('eventsource');
 
 // API 엔드포인트 설정

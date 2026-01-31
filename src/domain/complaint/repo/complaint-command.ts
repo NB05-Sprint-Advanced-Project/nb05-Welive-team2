@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { ComplaintProps } from '../complaint-entity';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
@@ -96,7 +97,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
 
   const updateStatus = async (entity: ComplaintProps) => {
     try {
-      const result = await prisma.complaint.update({
+      await prisma.complaint.update({
         where: { id: entity.id, version: entity.version },
         data: {
           status: entity.status,
@@ -136,7 +137,7 @@ export const createComplaintCommandRepo = (prisma: PrismaClient): IComplaintComm
 
     const complaintIds = props.map((v) => v.complaintId);
     const cases = props.map((v) => Prisma.sql`WHEN ${v.complaintId} THEN ${v.viewsCount}`);
-    let query = Prisma.sql`
+    const query = Prisma.sql`
       UPDATE "Complaint"
       SET "viewsCount" = CASE id ${Prisma.join(cases, ' ')} ELSE "viewsCount" END
       WHERE id IN (${Prisma.join(complaintIds)})

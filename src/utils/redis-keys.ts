@@ -1,6 +1,4 @@
 import { ComplaintStatus } from '../domain/complaint/complaint-entity';
-import { GetResidentsReqDto } from '../domain/user/dto/resident-user-response';
-import { GetResidentAccountsReqDto } from '../domain/user/dto/user-request';
 
 export const redisKeys = {
   authToken: (accessToken: string) => {
@@ -31,13 +29,13 @@ export const redisKeys = {
     return { key, lock };
   },
 
-  residentAccounts: (dto: GetResidentAccountsReqDto) => {
+  residentAccounts: () => {
     const key = 'residentAccounts:1:10'; // 기본 첫 페이지
     const lock = 'lock:residentAccounts:1:10';
     return { key, lock };
   },
 
-  residents: (dto: GetResidentsReqDto) => {
+  residents: () => {
     const key = 'residents:1:10';
     const lock = 'lock:residents:1:10';
     return { key, lock };

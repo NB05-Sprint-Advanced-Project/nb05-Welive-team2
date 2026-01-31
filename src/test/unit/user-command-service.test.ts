@@ -704,7 +704,7 @@ describe('user service 유닛 테스트', () => {
         joinedStatus: Status.PENDING,
       });
 
-      (mockUow.doWork as jest.Mock).mockImplementation(async (work) => {
+      (mockUow.doWork as jest.Mock).mockImplementation(async () => {
         throw TechnicalException({
           type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
         });

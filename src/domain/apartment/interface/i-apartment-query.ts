@@ -1,4 +1,3 @@
-import { Apartment } from '@prisma/client';
 import { ApartmentsView } from '../dto/view/apartments-view';
 import { ApartmentView } from '../dto/view/apartment-view';
 

@@ -1,5 +1,3 @@
-import { CommentProps } from '../comment-entity';
-
 export type CommentResponse = {
   id: string;
   content: string;

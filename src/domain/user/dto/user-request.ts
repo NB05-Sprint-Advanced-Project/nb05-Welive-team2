@@ -13,7 +13,6 @@ import {
   joinedStatusSchema,
   pageSchema,
   limitSchema,
-  residentSearchKeyword,
   residentAccountSearchKeyword,
   joinedStatusFilterSchema,
   buildingFilterSchema,

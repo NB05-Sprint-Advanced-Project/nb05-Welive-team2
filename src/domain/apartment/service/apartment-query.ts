@@ -1,6 +1,5 @@
 ﻿import { redisKeys } from '../../../utils/redis-keys';
 import { viewApartmentDTO, viewApartmentsDTO } from '../dto/apartment-request';
-import { ApartmentsView } from '../dto/view/apartments-view';
 import { IApartmentQueryRepo } from '../interface/i-apartment-query';
 import { IRedisLocker } from '../../../shared/interface/i-redis-locker';
 

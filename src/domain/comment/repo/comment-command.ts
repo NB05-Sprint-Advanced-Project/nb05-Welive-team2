@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { CommentProps } from '../comment-entity';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';

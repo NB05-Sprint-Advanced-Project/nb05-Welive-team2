@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient, Prisma, Apartment } from '@prisma/client';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';

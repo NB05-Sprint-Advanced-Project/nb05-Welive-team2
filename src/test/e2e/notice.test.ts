@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient } from '@prisma/client';
 import { Application } from 'express';
 import { createInjector } from '../../injector';
@@ -189,9 +190,9 @@ describe('Notice 통합 테스트', () => {
   });
 
   describe('PATCH /notices API', () => {
-    let mockNoticeId = 'test-notice-id';
+    const mockNoticeId = 'test-notice-id';
     beforeEach(async () => {
-      const notice = await mockPrisma.notices.create({
+      await mockPrisma.notices.create({
         data: {
           id: mockNoticeId,
           createdAt: new Date(),
@@ -259,10 +260,10 @@ describe('Notice 통합 테스트', () => {
   });
 
   describe('DELETE /notices API', () => {
-    let deleteTargetId = 'delete-test-id';
+    const deleteTargetId = 'delete-test-id';
 
     beforeEach(async () => {
-      const notice = await mockPrisma.notices.create({
+      await mockPrisma.notices.create({
         data: {
           id: deleteTargetId,
           createdAt: new Date(),

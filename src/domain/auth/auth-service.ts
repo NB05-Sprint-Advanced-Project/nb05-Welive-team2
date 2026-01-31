@@ -46,7 +46,7 @@ export const createAuthService = (
       userId: user.id,
     });
 
-    const { password, ...userWithoutPassword } = user;
+    const { ...userWithoutPassword } = user;
     return { userWithoutPassword, accessToken, refreshToken };
   };
 
@@ -58,13 +58,13 @@ export const createAuthService = (
       });
     }
 
-    const payload = await tokenManager.verifyToken({ token: oldToken });
+    const payload = tokenManager.verifyToken({ token: oldToken });
 
-    const accessToken = await tokenManager.generateAccessToken({
+    const accessToken = tokenManager.generateAccessToken({
       userId: payload.userId,
     });
 
-    const refreshToken = await tokenManager.generateRefreshToken({
+    const refreshToken = tokenManager.generateRefreshToken({
       userId: payload.userId,
     });
 

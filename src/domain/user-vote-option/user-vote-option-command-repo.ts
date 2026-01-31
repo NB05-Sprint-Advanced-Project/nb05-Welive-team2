@@ -1,6 +1,6 @@
 import { UserVoteOptionProps } from './user-vote-option-entity';
 import { IUserVoteOptionCommandRepo } from './i-user-vote-option-command-repo';
-import { BasePrismaClient, BaseRepo } from '../../shared/base-command-repo';
+import { BaseRepo } from '../../shared/base-command-repo';
 import { PrismaClient } from '@prisma/client';
 
 export const createUserVoteOptionCommandRepo = (

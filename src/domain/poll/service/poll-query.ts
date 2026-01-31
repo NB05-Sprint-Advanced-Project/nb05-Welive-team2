@@ -1,7 +1,6 @@
 import { PollStatus } from '@prisma/client';
 import { PollsView, PollView } from '../dto/poll-view';
 import { IPollQueryRepo } from '../interface/i-poll-query-repo';
-import { literal } from 'zod';
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { IRedisExternal } from '../../../shared/interface/i-redis';

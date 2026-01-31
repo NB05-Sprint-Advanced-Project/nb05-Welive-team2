@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient, Apartment, User } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Application } from 'express';
@@ -9,7 +10,6 @@ import {
 } from '../../domain/user/dto/user-request';
 import { userInclude } from '../../domain/user/user-mapper';
 import { createInjector } from '../../injector';
-import { BasePrismaClient } from '../../shared/base-command-repo';
 import { BusinessExceptionType } from '../../shared/exception/business-exception/exception-info';
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
 import http from 'http';
@@ -18,7 +18,6 @@ import { Role, Status } from '../../domain/user/entity/base-user';
 describe('user service e2e 테스트', () => {
   let app: Application;
   let prisma: PrismaClient;
-  let basePrisma: BasePrismaClient;
   let baseApartment: Apartment;
   let baseAdmin: User;
   let baseSuperAdmin: User;
@@ -650,7 +649,7 @@ describe('user service e2e 테스트', () => {
   // 입주민 계정
   describe('입주민 회원가입 (createResidentAccount)', () => {
     test('회원가입 성공', async () => {
-      const res = await request(app)
+      await request(app)
         .post('/api/v2/users/residents')
         .send({
           username: 'resident100',
@@ -898,7 +897,7 @@ describe('user service e2e 테스트', () => {
     });
 
     test('팬딩 상태 -> 승인 상태로 변경 성공', async () => {
-      const res = await request(app)
+      await request(app)
         .patch(`/api/v2/users/residents/${pendingResident.id}/join-status`)
         .set('Cookie', cookies)
         .send({ joinStatus: Status.APPROVED })
@@ -914,7 +913,7 @@ describe('user service e2e 테스트', () => {
     });
 
     test('팬딩 상태 -> 거절(REJECTED) 상태로 변경 성공', async () => {
-      const res = await request(app)
+      await request(app)
         .patch(`/api/v2/users/residents/${pendingResident.id}/join-status`)
         .set('Cookie', cookies)
         .send({ joinStatus: Status.REJECTED })
@@ -1000,7 +999,7 @@ describe('user service e2e 테스트', () => {
     });
 
     test('모든 PENDING 입주민 상태를 APPROVED로 변경', async () => {
-      const res = await request(app)
+      await request(app)
         .patch(`/api/v2/users/residents/join-status`)
         .set('Cookie', cookies)
         .send({ joinStatus: Status.APPROVED })
@@ -1072,11 +1071,7 @@ describe('user service e2e 테스트', () => {
         isHouseholder: true,
       } as CreateResidentReqDto;
 
-      const res = await request(app)
-        .post('/api/v2/residents')
-        .set('Cookie', cookies)
-        .send(dto)
-        .expect(201);
+      await request(app).post('/api/v2/residents').set('Cookie', cookies).send(dto).expect(201);
 
       const user = await prisma.user.findUnique({
         where: { email: dto.email },
@@ -1119,7 +1114,7 @@ describe('user service e2e 테스트', () => {
         isHouseholder: true,
       };
 
-      const res = await request(app)
+      await request(app)
         .patch(`/api/v2/residents/${createdResidentId}`)
         .set('Cookie', cookies)
         .send(dto)
@@ -1193,7 +1188,7 @@ describe('user service e2e 테스트', () => {
     });
 
     test('입주민 삭제 성공 (deleteResident)', async () => {
-      const res = await request(app)
+      await request(app)
         .delete(`/api/v2/residents/${createdResidentId}`)
         .set('Cookie', cookies)
         .expect(204);
@@ -1354,7 +1349,7 @@ describe('user service e2e 테스트', () => {
         newPassword: 'newPassword1!',
       } as UpdatePasswordReqDto;
 
-      const res = await request(app)
+      await request(app)
         .patch(`/api/v2/users/me/password`)
         .set('Cookie', residentCookies)
         .send(dto)

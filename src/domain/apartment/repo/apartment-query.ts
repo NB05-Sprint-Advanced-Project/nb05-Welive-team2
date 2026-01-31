@@ -1,5 +1,3 @@
-import { PrismaClient } from '@prisma/client';
-import { ApartmentProps } from '../entity/apartment-entity';
 import { ApartmentsView } from '../dto/view/apartments-view';
 import { ApartmentView } from '../dto/view/apartment-view';
 import { BasePrismaClient } from '../../../shared/base-command-repo';
@@ -50,7 +48,7 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
       }),
     };
 
-    const [apartments, totalCount] = await Promise.all([
+    const [apartments] = await Promise.all([
       prisma.apartment.findMany({
         where,
         skip,

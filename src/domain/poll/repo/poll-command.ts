@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { PollProps } from '../entity/poll';
 import { IPollCommandRepo } from '../interface/i-poll-command-repo';
@@ -59,7 +60,7 @@ export const createPollCommandRepo = (prismaClient: PrismaClient): IPollCommandR
       if (polls.length === 0) {
         return null;
       }
-      const { option_id, option_title, option_count, ...data } = polls[0];
+      const { ...data } = polls[0];
       return {
         ...data,
         options: polls

@@ -20,7 +20,7 @@ export const createNotificationHandler = (
   };
 
   const getNotification = async (req: Request, res: Response) => {
-    const result = await notificationQueryService.getNotification(req.user.userId);
+    await notificationQueryService.getNotification();
 
     // SSE 연결을 클라이언트 매니저에 저장
     ClientManager.set({

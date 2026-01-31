@@ -1,4 +1,3 @@
-import { Middlewares } from '../../../shared/interface/i-middlewares';
 import { validate } from '../../../utils/controller-util';
 import {
   createSuperAdminSchema,
@@ -26,7 +25,7 @@ export const createUserHandlers = (
   // 슈퍼 관리자
   const createSuperAdmin = async (req: Request, res: Response) => {
     const dto = validate(createSuperAdminSchema, req.body);
-    const superAdmin = await userCommandService.createSuperAdmin(dto);
+    await userCommandService.createSuperAdmin(dto);
     return res.status(204).send();
   };
 
@@ -52,7 +51,7 @@ export const createUserHandlers = (
       ...req.params,
       ...req.user,
     });
-    const updatedAdmin = await userCommandService.updateAdmin(dto);
+    await userCommandService.updateAdmin(dto);
     return res.status(204).send();
   };
 
@@ -61,7 +60,7 @@ export const createUserHandlers = (
       ...req.user,
       ...req.body,
     });
-    const result = await userCommandService.updateAdminJoinedStatuses(dto);
+    await userCommandService.updateAdminJoinedStatuses(dto);
     return res.status(204).send();
   };
 
@@ -71,7 +70,7 @@ export const createUserHandlers = (
       ...req.body,
       ...req.params,
     });
-    const result = await userCommandService.updateAdminJoinedStatus(dto);
+    await userCommandService.updateAdminJoinedStatus(dto);
     return res.status(204).send();
   };
 

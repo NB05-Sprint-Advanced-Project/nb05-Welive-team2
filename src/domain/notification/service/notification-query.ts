@@ -1,9 +1,8 @@
-import e from 'express';
 import { INotificationQueryRepo } from '../interface/i-notification-query';
 import { viewNotificationsDTO } from '../dto/notification-request';
 
 export const createNotificationQueryService = (notificationQueryRepo: INotificationQueryRepo) => {
-  const getNotification = async (userId: string) => {
+  const getNotification = async () => {
     return 'test';
   };
 

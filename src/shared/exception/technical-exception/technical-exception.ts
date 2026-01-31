@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TechnicalExceptionTable, TechnicalExceptionType } from './exception-info';
 
 /* example

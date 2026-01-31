@@ -1,4 +1,3 @@
-import { ResidentAddressProps } from './vo/resident-address';
 import { IHashManager } from '../../../shared/interface/i-bcrypt-hash-manager';
 import { UserApartmentLinkProps } from './vo/user-apartment-link';
 

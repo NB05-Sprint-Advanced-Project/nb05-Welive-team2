@@ -79,7 +79,7 @@ export const createUserQueryService = (
   };
 
   const getResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
-    const { key, lock } = redisKeys.residents(dto);
+    const { key, lock } = redisKeys.residents();
     const residentsUser = await redisLocker.doWork({
       key,
       lockKey: lock,
@@ -98,7 +98,7 @@ export const createUserQueryService = (
   const getResidentAccounts = async (
     dto: GetResidentAccountsReqDto,
   ): Promise<ResidentAccountView> => {
-    const { key, lock } = redisKeys.residentAccounts(dto);
+    const { key, lock } = redisKeys.residentAccounts();
     const residentAccountsUser = await redisLocker.doWork({
       key,
       lockKey: lock,
