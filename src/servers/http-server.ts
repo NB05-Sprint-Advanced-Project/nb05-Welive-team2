@@ -6,7 +6,8 @@ import { getEnv } from '../config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { monitorEventLoopDelay } from 'perf_hooks';
-import { swaggerUi, specs } from '../swagger';
+import { swaggerUi } from '../swagger';
+import swaggerFile from '../swagger-output.json';
 
 export const createHttpServer = (middlewares: Middlewares, controllers: Controllers) => {
   const app = express();
@@ -42,7 +43,7 @@ export const createHttpServer = (middlewares: Middlewares, controllers: Controll
   app.use(cookieParser());
   app.use(express.json());
   app.use(cookieParser());
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
   // controllers
   for (const controllerKey in controllers) {
