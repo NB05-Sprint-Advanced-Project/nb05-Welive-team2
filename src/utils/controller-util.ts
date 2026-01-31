@@ -11,15 +11,15 @@ export const createBaseController = (basePath: string) => {
 };
 
 export const validate = <T extends z.ZodType>(schema: T, data: unknown) => {
-  const parsedDate = schema.safeParse(data);
-  if (!parsedDate.success) {
+  const parsedData = schema.safeParse(data);
+  if (!parsedData.success) {
     throw BusinessException({
       type: BusinessExceptionType.INVALID_INPUT,
-      message: parsedDate.error.issues[0].message,
+      message: parsedData.error.issues[0].message,
     });
   }
 
-  return parsedDate.data;
+  return parsedData.data;
 };
 
 export const catchHandler = (handler: RequestHandler) => {

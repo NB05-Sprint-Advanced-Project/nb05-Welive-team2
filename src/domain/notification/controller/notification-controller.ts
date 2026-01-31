@@ -10,13 +10,13 @@ export const createNotificationController = (
   notificationCommandService: NotificationCommandService,
   middleware: Middlewares,
 ) => {
-  const { path, router } = createBaseController('/api/v2/notifications');
+  const { basePath, router } = createBaseController('/api/v2/notifications');
 
   const handlers = createNotificationHandler(notificationQueryService, notificationCommandService);
 
   registerNotificationRoutes(router, middleware, handlers);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type NotificationController = ReturnType<typeof createNotificationController>;

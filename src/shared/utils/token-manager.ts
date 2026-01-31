@@ -3,34 +3,7 @@ import crypto from 'crypto';
 import { getEnv } from '../../config';
 import { BusinessExceptionType } from '../exception/business-exception/exception-info';
 import { BusinessException } from '../exception/business-exception/business-exception';
-
-export type TokenPayload = {
-  userId: string;
-  role?: string;
-  name?: string;
-  exp: number;
-};
-
-export type SecretTokenPayload = {
-  userId: string;
-  role: string;
-  name: string;
-  exp: number;
-};
-
-export interface ITokenUtil {
-  generateAccessToken(payload: Omit<TokenPayload, 'exp'>): string;
-
-  generateRefreshToken(payload: Omit<TokenPayload, 'exp'>): string;
-
-  generateCsrfValue(): string;
-
-  /**
-   * ignoreExpiration이 false이고 토큰이 만료된 경우 예외를 던집니다.
-   * @throws {BusinessException}
-   */
-  verifyToken(props: { token: string; ignoreExpiration?: boolean }): SecretTokenPayload;
-}
+import { ITokenUtil, TokenPayload, SecretTokenPayload } from '../interface/i-token-manager';
 
 export const TokenUtil = (): ITokenUtil => {
   const generateAccessToken = (payload: TokenPayload) => {
@@ -65,10 +38,23 @@ export const TokenUtil = (): ITokenUtil => {
     }
   };
 
+  const getCookieValue = (cookieHeader: string | undefined, name: string) => {
+    if (!cookieHeader) {
+      return undefined;
+    }
+    const cookies = cookieHeader.split(';').map((cookie) => cookie.trim());
+    const match = cookies.find((cookie) => cookie.startsWith(`${name}=`));
+    if (!match) {
+      return undefined;
+    }
+    return match.substring(name.length + 1);
+  };
+
   return {
     generateAccessToken,
     generateRefreshToken,
     generateCsrfValue,
     verifyToken,
+    getCookieValue,
   };
 };

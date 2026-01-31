@@ -9,7 +9,7 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { Prisma } from '@prisma/client';
-import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { StateEntity, WorkType } from '../../state/entity/state';
 import { randomUUID } from 'crypto';
 import { Role } from '../../user/entity/base-user';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
@@ -33,7 +33,6 @@ export const createPollCommandService = (
 
           const stateEntity = StateEntity.create({
             workType: WorkType.ALARM,
-            status: StatusType.PENDING,
             payload: {
               id: randomUUID(),
               receiverType: Role.USER,

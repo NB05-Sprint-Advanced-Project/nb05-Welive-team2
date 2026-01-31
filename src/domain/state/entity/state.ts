@@ -51,11 +51,11 @@ export type CSVStateProps = {
 export const StateEntity = {
   create: (props: {
     workType: WorkType;
-    status: StatusType;
     payload: NotificationPayload | CSVPayload;
   }): StateProps => {
     return {
       id: randomUUID(),
+      status: StatusType.PENDING,
       ...props,
       payload: {
         id: randomUUID(),

@@ -2,9 +2,10 @@
 import { AuthService } from '../auth-service';
 import { validate } from '../../../utils/controller-util';
 import { loginSchema, cookieTokenSchema } from '../dto/auth-request';
+import { Request, Response } from 'express';
 
 export const createAuthHandlers = (authService: AuthService) => {
-  const login = async (req: any, res: any) => {
+  const login = async (req: Request, res: Response) => {
     const dto = validate(loginSchema, req.body);
 
     const { userWithoutPassword, accessToken, refreshToken } = await authService.login(dto);
@@ -29,7 +30,7 @@ export const createAuthHandlers = (authService: AuthService) => {
     return res.status(200).json(userWithoutPassword);
   };
 
-  const logout = async (req: any, res: any) => {
+  const logout = async (req: Request, res: Response) => {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: true,
@@ -45,7 +46,7 @@ export const createAuthHandlers = (authService: AuthService) => {
     return res.status(204).send();
   };
 
-  const refreshToken = async (req: any, res: any) => {
+  const refreshToken = async (req: Request, res: Response) => {
     const dto = validate(cookieTokenSchema, req.headers);
 
     const { accessToken, refreshToken } = await authService.refreshToken(dto);

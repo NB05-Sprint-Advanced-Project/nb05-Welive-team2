@@ -8,66 +8,42 @@ export const registerUserRoutes = (
   handlers: UserHandlers,
   middlewares: Middlewares,
 ) => {
-  // #swagger.tags = ['User']
-  // #swagger.summary = '슈퍼 관리자 생성'
+  // 슈퍼 관리자
   router.post('/super-admins', catchHandler(handlers.createSuperAdmin));
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 생성'
+  // 관리자
   router.post('/admins', catchHandler(handlers.createAdmin));
 
-  // 관리자 계정
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 목록 조회'
-  // #swagger.description = '슈퍼 관리자만 조회 가능'
   router.get(
     '/admins',
     catchHandler(middlewares.auth.authSuperAdmin),
     catchHandler(handlers.getAdministrators),
   );
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 가입 상태 일괄 수정'
-  // #swagger.description = '슈퍼 관리자만 수정 가능'
   router.patch(
     '/admins/join-status',
     catchHandler(middlewares.auth.authSuperAdmin),
     catchHandler(handlers.updateAdminsJoinStatuses),
   );
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '거부된 관리자 삭제'
-  // #swagger.description = '슈퍼 관리자만 삭제 가능'
   router.delete(
     '/admins/rejected',
     catchHandler(middlewares.auth.authSuperAdmin),
     catchHandler(handlers.deleteRejectedAdmins),
   );
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 가입 상태 수정'
-  // #swagger.description = '슈퍼 관리자만 수정 가능'
-  // #swagger.parameters['id'] = { description: '관리자 ID' }
   router.patch(
     '/admins/:id/join-status',
     catchHandler(middlewares.auth.authSuperAdmin),
     catchHandler(handlers.updateAdminJoinStatus),
   );
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 정보 수정'
-  // #swagger.description = '슈퍼 관리자만 수정 가능'
-  // #swagger.parameters['adminId'] = { description: '관리자 ID' }
   router.patch(
     '/admins/:adminId',
     catchHandler(middlewares.auth.authSuperAdmin),
     catchHandler(handlers.updateAdmin),
   );
 
-  // #swagger.tags = ['User']
-  // #swagger.summary = '관리자 삭제'
-  // #swagger.description = '슈퍼 관리자만 삭제 가능'
-  // #swagger.parameters['adminId'] = { description: '관리자 ID' }
   router.delete(
     '/admins/:adminId',
     catchHandler(middlewares.auth.authSuperAdmin),

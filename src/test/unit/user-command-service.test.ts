@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IApartmentCommandRepo } from '../../domain/apartment/interface/i-apartment-command';
 import {
   CreateAdminDto,
@@ -78,11 +79,11 @@ describe('user service 유닛 테스트', () => {
     };
 
     mockUserCommandRepo = {
-      findAdminUserById: jest.fn(),
+      findAdminById: jest.fn(),
       findResidentAccountUserById: jest.fn(),
       findBaseUserById: jest.fn(),
       findJoinedUserById: jest.fn(),
-      findUserByRole: jest.fn(),
+      findByRole: jest.fn(),
 
       findPendingAdminUsers: jest.fn(),
       findRejectedAdminUsers: jest.fn(),
@@ -108,7 +109,7 @@ describe('user service 유닛 테스트', () => {
       findById: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      remove: jest.fn(),
+      removeById: jest.fn(),
     };
 
     mockStateCommandRepo = {
@@ -281,7 +282,7 @@ describe('user service 유닛 테스트', () => {
 
     test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue(null);
 
       // when & then
       await expect(userCommandService.updateAdmin(dto)).rejects.toMatchObject({
@@ -291,7 +292,7 @@ describe('user service 유닛 테스트', () => {
 
     test('아파트가 없으면 APARTMENT_NOT_FOUND 예외를 던진다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(adminUser);
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue(adminUser);
       (mockApartmentRepo.findById as jest.Mock).mockResolvedValue(null);
 
       // when & then
@@ -302,7 +303,7 @@ describe('user service 유닛 테스트', () => {
 
     test('관리자 정보를 수정한다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(adminUser);
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue(adminUser);
       (mockApartmentRepo.findById as jest.Mock).mockResolvedValue({ id: 'apt-1' });
       (mockUserCommandRepo.update as jest.Mock).mockResolvedValue(undefined);
 
@@ -424,7 +425,7 @@ describe('user service 유닛 테스트', () => {
 
     test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue(null);
 
       // when & then
       await expect(userCommandService.updateAdminJoinedStatus(dto)).rejects.toMatchObject({
@@ -434,7 +435,7 @@ describe('user service 유닛 테스트', () => {
 
     test('이미 승인된 관리자면 상태를 변경할 수 없다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue({
         joinedStatus: Status.APPROVED,
       });
 
@@ -446,7 +447,7 @@ describe('user service 유닛 테스트', () => {
 
     test('이미 거절된 관리자면 상태를 변경할 수 없다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue({
         joinedStatus: Status.REJECTED,
       });
 
@@ -458,7 +459,7 @@ describe('user service 유닛 테스트', () => {
 
     test('대기 상태 관리자면 가입 상태를 변경한다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue({
         joinedStatus: Status.PENDING,
       });
 
@@ -477,7 +478,7 @@ describe('user service 유닛 테스트', () => {
 
     test('관리자 계정이 없으면 USER_NOT_FOUND 예외를 던진다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue(null);
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue(null);
 
       // when & then
       await expect(userCommandService.deleteAdmin(dto)).rejects.toMatchObject({
@@ -487,7 +488,7 @@ describe('user service 유닛 테스트', () => {
 
     test('관리자 계정을 삭제한다', async () => {
       // given
-      (mockUserCommandRepo.findAdminUserById as jest.Mock).mockResolvedValue({
+      (mockUserCommandRepo.findAdminById as jest.Mock).mockResolvedValue({
         id: 'admin-1',
       });
 
@@ -870,11 +871,11 @@ describe('user service 유닛 테스트', () => {
       (mockUserCommandRepo.findResidentById as jest.Mock).mockResolvedValue(notJoinedUser);
 
       const notJoinedMapperSpy = jest
-        .spyOn(userMapper, 'toUpdateNotJoinedEntityDataFromDto')
+        .spyOn(userMapper as any, 'toUpdateNotJoinedEntityDataFromDto')
         .mockReturnValue({} as NotJoinedResidentProps);
 
       const joinedMapperSpy = jest
-        .spyOn(userMapper, 'toUpdateResidentAccountEntityDataFromDto')
+        .spyOn(userMapper as any, 'toUpdateResidentAccountEntityDataFromDto')
         .mockReturnValue({} as ResidentAccountProps);
 
       // when
@@ -893,11 +894,11 @@ describe('user service 유닛 테스트', () => {
       (mockUserCommandRepo.findResidentById as jest.Mock).mockResolvedValue(joinedUser);
 
       const notJoinedMapperSpy = jest
-        .spyOn(userMapper, 'toUpdateNotJoinedEntityDataFromDto')
+        .spyOn(userMapper as any, 'toUpdateNotJoinedEntityDataFromDto')
         .mockReturnValue({} as NotJoinedResidentProps);
 
       const joinedMapperSpy = jest
-        .spyOn(userMapper, 'toUpdateResidentAccountEntityDataFromDto')
+        .spyOn(userMapper as any, 'toUpdateResidentAccountEntityDataFromDto')
         .mockReturnValue({} as ResidentAccountProps);
 
       // when

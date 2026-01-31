@@ -10,13 +10,13 @@ export const createUserController = (
   userCommandService: UserCommandService,
   userQueryService: UserQueryService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/users');
+  const { basePath, router } = createBaseController('/api/v2/users');
 
   const handlers = createUserHandlers(userCommandService, userQueryService);
 
   registerUserRoutes(router, handlers, middlewares);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type UserController = ReturnType<typeof createUserController>;

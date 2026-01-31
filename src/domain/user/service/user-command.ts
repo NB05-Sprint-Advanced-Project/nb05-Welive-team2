@@ -27,13 +27,6 @@ import { ResidentAccountEntity, ResidentAccountProps } from '../entity/resident-
 import { UserApartmentLinkVO } from '../entity/vo/user-apartment-link';
 import { ApartmentEntity } from '../../apartment/entity/apartment-entity';
 import { IApartmentCommandRepo } from '../../apartment/interface/i-apartment-command';
-import {
-  toAdminJoinRequestAlarmState,
-  toResidentAccountEntityFromDto,
-  toNotJoinedResidentEntityFromDto,
-  toUpdateNotJoinedEntityDataFromDto,
-  toUpdateResidentAccountEntityDataFromDto,
-} from '../user-mapper';
 import { NotJoinedResidentEntity } from '../entity/not-joined-resident';
 import {
   CreateResidentReqDto,
@@ -41,13 +34,14 @@ import {
   DeleteResidentReqDto,
 } from '../dto/resident-user-response';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
-import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { StateEntity, WorkType } from '../../state/entity/state';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { ResidentAddressVO } from '../entity/vo/resident-address';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '../../../utils/s3-client';
 import { clean, importResidentRowSchema } from '../dto/import-resident-row-dto';
 import { streamToString } from '../../../utils/stream-to-string';
+import { UserMapper } from '../user-mapper';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -60,13 +54,9 @@ export const createUserCommandService = (
   // 관리자
   const createSuperAdmin = async (dto: CreateSuperAdminDto): Promise<void> => {
     const userEntity = await AdminAccountEntity.create({
-      username: dto.username,
-      password: dto.password,
-      name: dto.name,
-      email: dto.email,
-      contact: dto.contact,
+      ...dto,
       role: Role.SUPER_ADMIN,
-      hashManager: hashManager,
+      hashManager,
     });
 
     try {
@@ -89,16 +79,8 @@ export const createUserCommandService = (
 
   const createAdmin = async (dto: CreateAdminDto): Promise<void> => {
     // 1. 아파트 생성
-    const apartmentEntity = ApartmentEntity.create({
-      name: dto.adminOf.name,
-      address: dto.adminOf.address,
-      description: dto.adminOf.description,
-      officeNumber: dto.adminOf.officeNumber,
-      buildingNumberFrom: dto.adminOf.buildingNumberFrom,
-      buildingNumberTo: dto.adminOf.buildingNumberTo,
-      floorCountPerBuilding: dto.adminOf.floorCountPerBuilding,
-      unitCountPerFloor: dto.adminOf.unitCountPerFloor,
-    });
+    const apartment = dto.adminOf;
+    const apartmentEntity = ApartmentEntity.create(apartment);
 
     try {
       await uow.doWork(
@@ -107,14 +89,10 @@ export const createUserCommandService = (
 
           // 2. 관리자 계정 생성
           const userEntity = await AdminAccountEntity.create({
-            username: dto.username,
-            email: dto.email,
-            contact: dto.contact,
-            name: dto.name,
-            password: dto.password,
+            ...dto,
             userApartmentLink: [UserApartmentLinkVO.create(apartment.id)],
             role: Role.ADMIN,
-            hashManager: hashManager,
+            hashManager,
           });
 
           await userCommandRepo.create(userEntity);
@@ -122,7 +100,6 @@ export const createUserCommandService = (
           // 알림 상태 데이터 생성
           const stateEntity = StateEntity.create({
             workType: WorkType.ALARM,
-            status: StatusType.PENDING,
             payload: {
               receiverType: Role.SUPER_ADMIN,
               message: `[회원가입] 관리자 ${userEntity.name}님이 회원가입을 요청했습니다.`,
@@ -164,38 +141,33 @@ export const createUserCommandService = (
       await uow.doWork(
         async () => {
           // 1. 특정 Admin 계정 가져오기
-          const foundUser = await userCommandRepo.findAdminUserById(dto.adminId);
+          const user = await userCommandRepo.findAdminById(dto.adminId);
 
-          if (!foundUser) {
+          if (!user) {
             throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });
           }
 
           // 2. 유저 정보 수정
           const updatedUserEntity = AdminAccountEntity.update({
-            user: foundUser,
-            name: dto.name,
-            email: dto.email,
-            contact: dto.contact,
+            user,
+            ...dto,
           });
 
           await userCommandRepo.update(updatedUserEntity);
 
           // // 3. 아파트 정보 조회
-          const foundApartment = await apartmentCommandRepo.findById(
-            foundUser.userApartmentLink![0].apartmentId,
+          const apartment = await apartmentCommandRepo.findById(
+            user.userApartmentLink![0].apartmentId,
           );
 
           // 4. 아파트 정보 수정
-          if (!foundApartment) {
+          if (!apartment) {
             throw BusinessException({ type: BusinessExceptionType.APARTMENT_NOT_FOUND });
           }
 
           const updatedApartmentEntity = ApartmentEntity.update({
-            apartment: foundApartment,
-            name: dto.adminOf.name,
-            address: dto.adminOf.address,
-            description: dto.adminOf.description,
-            officeNumber: dto.adminOf.officeNumber,
+            apartment,
+            ...dto.adminOf,
           });
 
           await apartmentCommandRepo.update(updatedApartmentEntity);
@@ -260,7 +232,7 @@ export const createUserCommandService = (
   };
 
   const updateAdminJoinedStatus = async (dto: UpdateAdminjoinedStatusDto) => {
-    const user = await userCommandRepo.findAdminUserById(dto.id);
+    const user = await userCommandRepo.findAdminById(dto.id);
 
     if (!user) {
       throw BusinessException({
@@ -280,7 +252,7 @@ export const createUserCommandService = (
   };
 
   const deleteAdmin = async (dto: DeleteAdminDto): Promise<void> => {
-    const user = await userCommandRepo.findAdminUserById(dto.adminId);
+    const user = await userCommandRepo.findAdminById(dto.adminId);
     if (!user) {
       throw BusinessException({
         type: BusinessExceptionType.USER_NOT_FOUND,
@@ -308,7 +280,7 @@ export const createUserCommandService = (
 
         if (!resident) {
           // 새로운 입주민이면 새로운 row 등록
-          residentEntity = await toResidentAccountEntityFromDto(dto, hashManager);
+          residentEntity = await UserMapper.toResidentAccountEntityFromDto(dto, hashManager);
           await userCommandRepo.create(residentEntity);
         } else {
           // 미가입했던 입주민이면(입주민 관리에서 등록된 입주민) 가입 상태를 Pending으로 승격
@@ -324,7 +296,7 @@ export const createUserCommandService = (
           });
         }
 
-        const stateEntity = toAdminJoinRequestAlarmState(residentEntity);
+        const stateEntity = UserMapper.toAdminJoinRequestAlarmState(residentEntity);
 
         await stateCommandRepo.create(stateEntity);
 
@@ -426,7 +398,7 @@ export const createUserCommandService = (
   // 입주민(가입한 입주민 + 미가입한 입주민)
   const createResident = async (dto: CreateResidentReqDto): Promise<void> => {
     try {
-      await userCommandRepo.create(toNotJoinedResidentEntityFromDto(dto));
+      await userCommandRepo.create(UserMapper.toNotJoinedResidentEntityFromDto(dto));
       redisExternal.del('residents:1:10');
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -453,9 +425,11 @@ export const createUserCommandService = (
         }
 
         if (user.joinedStatus === Status.NOT_JOINED) {
-          await userCommandRepo.update(toUpdateNotJoinedEntityDataFromDto(dto, user));
+          await userCommandRepo.update(UserMapper.toUpdateNotJoinedEntityDataFromDto(dto, user));
         } else {
-          await userCommandRepo.update(toUpdateResidentAccountEntityDataFromDto(dto, user));
+          await userCommandRepo.update(
+            UserMapper.toUpdateResidentAccountEntityDataFromDto(dto, user),
+          );
         }
         redisExternal.del('residents:1:10');
       });
@@ -480,8 +454,8 @@ export const createUserCommandService = (
   };
 
   const createResidentBulk = async (s3Dto: { userId: string; bucket: string; key: string }) => {
-    const apartmentId = (await userCommandRepo.findAdminUserById(s3Dto.userId))!
-      .userApartmentLink![0].apartmentId;
+    const apartmentId = (await userCommandRepo.findAdminById(s3Dto.userId))!.userApartmentLink![0]
+      .apartmentId;
 
     if (!apartmentId) {
       throw BusinessException({ type: BusinessExceptionType.USER_NOT_FOUND });

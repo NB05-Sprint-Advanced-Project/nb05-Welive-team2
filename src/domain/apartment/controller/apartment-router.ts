@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import path from 'path';
 import { catchHandler } from '../../../utils/controller-util';
 import { ApartmentHandlers } from './apartment-handler';
 
@@ -142,5 +141,5 @@ export const registerApartmentRoutes = (router: Router, handlers: ApartmentHandl
    *         description: 알 수 없는 오류입니다.
    */
   router.get('/:apartmentId', catchHandler(handlers.getApartment));
-  return { path, router };
+  return { router };
 };

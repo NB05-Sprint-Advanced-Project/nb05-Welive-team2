@@ -5,8 +5,8 @@ export interface ApartmentsView {
     address: string;
     description: string;
     officeNumber: string;
-    buildings: [number];
-    units: [number];
+    buildings: number[];
+    units: number[];
   }[];
   totalCount: number;
   page: number;

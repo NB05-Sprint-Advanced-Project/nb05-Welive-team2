@@ -2,43 +2,18 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { BaseAllUserProps, Role, Status } from '../entity/base-user';
 import { IUserCommandRepo } from '../interface/i-user-command-repo';
-import {
-  toBaseUserEntity,
-  toCreateAdminAccountDBData,
-  toCreateResidentAccountDBData,
-  toCreateNotJoinedResidentDBData,
-  toUpdateAdminAccountDBData,
-  toUpdateAvatarDBData,
-  userInclude,
-  toUpdateJoinedStatusDBData,
-  toAdminAccountEntity,
-  toResidentAccountEntityFromDB,
-  toUpdatePasswordDBData,
-  toCreateSuperAdminAccountDBData,
-  toNotJoinedResidentEntity,
-  toUpdateNotJoinedResidentDBData,
-  toUpdateResidentAccountDBData,
-} from '../user-mapper';
 import { TechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { AdminAccountProps } from '../entity/admin-account';
 import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { BaseRepo } from '../../../shared/base-command-repo';
+import { userInclude, userIncludeWithApartment, UserMapper } from '../user-mapper';
 
 export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
-  // const prisma = BaseRepo(prismaClient)
 
-  const findUserByRole = async (role: Role): Promise<BaseAllUserProps[]> => {
-    const userIncludeWithApartment = Prisma.validator<Prisma.UserInclude>()({
-      Address: true,
-      UserApartmentLink: {
-        include: {
-          apartment: true,
-        },
-      },
-    });
+  const findByRole = async (role: Role): Promise<BaseAllUserProps[]> => {
     const users = await prisma().user.findMany({
       where: {
         role,
@@ -46,16 +21,16 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       include: userIncludeWithApartment,
     });
 
-    return users.map((user) => toBaseUserEntity(user));
+    return users.map((user) => UserMapper.toBaseUserEntity(user));
   };
 
-  const findAdminUserById = async (id: string): Promise<AdminAccountProps | null> => {
+  const findAdminById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma().user.findUnique({
       where: { id },
       include: userInclude,
     });
 
-    return user ? toAdminAccountEntity(user) : null;
+    return user ? UserMapper.toAdminAccountEntity(user) : null;
   };
 
   const findPendingAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
@@ -75,7 +50,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       return null;
     }
 
-    return users.map((user) => toAdminAccountEntity(user));
+    return users.map((user) => UserMapper.toAdminAccountEntity(user));
   };
 
   const findRejectedAdminUsers = async (): Promise<AdminAccountProps[] | null> => {
@@ -95,7 +70,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       return null;
     }
 
-    return users.map((user) => toAdminAccountEntity(user));
+    return users.map((user) => UserMapper.toAdminAccountEntity(user));
   };
 
   const findResidentAccountUserById = async (id: string): Promise<ResidentAccountProps | null> => {
@@ -104,7 +79,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       include: userInclude,
     });
 
-    return user ? toResidentAccountEntityFromDB(user) : null;
+    return user ? UserMapper.toResidentAccountEntityFromDB(user) : null;
   };
 
   const findPendingResidentUsers = async (): Promise<ResidentAccountProps[] | null> => {
@@ -120,7 +95,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       return null;
     }
 
-    return users.map((user) => toResidentAccountEntityFromDB(user));
+    return users.map((user) => UserMapper.toResidentAccountEntityFromDB(user));
   };
 
   const findBaseUserById = async (id: string): Promise<BaseAllUserProps | null> => {
@@ -128,7 +103,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       where: { id },
       include: userInclude,
     });
-    return user ? toBaseUserEntity(user) : null;
+    return user ? UserMapper.toBaseUserEntity(user) : null;
   };
 
   const findJoinedUserById = async (
@@ -143,10 +118,10 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     }
 
     if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
-      return toAdminAccountEntity(user);
+      return UserMapper.toAdminAccountEntity(user);
     }
 
-    return toResidentAccountEntityFromDB(user);
+    return UserMapper.toResidentAccountEntityFromDB(user);
   };
 
   const findNotJoinedResidentByEmail = async (
@@ -160,7 +135,7 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       include: userInclude,
     });
 
-    return user ? toNotJoinedResidentEntity(user) : null;
+    return user ? UserMapper.toNotJoinedResidentEntity(user) : null;
   };
 
   const findResidentById = async (
@@ -178,10 +153,10 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     }
 
     if (residentUser.joinedStatus === Status.NOT_JOINED) {
-      return toNotJoinedResidentEntity(residentUser);
+      return UserMapper.toNotJoinedResidentEntity(residentUser);
     }
 
-    return toResidentAccountEntityFromDB(residentUser);
+    return UserMapper.toResidentAccountEntityFromDB(residentUser);
   };
 
   const create = async (
@@ -193,14 +168,14 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
       const createUserData: Prisma.UserCreateInput = (() => {
         switch (entity.role) {
           case Role.ADMIN:
-            return toCreateAdminAccountDBData(entity);
+            return UserMapper.toCreateAdminAccountDBData(entity);
           case Role.SUPER_ADMIN:
-            return toCreateSuperAdminAccountDBData(entity);
+            return UserMapper.toCreateSuperAdminAccountDBData(entity);
           case Role.USER:
             if (entity.joinedStatus === Status.NOT_JOINED) {
-              return toCreateNotJoinedResidentDBData(entity);
+              return UserMapper.toCreateNotJoinedResidentDBData(entity);
             } else {
-              return toCreateResidentAccountDBData(entity);
+              return UserMapper.toCreateResidentAccountDBData(entity);
             }
         }
       })();
@@ -330,12 +305,12 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
         switch (entity.role) {
           case Role.ADMIN:
           case Role.SUPER_ADMIN:
-            return toUpdateAdminAccountDBData(entity);
+            return UserMapper.toUpdateAdminAccountDBData(entity);
           case Role.USER:
             if (entity.joinedStatus === Status.NOT_JOINED) {
-              return toUpdateNotJoinedResidentDBData(entity);
+              return UserMapper.toUpdateNotJoinedResidentDBData(entity);
             } else {
-              return toUpdateResidentAccountDBData(entity);
+              return UserMapper.toUpdateResidentAccountDBData(entity);
             }
         }
       })();
@@ -396,7 +371,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
           version: entity.version,
         },
         data: {
-          ...toUpdateAvatarDBData(entity),
+          ...UserMapper.toUpdateAvatarDBData(entity),
           version: { increment: 1 },
         },
       });
@@ -421,7 +396,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
           version: entity.version,
         },
         data: {
-          ...toUpdateJoinedStatusDBData(entity),
+          ...UserMapper.toUpdateJoinedStatusDBData(entity),
           version: { increment: 1 },
         },
       });
@@ -448,7 +423,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
         version: entities[0].version, // baseVersion
       },
       data: {
-        ...toUpdateJoinedStatusDBData(entities[0]),
+        ...UserMapper.toUpdateJoinedStatusDBData(entities[0]),
         version: { increment: 1 },
       }, //baseUpdateData
     });
@@ -464,7 +439,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
           version: entity.version,
         },
         data: {
-          ...toUpdatePasswordDBData(entity),
+          ...UserMapper.toUpdatePasswordDBData(entity),
           version: { increment: 1 },
         },
       });
@@ -503,8 +478,8 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
   };
 
   return {
-    findUserByRole,
-    findAdminUserById,
+    findByRole,
+    findAdminById,
     findPendingAdminUsers,
     findRejectedAdminUsers,
     findResidentAccountUserById,

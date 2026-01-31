@@ -9,11 +9,9 @@ import { BaseRepo } from '../../../shared/base-command-repo';
 export const createApartmentCommandRepo = (prismaClient: PrismaClient): IApartmentCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
 
-  const create = async (model: Apartment): Promise<Apartment> => {
+  const create = async (data: Apartment): Promise<Apartment> => {
     try {
-      return await prisma().apartment.create({
-        data: model,
-      });
+      return await prisma().apartment.create({ data });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
         const target = (err.meta as any)?.target;
@@ -27,15 +25,16 @@ export const createApartmentCommandRepo = (prismaClient: PrismaClient): IApartme
       throw err;
     }
   };
-  const update = async (model: Apartment): Promise<Apartment> => {
+
+  const update = async (data: Apartment): Promise<Apartment> => {
     try {
       return await prisma().apartment.update({
         where: {
-          id: model.id,
-          version: model.version,
+          id: data.id,
+          version: data.version,
         },
         data: {
-          ...model,
+          ...data,
           version: { increment: 1 },
         },
       });
@@ -60,26 +59,22 @@ export const createApartmentCommandRepo = (prismaClient: PrismaClient): IApartme
     }
   };
 
-  const remove = async (apartmentId: string): Promise<void> => {
+  const removeById = async (id: string): Promise<void> => {
     await prisma().apartment.delete({
-      where: {
-        id: apartmentId,
-      },
+      where: { id },
     });
   };
 
-  const findById = async (apartmentId: string): Promise<ApartmentProps | null> => {
+  const findById = async (id: string): Promise<ApartmentProps | null> => {
     return await prisma().apartment.findUnique({
-      where: {
-        id: apartmentId,
-      },
+      where: { id },
     });
   };
 
   return {
     create,
     update,
-    remove,
+    removeById,
     findById,
   };
 };

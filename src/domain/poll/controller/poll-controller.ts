@@ -10,13 +10,13 @@ export const createPollController = (
   pollQueryService: PollQueryService,
   pollCommandService: PollCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/polls');
+  const { basePath, router } = createBaseController('/api/v2/polls');
 
   const handler = createPollHandler(middlewares, pollQueryService, pollCommandService);
 
   registerPollRoutes(router, handler, middlewares);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type PollController = ReturnType<typeof createPollController>;

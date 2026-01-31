@@ -10,13 +10,13 @@ export const createCommentController = (
   commentQueryService: CommentQueryService,
   commentCommandService: CommentCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/comments');
+  const { basePath, router } = createBaseController('/api/v2/comments');
 
   const handlers = createCommentHandlers(commentCommandService, commentQueryService);
 
   registerCommentRouters(router, middlewares, handlers);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type CommentController = ReturnType<typeof createCommentController>;

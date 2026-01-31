@@ -4,13 +4,13 @@ import { createAuthHandlers } from './auth-handler';
 import { registerAuthRoutes } from './auth-router';
 
 export const createAuthController = (authService: AuthService) => {
-  const { path, router } = createBaseController('/api/v2/auth');
+  const { basePath, router } = createBaseController('/api/v2/auth');
 
   const handlers = createAuthHandlers(authService);
 
   registerAuthRoutes(router, handlers);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type AuthController = ReturnType<typeof createAuthController>;

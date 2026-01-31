@@ -1,7 +1,7 @@
 import { BusinessException } from '../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../shared/exception/business-exception/exception-info';
 import { IHashManager } from '../../shared/interface/i-bcrypt-hash-manager';
-import { ITokenUtil } from '../../shared/utils/token-manager';
+import { ITokenUtil } from '../../shared/interface/i-token-manager';
 import { IUserQueryRepo } from '../user/interface/i-user-query-repo';
 import { CookieTokenDTO, LoginDTO } from './dto/auth-request';
 
@@ -10,18 +10,6 @@ export const createAuthService = (
   hashManager: IHashManager,
   tokenManager: ITokenUtil,
 ) => {
-  const getCookieValue = (cookieHeader: string | undefined, name: string) => {
-    if (!cookieHeader) {
-      return undefined;
-    }
-    const cookies = cookieHeader.split(';').map((cookie) => cookie.trim());
-    const match = cookies.find((cookie) => cookie.startsWith(`${name}=`));
-    if (!match) {
-      return undefined;
-    }
-    return match.substring(name.length + 1);
-  };
-
   const login = async (dto: LoginDTO) => {
     const user = await userQueryRepo.findByUsername(dto.username);
     if (!user) {
@@ -50,8 +38,8 @@ export const createAuthService = (
     return { userWithoutPassword, accessToken, refreshToken };
   };
 
-  const refreshToken = async (dto: CookieTokenDTO) => {
-    const oldToken = getCookieValue(dto.cookie, 'refresh_token');
+  const refreshToken = (dto: CookieTokenDTO) => {
+    const oldToken = tokenManager.getCookieValue(dto.cookie, 'refresh_token');
     if (!oldToken) {
       throw BusinessException({
         type: BusinessExceptionType.BAD_REQUEST,

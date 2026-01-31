@@ -4,13 +4,13 @@ import { createApartmentHandlers } from './apartment-handler';
 import { registerApartmentRoutes } from './apartment-router';
 
 export const createApartmentController = (apartmentQueryService: ApartmentQueryService) => {
-  const { path, router } = createBaseController('/api/v2/apartments');
+  const { basePath, router } = createBaseController('/api/v2/apartments');
 
   const handlers = createApartmentHandlers(apartmentQueryService);
 
   registerApartmentRoutes(router, handlers);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type ApartmentController = ReturnType<typeof createApartmentController>;

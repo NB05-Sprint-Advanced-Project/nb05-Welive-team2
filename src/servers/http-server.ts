@@ -47,7 +47,7 @@ export const createHttpServer = (middlewares: Middlewares, controllers: Controll
   // controllers
   for (const controllerKey in controllers) {
     const controller = controllers[controllerKey as keyof Controllers];
-    app.use(controller.path, controller.router);
+    app.use(controller.basePath, controller.router);
   }
 
   //errors

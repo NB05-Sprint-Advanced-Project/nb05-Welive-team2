@@ -31,9 +31,7 @@ export const createNotificationCommandService = (
     try {
       const roles = Array.from(new Set(dtos.map((dto) => dto.receiverType)));
 
-      const usersByRole = await Promise.all(
-        roles.map((role) => userCommandRepo.findUserByRole(role)),
-      );
+      const usersByRole = await Promise.all(roles.map((role) => userCommandRepo.findByRole(role)));
 
       const users = usersByRole.flat();
 

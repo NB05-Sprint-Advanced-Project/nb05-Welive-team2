@@ -10,13 +10,13 @@ export const createNoticeController = (
   noticeQueryService: NoticeQueryService,
   noticeCommandService: NoticeCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2');
+  const { basePath, router } = createBaseController('/api/v2');
 
   const handler = createNoticeHandler(middlewares, noticeQueryService, noticeCommandService);
 
   registerNoticeRoutes(router, handler, middlewares);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type NoticeController = ReturnType<typeof createNoticeController>;

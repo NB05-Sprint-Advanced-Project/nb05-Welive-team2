@@ -4,7 +4,7 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { IUnitOfWork } from '../../../shared/interface/i-unit-of-work';
-import { StateEntity, StatusType, WorkType } from '../../state/entity/state';
+import { StateEntity, WorkType } from '../../state/entity/state';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { Role } from '../../user/entity/base-user';
 import { ComplaintEntity, ComplaintStatus } from '../complaint-entity';
@@ -35,7 +35,6 @@ export const createComplaintCommandService = (
 
       const stateEntity = StateEntity.create({
         workType: WorkType.ALARM,
-        status: StatusType.PENDING,
         payload: {
           receiverType: Role.ADMIN,
           message: `[민원 알림] 새 민원이 등록되었습니다. '${entity.title}' `,
@@ -192,7 +191,6 @@ export const createComplaintCommandService = (
 
         const stateEntity = StateEntity.create({
           workType: WorkType.ALARM,
-          status: StatusType.PENDING,
           payload: {
             receiverType: Role.USER,
             message: `[민원 알림] 민원이 '${updateStatus}'입니다. `,

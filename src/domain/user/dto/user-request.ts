@@ -20,7 +20,6 @@ import {
 } from './common-schema';
 
 // 관리자
-// 관리자 계정
 export const viewAdministratorSchema = z.object({
   userId: userIdSchema,
   page: z.coerce.number().default(1),

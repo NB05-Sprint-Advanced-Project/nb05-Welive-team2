@@ -4,9 +4,9 @@ import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { ResidentAccountProps } from '../entity/resident-account';
 
 export interface IUserCommandRepo {
-  findUserByRole: (role: Role) => Promise<BaseAllUserProps[]>;
+  findByRole: (role: Role) => Promise<BaseAllUserProps[]>;
 
-  findAdminUserById: (id: string) => Promise<AdminAccountProps | null>;
+  findAdminById: (id: string) => Promise<AdminAccountProps | null>;
 
   findResidentAccountUserById: (id: string) => Promise<ResidentAccountProps | null>;
 

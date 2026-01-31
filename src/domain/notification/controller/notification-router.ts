@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import path from 'path';
 import { catchHandler } from '../../../utils/controller-util';
 import { NotificationHandlers } from './notification-handler';
 import { Middlewares } from '../../../shared/interface/i-middlewares';
@@ -155,5 +154,5 @@ export const registerNotificationRoutes = (
    */
   router.get('/sse', middleware.auth.authenticate, catchHandler(handlers.getLiveNotification));
 
-  return { path, router };
+  return { router };
 };

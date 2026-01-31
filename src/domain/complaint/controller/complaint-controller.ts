@@ -10,13 +10,13 @@ export const createComplaintController = (
   complaintQueryService: ComplaintQueryService,
   complaintCommandService: ComplaintCommandService,
 ) => {
-  const { path, router } = createBaseController('/api/v2/complaints');
+  const { basePath, router } = createBaseController('/api/v2/complaints');
 
   const handlers = createComplaintHandlers(complaintQueryService, complaintCommandService);
 
   registerComplaintRouters(router, middlewares, handlers);
 
-  return { path, router };
+  return { basePath, router };
 };
 
 export type ComplaintController = ReturnType<typeof createComplaintController>;

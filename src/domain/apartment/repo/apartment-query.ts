@@ -1,47 +1,30 @@
 import { ApartmentsView } from '../dto/view/apartments-view';
 import { ApartmentView } from '../dto/view/apartment-view';
 import { BasePrismaClient } from '../../../shared/base-command-repo';
+import { ApartmentMapper } from '../apartment-mapper';
 
 export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
-  const findById = async (apartmentId: string): Promise<ApartmentView | null> => {
+  const findById = async (id: string): Promise<ApartmentView | null> => {
     const apartment = await prisma.apartment.findUnique({
-      where: {
-        id: apartmentId,
-      },
+      where: { id },
     });
 
     if (!apartment) {
       return null;
     }
 
-    const totalBuildings = apartment.buildingNumberTo - apartment.buildingNumberFrom + 1;
-    const totalUnits = apartment.unitCountPerFloor * apartment.floorCountPerBuilding;
-
-    return {
-      id: apartment.id,
-      name: apartment.name,
-      address: apartment.address,
-      description: apartment.description,
-      officeNumber: apartment.officeNumber,
-      buildings: Array.from(
-        { length: totalBuildings },
-        (_, i) => apartment.buildingNumberFrom + i,
-      ) as [number], // 아파트 동수
-      units: Array.from({ length: totalUnits }, (_, i) => {
-        const floor = Math.floor(i / apartment.unitCountPerFloor) + 1;
-        const unit = (i % apartment.unitCountPerFloor) + 1;
-        return floor * 100 + unit;
-      }) as [number], // 아파트 호수
-    };
+    const apartmentView = ApartmentMapper.toApartmentView(apartment);
+    return apartmentView;
   };
 
-  const findAll = async (
-    page: number,
-    limit: number,
-    searchKeyword: string,
-  ): Promise<ApartmentsView | null> => {
-    const skip = (page - 1) * limit;
+  const findAll = async (params: {
+    page: number;
+    limit: number;
+    searchKeyword: string;
+  }): Promise<ApartmentsView | null> => {
+    const { page, limit, searchKeyword } = params;
 
+    const skip = (page - 1) * limit;
     const where = {
       ...(searchKeyword && {
         OR: [{ name: { contains: searchKeyword } }],
@@ -54,39 +37,21 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
         skip,
         take: limit,
       }),
-      prisma.user.count({ where }),
+      prisma.apartment.count({ where }),
     ]);
 
     if (apartments.length === 0) {
       return null;
     }
 
-    return {
-      data: apartments.map((apartment) => {
-        const totalBuildings = apartment.buildingNumberTo - apartment.buildingNumberFrom + 1;
-        const totalUnits = apartment.unitCountPerFloor * apartment.floorCountPerBuilding;
-        return {
-          id: apartment.id,
-          name: apartment.name,
-          address: apartment.address,
-          description: apartment.description,
-          officeNumber: apartment.officeNumber,
-          buildings: Array.from(
-            { length: totalBuildings },
-            (_, i) => apartment.buildingNumberFrom + i,
-          ) as [number],
-          units: Array.from({ length: totalUnits }, (_, i) => {
-            const floor = Math.floor(i / apartment.unitCountPerFloor) + 1;
-            const unit = (i % apartment.unitCountPerFloor) + 1;
-            return floor * 100 + unit;
-          }) as [number], // 아파트 호수
-        };
-      }),
-      totalCount: apartments.length,
-      page: page,
-      limit: limit,
-      hasNext: true,
-    };
+    const apartmentsView = ApartmentMapper.toApartmentsView({
+      apartments,
+      totalCount,
+      page,
+      limit,
+    });
+
+    return apartmentsView;
   };
 
   return {
