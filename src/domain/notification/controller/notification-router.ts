@@ -153,7 +153,7 @@ export const registerNotificationRoutes = (
    *       500:
    *         description: 알 수 없는 오류입니다.
    */
-  router.get('/sse', middleware.auth.authenticate, catchHandler(handlers.getNotification));
+  router.get('/sse', middleware.auth.authenticate, catchHandler(handlers.getLiveNotification));
 
   return { path, router };
 };

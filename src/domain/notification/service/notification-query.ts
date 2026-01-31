@@ -2,10 +2,6 @@ import { INotificationQueryRepo } from '../interface/i-notification-query';
 import { viewNotificationsDTO } from '../dto/notification-request';
 
 export const createNotificationQueryService = (notificationQueryRepo: INotificationQueryRepo) => {
-  const getNotification = async () => {
-    return 'test';
-  };
-
   const getNotifications = async (dto: viewNotificationsDTO) => {
     const notifications = await notificationQueryRepo.findManyById({
       userId: dto.userId,
@@ -16,7 +12,6 @@ export const createNotificationQueryService = (notificationQueryRepo: INotificat
   };
 
   return {
-    getNotification,
     getNotifications,
   };
 };

@@ -19,31 +19,21 @@ export const createNotificationHandler = (
     res.status(200).json(notifications);
   };
 
-  const getNotification = async (req: Request, res: Response) => {
-    await notificationQueryService.getNotification();
-
-    // SSE 연결을 클라이언트 매니저에 저장
+  const getLiveNotification = async (req: Request, res: Response) => {
     ClientManager.set({
       userId: req.user.userId,
       role: req.user.role as Role,
       connection: res,
     });
 
-    // // 예: src/servers/sse-server.ts 또는 컨트롤러 라우터에 추가
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     console.log(' SSE client connected', req.user.name, req.user.userId);
 
-    // 초기 이벤트(선택)
     res.write(
       `event: connected\ndata: [${req.user.role}] ${req.user.name}님이 SSE에 연결되었습니다. \n\n`,
     );
-
-    // setInterval(() => {
-    //   const payload = JSON.stringify({ message: 'ping', ts: Date.now(), data: result });
-    //   res.write(`event: notification\ndata: ${payload}\n\n`);
-    // }, 3000);
   };
 
   const markAsRead = async (req: Request, res: Response) => {
@@ -57,7 +47,7 @@ export const createNotificationHandler = (
 
   return {
     getNotifications,
-    getNotification,
+    getLiveNotification,
     markAsRead,
   };
 };

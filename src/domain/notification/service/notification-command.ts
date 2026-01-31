@@ -34,6 +34,7 @@ export const createNotificationCommandService = (
       const usersByRole = await Promise.all(
         roles.map((role) => userCommandRepo.findUserByRole(role)),
       );
+
       const users = usersByRole.flat();
 
       const notifications = NotificationMapper.createNotifications(dtos, users);

@@ -42,6 +42,7 @@ export const NotificationMapper = {
         notifications.push(notification);
       }
     }
+
     return notifications;
   },
 

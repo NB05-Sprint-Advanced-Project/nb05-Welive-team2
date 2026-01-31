@@ -198,14 +198,6 @@ export const createUserCommandService = (
             officeNumber: dto.adminOf.officeNumber,
           });
 
-          // const updatedApartmentEntity = ApartmentEntity.update({
-          //   apartment: foundApartment,
-          //   name: dto.adminOf.name,
-          //   address: dto.adminOf.address,
-          //   description: dto.adminOf.description,
-          //   officeNumber: dto.adminOf.officeNumber,
-          // });
-
           await apartmentCommandRepo.update(updatedApartmentEntity);
         },
         {
