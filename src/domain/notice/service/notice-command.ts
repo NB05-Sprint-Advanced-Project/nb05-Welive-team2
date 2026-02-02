@@ -13,11 +13,13 @@ import { StateEntity, WorkType } from '../../state/entity/state';
 import { randomUUID } from 'crypto';
 import { Role } from '../../user/entity/base-user';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 
 export const createNoticeCommandService = (
   uow: IUnitOfWork,
   noticeRepo: INoticeCommandRepo,
   stateRepo: IStateCommandRepo,
+  redisExternal: IRedisExternal,
 ) => {
   const createNotice = async (dto: CreateNoticeDto, userId: string): Promise<NoticeProps> => {
     return await uow.doWork(
@@ -59,6 +61,7 @@ export const createNoticeCommandService = (
           });
         }
         await noticeRepo.update(NoticeEntity.update(foundNotice, { ...data }));
+        await redisExternal.del(`noticeId:${noticeId}`);
       });
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -80,6 +83,7 @@ export const createNoticeCommandService = (
       async () => {
         const { noticeId } = dto;
         await noticeRepo.deleteNotice(noticeId);
+        await redisExternal.del(`noticeId:${noticeId}`);
       },
       { transactionOptions: { useTransaction: false }, useOptimisticLock: false },
     );

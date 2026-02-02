@@ -2,6 +2,10 @@ import { NoticeCategory } from '@prisma/client';
 import { EventEntity, EventProps } from './event';
 import { randomUUID } from 'crypto';
 
+type AuthorProps = {
+  readonly id: string;
+  name: string;
+};
 export type NoticeProps = {
   readonly id: string;
   readonly createdAt: Date;
@@ -15,6 +19,7 @@ export type NoticeProps = {
   readonly userId: string;
   comments?: Comment[];
   event?: EventProps;
+  author?: AuthorProps;
 
   version: number;
 };

@@ -227,7 +227,6 @@ describe('Poll 통합 테스트', () => {
           version: 1,
         },
       });
-      console.log(poll);
     });
 
     test('성공: 제목과 내용을 수정하면 DB에 반영', async () => {

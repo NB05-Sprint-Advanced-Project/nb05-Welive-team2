@@ -68,7 +68,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
   };
 
   const create = async (props: NoticeProps, userId: string): Promise<NoticeProps> => {
-    const { event, ...data } = props;
+    const { comments, event, author, ...data } = props;
     try {
       const notice = await prisma().notices.create({
         data: {
@@ -81,17 +81,16 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
             : undefined,
         },
         include: {
-          event: true,
+          author: true,
         },
       });
-      const { event: resultEvent, ...resultData } = notice;
+      const { author: resultAuthor, ...resultData } = notice;
       return {
         ...resultData,
-        event: resultEvent
+        author: resultAuthor
           ? {
-              id: resultEvent.id,
-              startDate: resultEvent.startDate,
-              endDate: resultEvent.endDate,
+              id: resultAuthor.id,
+              name: resultAuthor.name,
             }
           : undefined,
       };
@@ -151,8 +150,8 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
 
     const noticeIds = props.map((v) => v.noticeId);
     const cases = props.map((v) => Prisma.sql`WHEN ${v.noticeId} THEN ${v.viewCount}`);
-    const query = Prisma.sql`
-      UPDATE "NOTICES"
+    let query = Prisma.sql`
+      UPDATE "Notices"
       SET "viewCount" = GREATEST("viewCount", CASE id ${Prisma.join(cases, ' ')} ELSE "viewCount" END)
       WHERE id IN (${Prisma.join(noticeIds)})
     `;
