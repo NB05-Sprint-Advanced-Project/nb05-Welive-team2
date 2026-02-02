@@ -1008,7 +1008,7 @@ describe('user service e2e 테스트', () => {
       const updatedUsers = await prisma.user.findMany({
         where: { id: { in: [pendingResident1.id, pendingResident2.id] } },
       });
-      console.log(updatedUsers);
+
       expect(updatedUsers.find((u) => u.id === pendingResident1.id)!.joinedStatus).toBe(
         Status.APPROVED,
       );

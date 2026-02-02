@@ -416,7 +416,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
     entities: AdminAccountProps[] | ResidentAccountProps[],
   ): Promise<void> => {
     const entityIds = entities.map((entity) => entity.id);
-    const result = await prisma().user.updateMany({
+    await prisma().user.updateMany({
       where: {
         id: { in: entityIds },
       },
@@ -425,8 +425,6 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
         version: { increment: 1 },
       },
     });
-
-    console.log('result' + result);
   };
 
   const updatePassword = async (

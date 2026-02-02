@@ -368,15 +368,7 @@ export const createUserCommandService = (
           type: BusinessExceptionType.USER_NOT_FOUND,
         });
       }
-      users.forEach((user, index) => {
-        console.log(`users[${index}]`, {
-          id: user.id,
-          role: user.role,
-          joinedStatus: user.joinedStatus,
-          version: user.version,
-          updatedAt: user.updatedAt,
-        });
-      });
+
       await userCommandRepo.updateJoinedStatuses(
         users.map((user) => ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
       );
@@ -507,7 +499,6 @@ export const createUserCommandService = (
       // 데이터 형식 검증
       const parsed = importResidentRowSchema.safeParse(rawRow);
       if (!parsed.success) {
-        console.log('schema fail:', parsed.error.flatten().fieldErrors, rawRow);
         continue;
       }
 
@@ -516,10 +507,6 @@ export const createUserCommandService = (
       // 비즈니즈 검증
       const buildingNumber = Number(building);
       const unitNumber = Number(unit);
-      console.log('building' + buildingNumber);
-      console.log('unit' + unitNumber);
-      console.log('from' + buildingNumberFrom);
-      console.log('to' + buildingNumberTo);
       if (buildingNumber < buildingNumberFrom || buildingNumber > buildingNumberTo) {
         continue;
       }
