@@ -1,10 +1,11 @@
-import { getEnv } from "../config";
-import { isBusinessException } from "../shared/exception/business-exception/business-exception";
-import { isTechnicalException } from "../shared/exception/technical-exception/technical-exception";
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { getEnv } from '../config';
+import { isBusinessException } from '../shared/exception/business-exception/business-exception';
+import { isTechnicalException } from '../shared/exception/technical-exception/technical-exception';
 
 export const createGlobalErrorMiddleware = () => {
   return (err: ErrorRequestHandler, req: Request, res: Response, next: NextFunction) => {
+    void next;
 
     const isDev = getEnv().NODE_ENV === 'development';
     if (isBusinessException(err)) {

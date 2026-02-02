@@ -10,7 +10,6 @@ import { TechnicalExceptionType } from '../../../shared/exception/technical-exce
 import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 import { StateEntity, WorkType } from '../../state/entity/state';
-import { randomUUID } from 'crypto';
 import { Role } from '../../user/entity/base-user';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
 import { IRedisExternal } from '../../../shared/interface/i-redis';
@@ -34,7 +33,6 @@ export const createNoticeCommandService = (
         const stateEntity = StateEntity.create({
           workType: WorkType.ALARM,
           payload: {
-            id: randomUUID(),
             receiverType: Role.USER,
             message: `[공지사항] ${notice.title} 등록됨`,
           } as unknown as JSON,
