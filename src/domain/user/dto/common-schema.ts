@@ -64,8 +64,8 @@ export const unitFilterSchema = z.coerce
   .optional();
 
 export const updateJoinedStatusSchema = z
-  .enum(['APPROVED', 'REJECTED'])
-  .transform((v) => (v === 'APPROVED' ? Status.APPROVED : Status.REJECTED));
+  .enum([Status.APPROVED, Status.REJECTED])
+  .transform((v) => (v === Status.APPROVED ? Status.APPROVED : Status.REJECTED));
 
 export const joinedStatusSchema = z.enum([Status.APPROVED, Status.PENDING, Status.REJECTED], {
   message: `가입 상태는 ${Object.values(Status).join(', ')} 중 하나여야 합니다.`,

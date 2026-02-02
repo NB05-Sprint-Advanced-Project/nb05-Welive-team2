@@ -47,9 +47,9 @@ export const createUserHandlers = (
 
   const updateAdmin = async (req: Request, res: Response) => {
     const dto = validate(updateAdminSchema, {
-      ...req.body,
-      ...req.params,
       ...req.user,
+      ...req.params,
+      ...req.body,
     });
     await userCommandService.updateAdmin(dto);
     return res.status(204).send();

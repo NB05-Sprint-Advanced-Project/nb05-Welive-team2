@@ -36,6 +36,15 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
               },
             },
           },
+          {
+            UserApartmentLink: {
+              some: {
+                apartment: {
+                  address: { contains: searchKeyword },
+                },
+              },
+            },
+          },
         ],
       }),
       ...(joinStatus && { joinedStatus: { equals: joinStatus } }),
