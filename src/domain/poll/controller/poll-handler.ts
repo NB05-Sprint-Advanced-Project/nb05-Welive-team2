@@ -33,7 +33,6 @@ export const createPollHandler = (
 
   const createPoll = async (req: Request, res: Response) => {
     const userId = req.userId as string;
-    console.log(req.body);
     const body = validate(createPollReqBodySchema, req.body);
 
     const poll = await pollCommandService.createPoll({ ...body }, userId);
