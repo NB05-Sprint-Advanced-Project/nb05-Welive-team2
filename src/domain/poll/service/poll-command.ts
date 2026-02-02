@@ -13,12 +13,14 @@ import { StateEntity, WorkType } from '../../state/entity/state';
 import { randomUUID } from 'crypto';
 import { Role } from '../../user/entity/base-user';
 import { IStateCommandRepo } from '../../state/interface/i-state-command-repo';
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 
 export const createPollCommandService = (
   uow: IUnitOfWork,
   pollCommandRepo: IPollCommandRepo,
   userVoteOptionCommandRepo: IUserVoteOptionCommandRepo,
   stateRepo: IStateCommandRepo,
+  redisExternal: IRedisExternal,
 ) => {
   const createPoll = async (dto: CreatePollDto, userId: string): Promise<PollProps> => {
     try {
@@ -72,6 +74,7 @@ export const createPollCommandService = (
           });
         }
         await pollCommandRepo.update(PollEntity.update(foundPoll, { ...data }));
+        await redisExternal.del(`pollId:${pollId}`);
       });
     } catch (err) {
       if (isTechnicalException(err)) {
@@ -88,6 +91,7 @@ export const createPollCommandService = (
       async () => {
         const { pollId } = dto;
         await pollCommandRepo.deletePoll(pollId);
+        await redisExternal.del(`pollId:${pollId}`);
       },
       {
         transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
