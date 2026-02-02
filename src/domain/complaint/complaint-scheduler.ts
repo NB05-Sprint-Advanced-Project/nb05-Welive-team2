@@ -15,7 +15,7 @@ export const createComplaintScheduler = (service: ComplaintBatchService) => {
       complaintRunner(() => service.syncViewCounts());
     }, intervalMs);
 
-    console.log('complaint scehduler 실행');
+    console.log('complaint scheduler 실행');
   };
 
   const stop = () => {

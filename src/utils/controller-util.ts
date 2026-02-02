@@ -4,10 +4,10 @@ import { BusinessException } from '../shared/exception/business-exception/busine
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 import multer from 'multer';
 
-export const createBaseController = (basePath: string) => {
-  const path: string = basePath;
+export const createBaseController = (path: string) => {
+  const basePath = path;
   const router = Router();
-  return { path, router };
+  return { basePath, router };
 };
 
 export const validate = <T extends z.ZodType>(schema: T, data: unknown) => {

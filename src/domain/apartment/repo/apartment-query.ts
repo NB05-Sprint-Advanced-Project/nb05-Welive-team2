@@ -31,7 +31,7 @@ export const createApartmentQueryRepo = (prisma: BasePrismaClient) => {
       }),
     };
 
-    const [apartments] = await Promise.all([
+    const [apartments, totalCount] = await Promise.all([
       prisma.apartment.findMany({
         where,
         skip,
