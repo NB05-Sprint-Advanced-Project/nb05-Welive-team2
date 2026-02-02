@@ -37,9 +37,9 @@ import {
   DeleteResidentReqDto,
   UpdateResidentReqDto,
 } from '../../domain/user/dto/resident-user-response';
-import { UserMapper } from '../../domain/user/user-mapper';
 import { IStateCommandRepo } from '../../domain/state/interface/i-state-command-repo';
 import { IRedisExternal } from '../../shared/interface/i-redis';
+import { UserMapper } from '../../domain/user/user-mapper';
 
 describe('user service 유닛 테스트', () => {
   let mockUow: IUnitOfWork;
@@ -871,7 +871,7 @@ describe('user service 유닛 테스트', () => {
       (mockUserCommandRepo.findResidentById as jest.Mock).mockResolvedValue(notJoinedUser);
 
       const notJoinedMapperSpy = jest
-        .spyOn(UserMapper as any, 'toUpdateNotJoinedEntityDataFromDto')
+        .spyOn(UserMapper, 'toUpdateNotJoinedEntityDataFromDto')
         .mockReturnValue({} as NotJoinedResidentProps);
 
       const joinedMapperSpy = jest
