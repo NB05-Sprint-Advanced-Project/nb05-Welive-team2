@@ -2,7 +2,6 @@ import { validate } from '../../../utils/controller-util';
 import {
   createSuperAdminSchema,
   createAdminSchema,
-  updateAvatarUrlSchema,
   updatePasswordSchema,
   viewAdministratorSchema,
   signUpResidentAccountSchema,
@@ -90,11 +89,11 @@ export const createUserHandlers = (
 
   // 공통 controllers
   const updateAvatarUrl = async (req: Request, res: Response) => {
-    const dto = validate(updateAvatarUrlSchema, {
-      userId: req.userId,
-      avatarUrl: (req.file as Express.MulterS3.File).location,
+    await userCommandService.updateAvatarUrl({
+      userId: req.userId!,
+      bucket: req.file!.bucket,
+      key: req.file!.key,
     });
-    await userCommandService.updateAvatarUrl(dto);
     return res.sendStatus(204);
   };
 

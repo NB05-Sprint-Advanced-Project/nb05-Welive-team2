@@ -6,7 +6,7 @@ import path from 'path';
 import { BusinessException } from '../shared/exception/business-exception/business-exception';
 import { BusinessExceptionType } from '../shared/exception/business-exception/exception-info';
 
-type UploadType = 'image' | 'csv';
+type UploadType = 'avatarImage' | 'csv';
 
 export const createMulterMiddleware = () => {
   const s3Client = new S3Client({
@@ -22,11 +22,11 @@ export const createMulterMiddleware = () => {
         s3: s3Client,
         bucket: getEnv().AWS_S3_BUCKET_NAME,
         contentType: multerS3.AUTO_CONTENT_TYPE,
-        acl: type === 'image' ? 'public-read' : 'private',
+        acl: 'private',
         key: (req, file, callback) => {
           const ext = path.extname(file.originalname);
           const filename = `${path.basename(file.originalname, ext)}.${Date.now()}${ext}`;
-          const dir = type === 'image' ? 'profile-image' : 'CSV-from';
+          const dir = type === 'avatarImage' ? 'profile-image' : 'CSV-from';
           callback(null, `${dir}/${filename}`);
         },
       }),
@@ -34,7 +34,7 @@ export const createMulterMiddleware = () => {
         fileSize: 10 * 1024 * 1024, // 최대 10메가까지
       },
       fileFilter: (req, file, cb) => {
-        if (type === 'image') {
+        if (type === 'avatarImage') {
           if (!file.mimetype.startsWith('image/')) {
             return cb(
               BusinessException({
@@ -58,7 +58,7 @@ export const createMulterMiddleware = () => {
       },
     });
   return {
-    image: () => createUploader('image').single('image'),
+    image: () => createUploader('avatarImage').single('avatarImage'),
     csv: () => createUploader('csv').single('csv'),
   };
 };

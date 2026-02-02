@@ -6,7 +6,6 @@ import {
   UpdateAdminDto,
   UpdateAdminjoinedStatusDto,
   UpdateAdminjoinedStatusesDto,
-  UpdateAvatarUrlReqDto,
   UpdatePasswordReqDto,
   UpdateResidentAccountJoinedStatusesReqDto,
   UpdateResidentAccountJoinedStatusReqDto,
@@ -42,6 +41,7 @@ import { s3 } from '../../../utils/s3-client';
 import { clean, importResidentRowSchema } from '../dto/import-resident-row-dto';
 import { streamToString } from '../../../utils/stream-to-string';
 import { UserMapper } from '../user-mapper';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export const createUserCommandService = (
   uow: IUnitOfWork,
@@ -567,10 +567,14 @@ export const createUserCommandService = (
   };
 
   // 기타
-  const updateAvatarUrl = async (dto: UpdateAvatarUrlReqDto): Promise<void> => {
+  const updateAvatarUrl = async (s3Dto: {
+    userId: string;
+    bucket: string;
+    key: string;
+  }): Promise<void> => {
     try {
       await uow.doWork(async () => {
-        const user = await userCommandRepo.findBaseUserById(dto.userId);
+        const user = await userCommandRepo.findBaseUserById(s3Dto.userId);
 
         if (!user) {
           throw BusinessException({
@@ -578,7 +582,15 @@ export const createUserCommandService = (
           });
         }
 
-        await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, dto.avatarUrl));
+        const signedUrl = await getSignedUrl(
+          s3,
+          new GetObjectCommand({
+            Bucket: s3Dto.bucket,
+            Key: s3Dto.key,
+          }),
+        );
+
+        await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, signedUrl));
       });
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {

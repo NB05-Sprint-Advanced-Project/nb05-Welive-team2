@@ -64,6 +64,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.980.0",
     "@prisma/client": "^6.19.1",
     "@types/ws": "^8.18.1",
     "axios": "^1.13.4",
