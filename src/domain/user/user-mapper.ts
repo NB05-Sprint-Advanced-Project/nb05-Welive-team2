@@ -9,7 +9,6 @@ import { UpdateResidentReqDto, CreateResidentReqDto } from './dto/resident-user-
 import { SignUpResidentAccountReqDto } from './dto/user-request';
 import { ResidentAddressVO } from './entity/vo/resident-address';
 import { StateEntity, StateProps, WorkType } from '../state/entity/state';
-import { randomUUID } from 'crypto';
 
 export const userInclude = Prisma.validator<Prisma.UserInclude>()({
   Address: true,
@@ -341,7 +340,6 @@ export const UserMapper = {
     return StateEntity.create({
       workType: WorkType.ALARM,
       payload: {
-        id: randomUUID(),
         receiverType: Role.ADMIN,
         message: `[회원가입] 입주민 ${residentEntity.name}님이 회원가입을 요청했습니다.`,
       },
