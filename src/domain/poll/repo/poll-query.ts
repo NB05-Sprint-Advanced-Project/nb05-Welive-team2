@@ -23,14 +23,11 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
       return null;
     }
 
-    let optionIdVotedByMe: string | null = null;
+    const votedOption = poll.options.find((opt) =>
+      opt.UserVoteOptions.some((vote) => vote.userId === userId),
+    );
 
-    for (const option of poll.options) {
-      if (option.UserVoteOptions.includes({ userId })) {
-        optionIdVotedByMe = option.id;
-        break;
-      }
-    }
+    const optionIdVotedByMe = votedOption ? votedOption.id : null;
     return {
       id: poll.id,
       createdAt: poll.createdAt,
@@ -62,9 +59,15 @@ export const createPollQueryRepo = (prismaClient: PrismaClient): IPollQueryRepo 
     searchKeyword: string,
     status: PollStatus | 'ALL',
     building: number,
+    userId: string,
   ): Promise<PollsView> => {
     const where = {
       status: status === 'ALL' ? undefined : status,
+      apartment: {
+        UserApartmentLink: {
+          some: { userId },
+        },
+      },
       building: building === 0 ? undefined : building,
       ...(searchKeyword
         ? {
