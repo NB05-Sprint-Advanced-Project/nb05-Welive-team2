@@ -452,7 +452,7 @@ describe('Poll 통합 테스트', () => {
 
       const vote = await mockPrisma.userVoteOption.findUnique({
         where: {
-          userId_optionId: { userId: mockAdminId, optionId: mockOptionId1 },
+          userId_pollId: { userId: mockAdminId, pollId: canclePollId },
         },
       });
       expect(vote).toBeNull();

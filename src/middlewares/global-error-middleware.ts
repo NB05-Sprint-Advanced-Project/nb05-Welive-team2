@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response } from 'express';
-import { getEnv } from '../config';
-import { isBusinessException } from '../shared/exception/business-exception/business-exception';
-import { isTechnicalException } from '../shared/exception/technical-exception/technical-exception';
+import { getEnv } from "../config";
+import { isBusinessException } from "../shared/exception/business-exception/business-exception";
+import { isTechnicalException } from "../shared/exception/technical-exception/technical-exception";
+import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 
 export const createGlobalErrorMiddleware = () => {
-  return (err: any, req: Request, res: Response) => {
+  return (err: ErrorRequestHandler, req: Request, res: Response, next: NextFunction) => {
+
     const isDev = getEnv().NODE_ENV === 'development';
     if (isBusinessException(err)) {
       if (isDev) console.error(err);
