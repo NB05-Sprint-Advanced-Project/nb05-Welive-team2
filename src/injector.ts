@@ -116,6 +116,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     pollCommandRepository,
     userVoteOptionCommandRepository,
     stateCommandRepo,
+    redisExternal,
   );
 
   const noticeQueryService = createNoticeQueryService(
@@ -126,12 +127,8 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
   const noticeCommandService = createNoticeCommandService(
     unitOfwork,
     noticeCommandRepository,
-<<<<<<< HEAD
     stateCommandRepo,
-=======
-    stateCommandRepository,
     redisExternal,
->>>>>>> c0cdf57 ([fix] notice 수정)
   );
   const noticeBatchService = createNoticeBatchService(noticeCommandRepository, redisExternal);
 
