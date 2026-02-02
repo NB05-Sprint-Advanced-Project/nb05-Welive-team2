@@ -32,19 +32,22 @@ export const createPollQueryService = (
   };
 
   // 대부분의 사용자가 1페이지/전체 카테고리만 조회. 따라서 이것만 캐싱
-  const getAllPolls = async ({
-    page,
-    limit,
-    searchKeyword,
-    status,
-    building,
-  }: {
-    page: number;
-    limit: number;
-    searchKeyword: string;
-    status: PollStatus | 'ALL';
-    building: number;
-  }): Promise<PollsView> => {
+  const getAllPolls = async (
+    userId: string,
+    {
+      page,
+      limit,
+      searchKeyword,
+      status,
+      building,
+    }: {
+      page: number;
+      limit: number;
+      searchKeyword: string;
+      status: PollStatus | 'ALL';
+      building: number;
+    },
+  ): Promise<PollsView> => {
     const isDefaultReq =
       page === 1 && limit === 10 && searchKeyword === '' && status === 'ALL' && building === 0;
     const key = `polls:list:default`;
@@ -53,7 +56,7 @@ export const createPollQueryService = (
       const cached = await redisExternal.get(key);
       if (cached) return JSON.parse(cached);
     }
-    const polls = await repo.findAll(page, limit, searchKeyword, status, building);
+    const polls = await repo.findAll(page, limit, searchKeyword, status, building, userId);
 
     if (isDefaultReq) {
       await redisExternal.setIfNotExist(key, JSON.stringify(polls), 3);

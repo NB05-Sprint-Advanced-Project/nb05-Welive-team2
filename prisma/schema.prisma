@@ -169,6 +169,7 @@ model Polls {
 
   version Int
   options Options[]
+  UserVoteOptions UserVoteOption[]
 }
 
 enum PollStatus {
@@ -238,6 +239,9 @@ model UserVoteOption {
   optionId String
   option   Options @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
-  @@id([userId, optionId])
+  pollId String
+  poll   Polls   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  @@id([userId, pollId]) 
   @@index([optionId])
 }
