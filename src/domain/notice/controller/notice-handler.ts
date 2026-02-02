@@ -26,7 +26,8 @@ export const createNoticeHandler = (
 
   const getAllNotices = async (req: Request, res: Response) => {
     const query = validate(getAllNoticesReqParamsSchema, req.query);
-    const notices = await noticeQueryService.getAllNotices({ ...query });
+    const userId = req.user.userId;
+    const notices = await noticeQueryService.getAllNotices(userId, { ...query });
     return res.json(notices);
   };
 

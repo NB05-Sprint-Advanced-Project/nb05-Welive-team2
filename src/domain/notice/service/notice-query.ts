@@ -47,17 +47,20 @@ export const createNoticeQueryService = (
   */
 
   // todo: 키값들 상수로 빼서 관리
-  const getAllNotices = async ({
-    page,
-    limit,
-    searchKeyword,
-    category,
-  }: {
-    page: number;
-    limit: number;
-    searchKeyword: string;
-    category: NoticeCategory | 'ALL';
-  }): Promise<NoticesView> => {
+  const getAllNotices = async (
+    userId: string,
+    {
+      page,
+      limit,
+      searchKeyword,
+      category,
+    }: {
+      page: number;
+      limit: number;
+      searchKeyword: string;
+      category: NoticeCategory | 'ALL';
+    },
+  ): Promise<NoticesView> => {
     const isDefaultReq = page === 1 && limit === 10 && searchKeyword === '' && category === 'ALL';
     const key = `notices:list:${category}:default`;
 
@@ -66,7 +69,7 @@ export const createNoticeQueryService = (
       if (cached) return JSON.parse(cached);
     }
 
-    const notices = await repo.findAll(page, limit, searchKeyword, category);
+    const notices = await repo.findAll(page, limit, searchKeyword, category, userId);
 
     if (isDefaultReq) {
       await redisExternal.setIfNotExist(key, JSON.stringify(notices), 3);

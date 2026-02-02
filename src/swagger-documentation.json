@@ -444,7 +444,15 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC", "ALL"],
+            "enum": [
+              "MAINTENANCE",
+              "EMERGENCY",
+              "COMMUNITY",
+              "RESIDENT_VOTE",
+              "RESIDENT_COUNCIL",
+              "ETC",
+              "ALL"
+            ],
             "default": "ALL"
           }
         },
@@ -461,7 +469,14 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
+            "enum": [
+              "MAINTENANCE",
+              "EMERGENCY",
+              "COMMUNITY",
+              "RESIDENT_VOTE",
+              "RESIDENT_COUNCIL",
+              "ETC"
+            ]
           },
           "isPinned": {
             "type": "boolean"
@@ -489,7 +504,14 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
+            "enum": [
+              "MAINTENANCE",
+              "EMERGENCY",
+              "COMMUNITY",
+              "RESIDENT_VOTE",
+              "RESIDENT_COUNCIL",
+              "ETC"
+            ]
           },
           "isPinned": {
             "type": "boolean"
@@ -2105,7 +2127,14 @@
                   },
                   "category": {
                     "type": "string",
-                    "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
+                    "enum": [
+                      "MAINTENANCE",
+                      "EMERGENCY",
+                      "COMMUNITY",
+                      "RESIDENT_VOTE",
+                      "RESIDENT_COUNCIL",
+                      "ETC"
+                    ]
                   },
                   "isPinned": {
                     "type": "boolean"
@@ -2309,7 +2338,14 @@
                   },
                   "category": {
                     "type": "string",
-                    "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
+                    "enum": [
+                      "MAINTENANCE",
+                      "EMERGENCY",
+                      "COMMUNITY",
+                      "RESIDENT_VOTE",
+                      "RESIDENT_COUNCIL",
+                      "ETC"
+                    ]
                   },
                   "isPinned": {
                     "type": "boolean"

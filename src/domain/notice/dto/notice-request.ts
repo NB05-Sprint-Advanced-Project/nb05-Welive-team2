@@ -12,7 +12,15 @@ export const getAllNoticesReqParamsSchema = z.object({
   limit: z.coerce.number().int().default(20),
   searchKeyword: z.string().default(''),
   category: z
-    .enum(['MAINTENANCE', 'EMERGENCY', 'COMMUNITY', 'RESIDENT_VOTE', 'RESIDENT_COUNCIL', 'ETC', 'ALL'])
+    .enum([
+      'MAINTENANCE',
+      'EMERGENCY',
+      'COMMUNITY',
+      'RESIDENT_VOTE',
+      'RESIDENT_COUNCIL',
+      'ETC',
+      'ALL',
+    ])
     .default('ALL'),
 });
 
@@ -20,7 +28,14 @@ export const getAllNoticesReqParamsSchema = z.object({
 export const createNoticeReqBodySchema = z.object({
   title: z.string(),
   content: z.string(),
-  category: z.enum(['MAINTENANCE', 'EMERGENCY', 'COMMUNITY', 'RESIDENT_VOTE', 'RESIDENT_COUNCIL', 'ETC']),
+  category: z.enum([
+    'MAINTENANCE',
+    'EMERGENCY',
+    'COMMUNITY',
+    'RESIDENT_VOTE',
+    'RESIDENT_COUNCIL',
+    'ETC',
+  ]),
   isPinned: z.boolean(),
   apartmentId: z.string(),
   event: eventSchema.optional(),
@@ -37,7 +52,14 @@ export const updateNoticeReqBodySchema = z
   .object({
     title: z.string(),
     content: z.string(),
-    category: z.enum(['MAINTENANCE', 'EMERGENCY', 'COMMUNITY', 'RESIDENT_VOTE', 'RESIDENT_COUNCIL', 'ETC']),
+    category: z.enum([
+      'MAINTENANCE',
+      'EMERGENCY',
+      'COMMUNITY',
+      'RESIDENT_VOTE',
+      'RESIDENT_COUNCIL',
+      'ETC',
+    ]),
     isPinned: z.boolean(),
     event: eventSchema.optional(),
   })

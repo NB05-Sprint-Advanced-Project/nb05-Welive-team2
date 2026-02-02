@@ -50,9 +50,15 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
     limit: number,
     searchKeyword: string,
     category: NoticeCategory | 'ALL',
+    userId: string,
   ): Promise<NoticesView> => {
     const where = {
       category: category === 'ALL' ? undefined : category,
+      apartment: {
+        UserApartmentLink: {
+          some: { userId },
+        },
+      },
       ...(searchKeyword
         ? {
             OR: [
