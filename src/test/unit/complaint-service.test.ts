@@ -125,7 +125,7 @@ describe('complaint service 단위 테스트', () => {
       update: jest.fn(),
       delete: jest.fn(),
       updateStatus: jest.fn(),
-      updateViewCountBulk: jest.fn(),
+      updateViewsCountBulk: jest.fn(),
     } as unknown as IComplaintCommandRepo;
 
     const mockStateRepo = {

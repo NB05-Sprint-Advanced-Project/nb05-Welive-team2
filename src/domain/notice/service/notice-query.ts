@@ -29,14 +29,14 @@ export const createNoticeQueryService = (
       throw BusinessException({ type: BusinessExceptionType.NOTICE_NOT_FOUND });
     }
 
-    const viewCountKey = `notice:${noticeId}:viewCount`;
-    await redisExternal.setIfNotExist(viewCountKey, String(notice.viewCount), 10);
-    const newViewCount = await redisExternal.increase(viewCountKey);
+    const viewsCountKey = `notice:${noticeId}:viewsCount`;
+    await redisExternal.setIfNotExist(viewsCountKey, String(notice.viewsCount), 10);
+    const newViewsCount = await redisExternal.increase(viewsCountKey);
 
     const dirtyNoticeKey = `dirty:noticeIds`;
     await redisExternal.addToSet(dirtyNoticeKey, noticeId);
 
-    notice.viewCount = newViewCount;
+    notice.viewsCount = newViewsCount;
     return notice;
   };
 
@@ -59,7 +59,7 @@ export const createNoticeQueryService = (
     category: NoticeCategory | 'ALL';
   }): Promise<NoticesView> => {
     const isDefaultReq = page === 1 && limit === 10 && searchKeyword === '' && category === 'ALL';
-    const key = `notices:list:default`;
+    const key = `notices:list:${category}:default`;
 
     if (isDefaultReq) {
       const cached = await redisExternal.get(key);

@@ -25,8 +25,8 @@ export const createNoticeHandler = (
   };
 
   const getAllNotices = async (req: Request, res: Response) => {
-    const params = validate(getAllNoticesReqParamsSchema, req.params);
-    const notices = await noticeQueryService.getAllNotices({ ...params });
+    const query = validate(getAllNoticesReqParamsSchema, req.query);
+    const notices = await noticeQueryService.getAllNotices({ ...query });
     return res.json(notices);
   };
 

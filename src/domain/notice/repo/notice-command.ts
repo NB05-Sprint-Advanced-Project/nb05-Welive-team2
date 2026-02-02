@@ -145,14 +145,14 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
     return;
   };
 
-  const updateViewCountBulk = async (props: { noticeId: string; viewCount: number }[]) => {
+  const updateViewsCountBulk = async (props: { noticeId: string; viewsCount: number }[]) => {
     if (props.length === 0) return;
 
     const noticeIds = props.map((v) => v.noticeId);
-    const cases = props.map((v) => Prisma.sql`WHEN ${v.noticeId} THEN ${v.viewCount}`);
+    const cases = props.map((v) => Prisma.sql`WHEN ${v.noticeId} THEN ${v.viewsCount}`);
     let query = Prisma.sql`
       UPDATE "Notices"
-      SET "viewCount" = GREATEST("viewCount", CASE id ${Prisma.join(cases, ' ')} ELSE "viewCount" END)
+      SET "viewsCount" = GREATEST("viewsCount", CASE id ${Prisma.join(cases, ' ')} ELSE "viewsCount" END)
       WHERE id IN (${Prisma.join(noticeIds)})
     `;
 
@@ -163,7 +163,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
     create,
     update,
     deleteNotice,
-    updateViewCountBulk,
+    updateViewsCountBulk,
   };
 };
 

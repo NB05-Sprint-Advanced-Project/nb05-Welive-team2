@@ -28,7 +28,7 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
       content: notice.content,
       category: notice.category,
       isPinned: notice.isPinned,
-      viewCount: notice.viewCount,
+      viewsCount: notice.viewsCount,
       apartmentId: notice.apartmentId,
       author: {
         id: notice.author.id,
@@ -90,7 +90,7 @@ export const createNoticeQueryRepo = (prismaClient: PrismaClient): INoticeQueryR
           content: notice.content,
           category: notice.category,
           isPinned: notice.isPinned,
-          viewCount: notice.viewCount,
+          viewsCount: notice.viewsCount,
           apartmentId: notice.apartmentId,
           author: {
             id: notice.author.id,

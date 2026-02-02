@@ -444,7 +444,7 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "URGENT", "COMMUNITY", "VOTING", "BOARD_MEETING", "ETC", "ALL"],
+            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC", "ALL"],
             "default": "ALL"
           }
         },
@@ -461,7 +461,7 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "URGENT", "COMMUNITY", "VOTING", "BOARD_MEETING", "ETC"]
+            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
           },
           "isPinned": {
             "type": "boolean"
@@ -489,7 +489,7 @@
           },
           "category": {
             "type": "string",
-            "enum": ["MAINTENANCE", "URGENT", "COMMUNITY", "VOTING", "BOARD_MEETING", "ETC"]
+            "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
           },
           "isPinned": {
             "type": "boolean"
@@ -2105,7 +2105,7 @@
                   },
                   "category": {
                     "type": "string",
-                    "enum": ["MAINTENANCE", "URGENT", "COMMUNITY", "VOTING", "BOARD_MEETING", "ETC"]
+                    "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
                   },
                   "isPinned": {
                     "type": "boolean"
@@ -2208,10 +2208,10 @@
               "type": "string",
               "enum": [
                 "MAINTENANCE",
-                "URGENT",
+                "EMERGENCY",
                 "COMMUNITY",
-                "VOTING",
-                "BOARD_MEETING",
+                "RESIDENT_VOTE",
+                "RESIDENT_COUNCIL",
                 "ETC",
                 "ALL"
               ],
@@ -2309,7 +2309,7 @@
                   },
                   "category": {
                     "type": "string",
-                    "enum": ["MAINTENANCE", "URGENT", "COMMUNITY", "VOTING", "BOARD_MEETING", "ETC"]
+                    "enum": ["MAINTENANCE", "EMERGENCY", "COMMUNITY", "RESIDENT_VOTE", "RESIDENT_COUNCIL", "ETC"]
                   },
                   "isPinned": {
                     "type": "boolean"

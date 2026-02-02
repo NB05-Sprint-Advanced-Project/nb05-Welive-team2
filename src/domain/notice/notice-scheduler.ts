@@ -9,10 +9,10 @@ export const createNoticeScheduler = (service: NoticeBatchService) => {
   const start = () => {
     if (intervalId) return;
 
-    noticeRunner(() => service.syncViewCounts());
+    noticeRunner(() => service.syncViewsCounts());
 
     intervalId = setInterval(async () => {
-      noticeRunner(() => service.syncViewCounts());
+      noticeRunner(() => service.syncViewsCounts());
     }, intervalMs);
 
     console.log('notice scehduler 실행');
