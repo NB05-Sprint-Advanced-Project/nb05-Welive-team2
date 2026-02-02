@@ -416,17 +416,17 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
     entities: AdminAccountProps[] | ResidentAccountProps[],
   ): Promise<void> => {
     const entityIds = entities.map((entity) => entity.id);
-
-    await prisma().user.updateMany({
+    const result = await prisma().user.updateMany({
       where: {
         id: { in: entityIds },
-        version: entities[0].version, // baseVersion
       },
       data: {
         ...UserMapper.toUpdateJoinedStatusDBData(entities[0]),
         version: { increment: 1 },
-      }, //baseUpdateData
+      },
     });
+
+    console.log('result' + result);
   };
 
   const updatePassword = async (

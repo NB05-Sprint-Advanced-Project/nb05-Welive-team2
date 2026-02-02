@@ -78,44 +78,84 @@ export const createUserQueryService = (
     return residentUser;
   };
 
+  /**
+   * 조회 디폴트 값만 캐싱을 하고 나머지 조회(필터 조회)는 바로 DB 조회
+   * @ throws EMPORARY_UNAVAILABLE
+   */
   const getResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
-    const { key, lock } = redisKeys.residents();
-    const residentsUser = await redisLocker.doWork({
-      key,
-      lockKey: lock,
-      cacheTtlSeconds: 30,
-      lockTtlSeconds: 3,
-      work: () => userQueryRepo.findResidents(dto),
-    });
-    if (residentsUser === null) {
+    const { page, limit, searchKeyword, building, unit, isHouseholder, isRegistered } = dto;
+
+    let residentsUser: ResidentsView | null = null;
+
+    const isDefaultFilter =
+      limit === 10 &&
+      page === 1 &&
+      searchKeyword === undefined &&
+      building === undefined &&
+      unit === undefined &&
+      isHouseholder === undefined &&
+      isRegistered === undefined;
+
+    if (isDefaultFilter) {
+      const { key, lock } = redisKeys.residents();
+      residentsUser = await redisLocker.doWork({
+        key,
+        lockKey: lock,
+        cacheTtlSeconds: 30,
+        lockTtlSeconds: 3,
+        work: () => userQueryRepo.findResidents(dto),
+      });
+    } else {
+      residentsUser = await userQueryRepo.findResidents(dto);
+    }
+
+    if (!residentsUser) {
       throw BusinessException({
         type: BusinessExceptionType.TEMPORARY_UNAVAILABLE,
       });
     }
+
     return residentsUser;
   };
 
+  /**
+   * 조회 디폴트 값만 캐싱을 하고 나머지 조회(필터 조회)는 바로 DB 조회
+   * @ throws EMPORARY_UNAVAILABLE
+   */
   const getResidentAccounts = async (
     dto: GetResidentAccountsReqDto,
   ): Promise<ResidentAccountView> => {
-    const { key, lock } = redisKeys.residentAccounts();
-    const residentAccountsUser = await redisLocker.doWork({
-      key,
-      lockKey: lock,
-      cacheTtlSeconds: 30,
-      lockTtlSeconds: 3,
-      work: () => userQueryRepo.findResidentAccounts(dto),
-    });
+    const { page, limit, searchKeyword, joinStatus, building, unit } = dto;
 
-    // 캐시 재시도까지도 실패한 요청
-    if (residentAccountsUser === null) {
+    let residentAccountsUser: ResidentAccountView | null = null;
+
+    const isDefaultFilter =
+      limit === 10 &&
+      page === 1 &&
+      searchKeyword === undefined &&
+      building === undefined &&
+      unit === undefined &&
+      joinStatus === undefined;
+
+    if (isDefaultFilter) {
+      const { key, lock } = redisKeys.residentAccounts();
+      residentAccountsUser = await redisLocker.doWork({
+        key,
+        lockKey: lock,
+        cacheTtlSeconds: 30,
+        lockTtlSeconds: 3,
+        work: () => userQueryRepo.findResidentAccounts(dto),
+      });
+    } else {
+      residentAccountsUser = await userQueryRepo.findResidentAccounts(dto);
+    }
+
+    if (!residentAccountsUser) {
       throw BusinessException({
         type: BusinessExceptionType.TEMPORARY_UNAVAILABLE,
       });
     }
 
-    // 캐시 안한 로직
-    // const residentAccountsUser =userQueryRepo.findResidentAccounts(dto)
     return residentAccountsUser;
   };
 

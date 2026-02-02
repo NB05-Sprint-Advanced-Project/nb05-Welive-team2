@@ -29,9 +29,11 @@ export const catchHandler = (handler: RequestHandler) => {
     } catch (err) {
       if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          throw BusinessException({
-            type: BusinessExceptionType.FILE_SIZE_EXCEEDED,
-          });
+          return next(
+            BusinessException({
+              type: BusinessExceptionType.FILE_SIZE_EXCEEDED,
+            }),
+          );
         }
       }
 

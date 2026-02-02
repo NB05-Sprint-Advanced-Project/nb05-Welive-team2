@@ -25,7 +25,7 @@ describe('user service e2e 테스트', () => {
   let baseNotJoinedResident: User;
   let server: http.Server;
   let hashManager: IHashManager;
-  let cookies: string;
+  let adminCookies: string;
   let superAdminCookies: string;
   let redis: any;
 
@@ -165,7 +165,7 @@ describe('user service e2e 테스트', () => {
       password: '123123qwe!', // 관리자 초기 비밀번호
     });
 
-    cookies = res.headers['set-cookie'];
+    adminCookies = res.headers['set-cookie'];
 
     const superAdminRes = await request(app).post('/api/v2/auth/login').send({
       username: baseSuperAdmin.username,
@@ -827,7 +827,7 @@ describe('user service e2e 테스트', () => {
     test('가입한 입주민 목록 조회 성공', async () => {
       const res = await request(app)
         .get('/api/v2/users/residents')
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .query({
           page: 1,
           limit: 10,
@@ -899,7 +899,7 @@ describe('user service e2e 테스트', () => {
     test('팬딩 상태 -> 승인 상태로 변경 성공', async () => {
       await request(app)
         .patch(`/api/v2/users/residents/${pendingResident.id}/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.APPROVED })
         .expect(204);
 
@@ -915,7 +915,7 @@ describe('user service e2e 테스트', () => {
     test('팬딩 상태 -> 거절(REJECTED) 상태로 변경 성공', async () => {
       await request(app)
         .patch(`/api/v2/users/residents/${pendingResident.id}/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.REJECTED })
         .expect(204);
 
@@ -931,7 +931,7 @@ describe('user service e2e 테스트', () => {
     test('이미 승인 상태인 입주민은 상태 변경 불가', async () => {
       const res = await request(app)
         .patch(`/api/v2/users/residents/${approvedResident.id}/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.REJECTED })
         .expect(409);
 
@@ -1001,14 +1001,14 @@ describe('user service e2e 테스트', () => {
     test('모든 PENDING 입주민 상태를 APPROVED로 변경', async () => {
       await request(app)
         .patch(`/api/v2/users/residents/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.APPROVED })
         .expect(204);
 
       const updatedUsers = await prisma.user.findMany({
         where: { id: { in: [pendingResident1.id, pendingResident2.id] } },
       });
-
+      console.log(updatedUsers);
       expect(updatedUsers.find((u) => u.id === pendingResident1.id)!.joinedStatus).toBe(
         Status.APPROVED,
       );
@@ -1026,7 +1026,7 @@ describe('user service e2e 테스트', () => {
 
       const res = await request(app)
         .patch(`/api/v2/users/residents/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.APPROVED })
         .expect(404);
 
@@ -1039,13 +1039,13 @@ describe('user service e2e 테스트', () => {
       // 대기중인 모든 입주민을 일괄 거절 상태로 변경
       await request(app)
         .patch(`/api/v2/users/residents/join-status`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send({ joinStatus: Status.REJECTED })
         .expect(204);
 
       await request(app)
         .delete('/api/v2/users/residents/rejected')
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .expect(204);
 
       const users = await prisma.user.findMany({
@@ -1071,7 +1071,11 @@ describe('user service e2e 테스트', () => {
         isHouseholder: true,
       } as CreateResidentReqDto;
 
-      await request(app).post('/api/v2/residents').set('Cookie', cookies).send(dto).expect(201);
+      await request(app)
+        .post('/api/v2/residents')
+        .set('Cookie', adminCookies)
+        .send(dto)
+        .expect(201);
 
       const user = await prisma.user.findUnique({
         where: { email: dto.email },
@@ -1097,7 +1101,7 @@ describe('user service e2e 테스트', () => {
 
       const res = await request(app)
         .post('/api/v2/residents')
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send(dto)
         .expect(409);
 
@@ -1116,7 +1120,7 @@ describe('user service e2e 테스트', () => {
 
       await request(app)
         .patch(`/api/v2/residents/${createdResidentId}`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send(dto)
         .expect(204);
 
@@ -1142,7 +1146,7 @@ describe('user service e2e 테스트', () => {
 
       const res = await request(app)
         .patch(`/api/v2/residents/${id}`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send(dto)
         .expect(404);
 
@@ -1178,7 +1182,7 @@ describe('user service e2e 테스트', () => {
 
       const res = await request(app)
         .patch(`/api/v2/residents/${createdResidentId}`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .send(dto)
         .expect(409);
 
@@ -1190,7 +1194,7 @@ describe('user service e2e 테스트', () => {
     test('입주민 삭제 성공 (deleteResident)', async () => {
       await request(app)
         .delete(`/api/v2/residents/${createdResidentId}`)
-        .set('Cookie', cookies)
+        .set('Cookie', adminCookies)
         .expect(204);
 
       const deleted = await prisma.user.findUnique({
@@ -1234,7 +1238,7 @@ describe('user service e2e 테스트', () => {
       test('입주민 단건 조회 성공', async () => {
         const res = await request(app)
           .get(`/api/v2/residents/${residentId}`)
-          .set('Cookie', cookies)
+          .set('Cookie', adminCookies)
           .expect(200);
 
         expect(res.body.id).toBe(residentId);
@@ -1244,7 +1248,7 @@ describe('user service e2e 테스트', () => {
       test('입주민 단건 조회 실패 - 존재하지 않음', async () => {
         const res = await request(app)
           .get(`/api/v2/residents/${randomUUID()}`)
-          .set('Cookie', cookies)
+          .set('Cookie', adminCookies)
           .expect(404);
 
         expect(res.body.type).toBe(BusinessExceptionType.USER_NOT_FOUND);
@@ -1311,7 +1315,7 @@ describe('user service e2e 테스트', () => {
       test('입주민 목록 조회 성공 (가입 + 미가입)', async () => {
         const res = await request(app)
           .get('/api/v2/residents')
-          .set('Cookie', cookies)
+          .set('Cookie', adminCookies)
           .query({ page: 1, limit: 10 })
           .expect(200);
 
@@ -1329,8 +1333,6 @@ describe('user service e2e 테스트', () => {
   });
 
   // 기타
-  // describe("유저 프로필 변경 (updateAvatarUrl)", () => {});
-
   describe('유저(대표로 입주민만) 비밀번호 변경 (updatePassword)', () => {
     let residentCookies: string;
 

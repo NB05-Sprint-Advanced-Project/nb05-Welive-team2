@@ -4,7 +4,6 @@ import {
   buildingSchema,
   contactSchema,
   emailSchema,
-  updateJoinedStatusSchema,
   nameSchema,
   passwordSchema,
   unitSchema,
@@ -104,12 +103,12 @@ export const signUpResidentAccountSchema = z.object({
 // 단건
 export const updateResidentAccountJoinedStatusSchema = z.object({
   id: userIdSchema,
-  joinStatus: updateJoinedStatusSchema,
+  joinStatus: joinedStatusSchema,
 });
 
 // 다건
 export const updateResidentAccountJoinedStatusesSchema = z.object({
-  joinStatus: updateJoinedStatusSchema,
+  joinStatus: joinedStatusSchema,
 });
 
 const deleteResidentAccountSchema = z.object({

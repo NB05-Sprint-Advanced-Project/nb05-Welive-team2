@@ -171,7 +171,6 @@ export const UserMapper = {
   ): Prisma.UserUpdateInput => {
     return {
       joinedStatus: entity.joinedStatus,
-      version: entity.version,
       updatedAt: entity.updatedAt,
     };
   },

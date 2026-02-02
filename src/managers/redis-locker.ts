@@ -34,10 +34,8 @@ export const createRedisLocker = (redisExternal: IRedisExternal): IRedisLocker =
 
     const cache = await redisExternal.get(key);
     let result: T | null = null;
-    //console.log("캐시 확인 전")
     if (cache) {
       result = JSON.parse(cache);
-      // console.log("이미 캐시 있어서 리턴")
     } else {
       if (redisLock) {
         for (let i = 0; i < retryCount; i++) {

@@ -301,6 +301,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       }),
     };
 
+    console.log(where);
     const [residentAccounts, totalCount] = await prisma.$transaction([
       prisma.user.findMany({
         where,

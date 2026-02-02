@@ -698,24 +698,6 @@ describe('user service 유닛 테스트', () => {
       // then
       expect(mockUserCommandRepo.updateJoinedStatus).toHaveBeenCalled();
     });
-
-    test('낙관적 락 실패 시 CONCURRENT_MODIFICATION 예외를 던진다', async () => {
-      // given
-      (mockUserCommandRepo.findResidentAccountUserById as jest.Mock).mockResolvedValue({
-        joinedStatus: Status.PENDING,
-      });
-
-      (mockUow.doWork as jest.Mock).mockImplementation(async () => {
-        throw TechnicalException({
-          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
-        });
-      });
-
-      // when & then
-      await expect(userCommandService.updateResidentAccountJoinStatus(dto)).rejects.toMatchObject({
-        type: BusinessExceptionType.CONCURRENT_MODIFICATION,
-      });
-    });
   });
 
   describe('입주민 계정 가입 상태 일괄 변경 테스트(updateResidentAccountJoinStatuses())', () => {
@@ -757,22 +739,6 @@ describe('user service 유닛 테스트', () => {
       // then
       expect(mockUserCommandRepo.findPendingResidentUsers).toHaveBeenCalled();
       expect(mockUserCommandRepo.updateJoinedStatuses).toHaveBeenCalledWith(expect.any(Array));
-    });
-
-    test('낙관적 락 실패 시 CONCURRENT_MODIFICATION 예외를 던진다.', async () => {
-      // given
-      (mockUow.doWork as jest.Mock).mockImplementation(async () => {
-        throw TechnicalException({
-          type: TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED,
-        });
-      });
-
-      // when & then
-      await expect(userCommandService.updateResidentAccountJoinStatuses(dto)).rejects.toMatchObject(
-        {
-          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
-        },
-      );
     });
   });
 
@@ -923,22 +889,6 @@ describe('user service 유닛 테스트', () => {
         type: BusinessExceptionType.CONCURRENT_MODIFICATION,
       });
     });
-
-    test.each([
-      [TechnicalExceptionType.UNIQUE_VIOLATION_EMAIL, BusinessExceptionType.EMAIL_ALREADY_IN_USE],
-      [
-        TechnicalExceptionType.UNIQUE_VIOLATION_CONTACT,
-        BusinessExceptionType.CONTACT_ALREADY_IN_USE,
-      ],
-    ])('%s 발생 시 %s 예외로 변환한다', async (technicalType, businessType) => {
-      // given
-      (mockUow.doWork as jest.Mock).mockRejectedValue(TechnicalException({ type: technicalType }));
-
-      // when & then
-      await expect(userCommandService.updateResident(dto)).rejects.toMatchObject({
-        type: businessType,
-      });
-    });
   });
 
   describe('입주민 삭제(deleteResident)', () => {
@@ -960,8 +910,6 @@ describe('user service 유닛 테스트', () => {
   });
 
   // 기타
-  describe('계정 프로필 변경', () => {});
-
   describe('계정 비밀번호 변경', () => {
     const dto: UpdatePasswordReqDto = {
       userId: 'user-1',

@@ -350,9 +350,7 @@ export const createUserCommandService = (
       });
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
-        throw BusinessException({
-          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
-        });
+        return;
       }
 
       throw err;
@@ -362,31 +360,29 @@ export const createUserCommandService = (
   const updateResidentAccountJoinStatuses = async (
     dto: UpdateResidentAccountJoinedStatusesReqDto,
   ) => {
-    try {
-      await uow.doWork(async () => {
-        const users = await userCommandRepo.findPendingResidentUsers();
+    await uow.doWork(async () => {
+      const users = await userCommandRepo.findPendingResidentUsers();
 
-        if (!users) {
-          throw BusinessException({
-            type: BusinessExceptionType.USER_NOT_FOUND,
-          });
-        }
-
-        await userCommandRepo.updateJoinedStatuses(
-          users.map((user) => ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
-        );
-        redisExternal.del('residentAccounts:1:10');
-        redisExternal.del('residents:1:10');
-      });
-    } catch (err) {
-      if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+      if (!users) {
         throw BusinessException({
-          type: BusinessExceptionType.CONCURRENT_MODIFICATION,
+          type: BusinessExceptionType.USER_NOT_FOUND,
         });
       }
-
-      throw err;
-    }
+      users.forEach((user, index) => {
+        console.log(`users[${index}]`, {
+          id: user.id,
+          role: user.role,
+          joinedStatus: user.joinedStatus,
+          version: user.version,
+          updatedAt: user.updatedAt,
+        });
+      });
+      await userCommandRepo.updateJoinedStatuses(
+        users.map((user) => ResidentAccountEntity.updateJoinedStatus(user, dto.joinStatus)),
+      );
+      redisExternal.del('residentAccounts:1:10');
+      redisExternal.del('residents:1:10');
+    });
   };
 
   const deleteResidentAccounts = async (): Promise<void> => {

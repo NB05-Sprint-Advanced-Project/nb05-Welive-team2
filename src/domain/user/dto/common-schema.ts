@@ -63,10 +63,6 @@ export const unitFilterSchema = z.coerce
   .min(1, { message: '호(아파트 호수)은 1 이상이어야 합니다.' })
   .optional();
 
-export const updateJoinedStatusSchema = z
-  .enum([Status.APPROVED, Status.REJECTED])
-  .transform((v) => (v === Status.APPROVED ? Status.APPROVED : Status.REJECTED));
-
 export const joinedStatusSchema = z.enum([Status.APPROVED, Status.PENDING, Status.REJECTED], {
   message: `가입 상태는 ${Object.values(Status).join(', ')} 중 하나여야 합니다.`,
 });
