@@ -9,6 +9,7 @@ export interface INoticeQueryRepo {
     limit: number,
     searchKeyword: string,
     category: NoticeCategory | 'ALL',
+    userId: string,
   ): Promise<NoticesView>;
   findEvents(apartmentId: string, year: number, month: number): Promise<EventView[]>;
 }

@@ -169,6 +169,7 @@ model Polls {
 
   version Int
   options Options[]
+  UserVoteOptions UserVoteOption[]
 }
 
 enum PollStatus {
@@ -194,7 +195,7 @@ model Notices {
   content     String
   category    NoticeCategory
   isPinned    Boolean
-  viewCount   Int
+  viewsCount   Int
   apartmentId String
   apartment   Apartment      @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
   userId      String
@@ -206,10 +207,10 @@ model Notices {
 
 enum NoticeCategory {
   MAINTENANCE
-  URGENT
+  EMERGENCY
   COMMUNITY
-  VOTING
-  BOARD_MEETING
+  RESIDENT_VOTE
+  RESIDENT_COUNCIL
   ETC
 }
 
@@ -238,6 +239,9 @@ model UserVoteOption {
   optionId String
   option   Options @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
-  @@id([userId, optionId])
+  pollId String
+  poll   Polls   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  @@id([userId, pollId]) 
   @@index([optionId])
 }

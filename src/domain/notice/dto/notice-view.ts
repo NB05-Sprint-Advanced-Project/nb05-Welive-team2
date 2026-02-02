@@ -8,7 +8,7 @@ export interface NoticeView {
   content: string;
   category: NoticeCategory;
   isPinned: boolean;
-  viewCount: number;
+  viewsCount: number;
   apartmentId: string;
 
   author: {

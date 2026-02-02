@@ -102,8 +102,11 @@ export const createPollCommandService = (
     try {
       return await uow.doWork(
         async () => {
-          const { optionId, userId } = dto;
-          await userVoteOptionCommandRepo.vote(UserVoteOptionEntity.create({ optionId, userId }));
+          const { pollId, optionId, userId } = dto;
+          await userVoteOptionCommandRepo.vote(
+            UserVoteOptionEntity.create({ userId, optionId, pollId }),
+          );
+          await redisExternal.del(`pollId:${pollId}`);
         },
         {
           transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },
@@ -125,6 +128,7 @@ export const createPollCommandService = (
       async () => {
         const { optionId, userId } = dto;
         await userVoteOptionCommandRepo.cancle(optionId, userId);
+        await redisExternal.del(`pollId:${dto.pollId}`);
       },
       {
         transactionOptions: { useTransaction: true, isolationLevel: 'ReadCommitted' },

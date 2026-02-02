@@ -14,7 +14,7 @@ export type NoticeProps = {
   content: string;
   category: NoticeCategory;
   isPinned: boolean;
-  viewCount: number;
+  viewsCount: number;
   readonly apartmentId: string;
   readonly userId: string;
   comments?: Comment[];
@@ -50,7 +50,7 @@ export const NoticeEntity = {
       id: randomUUID(),
       createdAt: now,
       updatedAt: now,
-      viewCount: 0,
+      viewsCount: 0,
       userId,
       event: createdEvent,
       version,

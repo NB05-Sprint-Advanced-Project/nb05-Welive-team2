@@ -9,5 +9,6 @@ export interface IPollQueryRepo {
     searchKeyword: string,
     status: PollStatus | 'ALL',
     building: number,
+    userId: string,
   ): Promise<PollsView>;
 }

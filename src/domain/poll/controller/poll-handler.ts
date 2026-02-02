@@ -25,14 +25,17 @@ export const createPollHandler = (
   };
 
   const getAllPolls = async (req: Request, res: Response) => {
-    const params = validate(getAllPollsReqParamsSchema, req.query);
-    const polls = await pollQueryService.getAllPolls({ ...params });
+    const query = validate(getAllPollsReqParamsSchema, req.query);
+    const userId = req.user.userId;
+    const polls = await pollQueryService.getAllPolls(userId, { ...query });
     return res.json(polls);
   };
 
   const createPoll = async (req: Request, res: Response) => {
     const userId = req.userId as string;
+    console.log(req.body);
     const body = validate(createPollReqBodySchema, req.body);
+
     const poll = await pollCommandService.createPoll({ ...body }, userId);
     return res.status(201).json(poll);
   };

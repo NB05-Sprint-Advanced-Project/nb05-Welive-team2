@@ -22,7 +22,7 @@ export const createPollReqBodySchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   apartmentId: z.string(),
-  building: z.int(),
+  building: z.coerce.number().int().default(0),
   options: z.array(createOptionSchema),
 });
 
