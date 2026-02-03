@@ -83,6 +83,7 @@ describe('user service 유닛 테스트', () => {
       findResidentAccountUserById: jest.fn(),
       findBaseUserById: jest.fn(),
       findJoinedUserById: jest.fn(),
+      findByRoleAndApartmentId: jest.fn(),
       findByRole: jest.fn(),
 
       findPendingAdminUsers: jest.fn(),
@@ -116,6 +117,7 @@ describe('user service 유닛 테스트', () => {
       create: jest.fn(),
       findAllByStatus: jest.fn(),
       bulkUpdate: jest.fn(),
+      delete: jest.fn(),
     };
 
     userCommandService = createUserCommandService(
