@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable */
 import { Prisma, PrismaClient } from '@prisma/client';
 import { INoticeCommandRepo } from '../interface/i-notice-command-repo';
 import { BaseRepo } from '../../../shared/base-command-repo';
@@ -68,7 +68,9 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
   };
 
   const create = async (props: NoticeProps, userId: string): Promise<NoticeProps> => {
-    const { comments, event, author, ...data } = props;
+    // eslint-disable-next-line no-alert, no-console
+    const { event, author: _, ...data } = props;
+
     try {
       const notice = await prisma().notices.create({
         data: {
@@ -104,6 +106,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
       throw err;
     }
   };
+
   const update = async (props: NoticeProps): Promise<void> => {
     const { event, ...data } = props as any;
     try {
@@ -150,7 +153,7 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
 
     const noticeIds = props.map((v) => v.noticeId);
     const cases = props.map((v) => Prisma.sql`WHEN ${v.noticeId} THEN ${v.viewsCount}`);
-    let query = Prisma.sql`
+    const query = Prisma.sql`
       UPDATE "Notices"
       SET "viewsCount" = GREATEST("viewsCount", CASE id ${Prisma.join(cases, ' ')} ELSE "viewsCount" END)
       WHERE id IN (${Prisma.join(noticeIds)})

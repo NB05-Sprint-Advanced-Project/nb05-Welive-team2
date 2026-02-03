@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable */
 import { PrismaClient } from '@prisma/client';
 import { Application } from 'express';
 import { TokenUtil } from '../../shared/utils/token-manager';
@@ -206,7 +206,7 @@ describe('Poll 통합 테스트', () => {
   describe('PATCH /polls API', () => {
     const patchPollId = 'patch-poll-id';
     beforeEach(async () => {
-      const poll = await mockPrisma.polls.upsert({
+      const _ = await mockPrisma.polls.upsert({
         where: { id: patchPollId },
         update: {
           title: '수정 전 제목',
