@@ -15,6 +15,7 @@ on:
     branches: ['develop']
   push:
     branches: ['main']
+  workflow_dispatch:
 
 jobs:
   ci:
