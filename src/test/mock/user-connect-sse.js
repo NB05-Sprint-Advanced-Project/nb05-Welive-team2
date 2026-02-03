@@ -3,8 +3,6 @@ const { EventSource } = require('eventsource');
 
 // API 엔드포인트 설정
 const BASE = 'http://localhost:4000';
-const SUPERADMIN_CREATE = `${BASE}/api/v2/users/super-admins`;
-const ADMIN_CREATE = `${BASE}/api/v2/users/admins`;
 const LOGIN = `${BASE}/api/v2/auth/login`;
 const SSE = `${BASE}/api/v2/notifications/sse`;
 

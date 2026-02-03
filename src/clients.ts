@@ -23,7 +23,7 @@ export const ClientManager = {
 
   send: (connections: Map<string, Response> | undefined, payloads: LiveNotificationPayload[]) => {
     if (!connections) return;
-    connections.forEach((connection, user) => {
+    connections.forEach((connection) => {
       connection.write(`event: ${WorkType.ALARM}\ndata: ${JSON.stringify(payloads)}\n\n`);
     });
   },
