@@ -20,6 +20,11 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: dummy
+      NODE_ENV: test
+
     steps:
       - name: checkout branch
         uses: actions/checkout@v3
