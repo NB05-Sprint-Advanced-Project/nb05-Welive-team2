@@ -20,7 +20,7 @@ export interface IUserCommandRepo {
 
   findRejectedAdminUsers: () => Promise<AdminAccountProps[] | null>;
 
-  findPendingResidentUsers: () => Promise<ResidentAccountProps[] | null>;
+  findPendingResidentUsers: (adminId: string) => Promise<ResidentAccountProps[] | null>;
 
   findNotJoinedResidentByEmail: (email: string) => Promise<NotJoinedResidentProps | null>;
 
@@ -79,5 +79,5 @@ export interface IUserCommandRepo {
 
   deleteUser: (id: string) => Promise<void>;
 
-  deleteUsers: () => Promise<void>;
+  deleteUsers: (roleToDelete: Role, adminId?: string) => Promise<void>;
 }

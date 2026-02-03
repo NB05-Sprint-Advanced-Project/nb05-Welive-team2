@@ -23,7 +23,10 @@ export const createResidentUserHandlers = (
   };
 
   const getResidents = async (req: Request, res: Response) => {
-    const reqDto = validate(getResidentsSchema, req.query);
+    const reqDto = validate(getResidentsSchema, {
+      ...req.query,
+      userId: req.userId,
+    });
 
     return res.json(await userQueryService.getResidents(reqDto));
   };

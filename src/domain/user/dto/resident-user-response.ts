@@ -40,6 +40,7 @@ export const deleteResidentSchema = z.object({
 });
 
 export const getResidentsSchema = z.object({
+  userId: userIdSchema,
   page: pageSchema,
   limit: limitSchema,
   searchKeyword: residentSearchKeyword,

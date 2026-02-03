@@ -9,6 +9,8 @@ import { ResidentAccountProps } from '../entity/resident-account';
 import { NotJoinedResidentProps } from '../entity/not-joined-resident';
 import { BaseRepo } from '../../../shared/base-command-repo';
 import { userInclude, userIncludeWithApartment, UserMapper } from '../user-mapper';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandRepo => {
   const { prisma } = BaseRepo(prismaClient);
@@ -101,11 +103,31 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     return user ? UserMapper.toResidentAccountEntityFromDB(user) : null;
   };
 
-  const findPendingResidentUsers = async (): Promise<ResidentAccountProps[] | null> => {
+  const findPendingResidentUsers = async (
+    adminId: string,
+  ): Promise<ResidentAccountProps[] | null> => {
+    const link = await prisma().userApartmentLink.findFirst({
+      where: { userId: adminId },
+      select: { apartmentId: true },
+    });
+
+    if (!link) {
+      throw BusinessException({
+        type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+      });
+    }
+
+    const apartmentId = link.apartmentId;
+
     const users = await prisma().user.findMany({
       where: {
         role: Role.USER,
         joinedStatus: Status.PENDING,
+        UserApartmentLink: {
+          some: {
+            apartmentId,
+          },
+        },
       },
       include: userInclude,
     });
@@ -486,10 +508,47 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
     }
   };
 
-  const deleteUsers = async (): Promise<void> => {
+  const deleteUsers = async (roleToDelete: Role, adminId?: string): Promise<void> => {
+    // 입주민 삭제일 때만 apartmentId 필요
+    if (roleToDelete === Role.USER) {
+      if (!adminId) {
+        throw BusinessException({
+          type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+        });
+      }
+
+      const link = await prisma().userApartmentLink.findFirst({
+        where: { userId: adminId },
+        select: { apartmentId: true },
+      });
+
+      if (!link) {
+        throw BusinessException({
+          type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+        });
+      }
+      await prisma().user.deleteMany({
+        where: {
+          joinedStatus: Status.REJECTED,
+          role: roleToDelete,
+          ...(roleToDelete === Role.USER && {
+            UserApartmentLink: {
+              some: {
+                apartmentId: link.apartmentId,
+              },
+            },
+          }),
+        },
+      });
+
+      return;
+    }
+
+    // 관리자 삭제일 때
     await prisma().user.deleteMany({
       where: {
         joinedStatus: Status.REJECTED,
+        role: roleToDelete,
       },
     });
   };

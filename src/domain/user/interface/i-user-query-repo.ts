@@ -29,4 +29,6 @@ export interface IUserQueryRepo {
   findResidentAccounts: (dto: GetResidentAccountsReqDto) => Promise<ResidentAccountView>;
 
   findResidentsForExport: (dto: ExportResidentsReqDto) => Promise<ResidentViewForCSV[]>;
+
+  findApartmentIdByUserId: (userId: string) => Promise<string | null>;
 }

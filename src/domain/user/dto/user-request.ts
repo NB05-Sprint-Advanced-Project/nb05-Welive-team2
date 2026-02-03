@@ -108,6 +108,7 @@ export const updateResidentAccountJoinedStatusSchema = z.object({
 
 // 다건
 export const updateResidentAccountJoinedStatusesSchema = z.object({
+  userId: userIdSchema,
   joinStatus: joinedStatusSchema,
 });
 
@@ -117,6 +118,7 @@ const deleteResidentAccountSchema = z.object({
 });
 
 export const getResidentAccountsSchema = z.object({
+  userId: userIdSchema,
   page: pageSchema,
   limit: limitSchema,
   searchKeyword: residentAccountSearchKeyword,

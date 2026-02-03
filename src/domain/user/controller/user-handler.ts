@@ -115,14 +115,20 @@ export const createUserHandlers = (
   };
 
   const getResidentAccounts = async (req: Request, res: Response) => {
-    const reqDto = validate(getResidentAccountsSchema, req.query);
+    const reqDto = validate(getResidentAccountsSchema, {
+      ...req.query,
+      userId: req.userId,
+    });
 
     return res.json(await userQueryService.getResidentAccounts(reqDto));
   };
 
   //다건
   const updateResidentAccountJoinStatuses = async (req: Request, res: Response) => {
-    const reqDto = validate(updateResidentAccountJoinedStatusesSchema, req.body);
+    const reqDto = validate(updateResidentAccountJoinedStatusesSchema, {
+      ...req.body,
+      userId: req.userId,
+    });
     await userCommandService.updateResidentAccountJoinStatuses(reqDto);
 
     return res.sendStatus(204);
@@ -140,7 +146,7 @@ export const createUserHandlers = (
   };
 
   const deleteResidentAccounts = async (req: Request, res: Response) => {
-    await userCommandService.deleteResidentAccounts();
+    await userCommandService.deleteResidentAccounts(req.userId!);
 
     return res.sendStatus(204);
   };

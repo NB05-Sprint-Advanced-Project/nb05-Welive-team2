@@ -11,6 +11,8 @@ import { userInclude } from '../user-mapper';
 import { ExportResidentsReqDto, GetResidentsReqDto } from '../dto/resident-user-response';
 import { GetResidentAccountsReqDto } from '../dto/user-request';
 import { LoginView } from '../../auth/controller/view/log-in';
+import { BusinessException } from '../../../shared/exception/business-exception/business-exception';
+import { BusinessExceptionType } from '../../../shared/exception/business-exception/exception-info';
 
 export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   const findAllAdmins = async (
@@ -179,12 +181,26 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   };
 
   const findResidents = async (dto: GetResidentsReqDto): Promise<ResidentsView> => {
+    const link = await prisma.userApartmentLink.findFirst({
+      where: { userId: dto.userId },
+      select: { apartmentId: true },
+    });
+
+    if (!link) {
+      throw BusinessException({
+        type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+      });
+    }
+
+    const apartmentId = link.apartmentId;
+
     const joinedStatus =
       dto.isRegistered === undefined
         ? { in: [Status.NOT_JOINED, Status.APPROVED] }
         : dto.isRegistered
           ? Status.APPROVED
           : Status.NOT_JOINED;
+
     const where = {
       joinedStatus,
       Address: {
@@ -201,6 +217,11 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
           { email: { contains: dto.searchKeyword } },
         ],
       }),
+      UserApartmentLink: {
+        some: {
+          apartmentId,
+        },
+      },
     };
 
     const [residents, totalCount] = await prisma.$transaction([
@@ -279,6 +300,19 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
   const findResidentAccounts = async (
     dto: GetResidentAccountsReqDto,
   ): Promise<ResidentAccountView> => {
+    const link = await prisma.userApartmentLink.findFirst({
+      where: { userId: dto.userId },
+      select: { apartmentId: true },
+    });
+
+    if (!link) {
+      throw BusinessException({
+        type: BusinessExceptionType.APARTMENT_NOT_FOUND,
+      });
+    }
+
+    const apartmentId = link.apartmentId;
+
     const joinedStatus =
       dto.joinStatus === undefined
         ? { in: [Status.PENDING, Status.APPROVED, Status.REJECTED] }
@@ -299,6 +333,11 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       ...(dto.searchKeyword && {
         OR: [{ name: { contains: dto.searchKeyword } }, { email: { contains: dto.searchKeyword } }],
       }),
+      UserApartmentLink: {
+        some: {
+          apartmentId,
+        },
+      },
     };
 
     const [residentAccounts, totalCount] = await prisma.$transaction([
@@ -336,6 +375,14 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     };
   };
 
+  const findApartmentIdByUserId = async (userId: string): Promise<string | null> => {
+    const link = await prisma.userApartmentLink.findFirst({
+      where: { userId },
+      select: { apartmentId: true },
+    });
+    return link?.apartmentId ?? null;
+  };
+
   return {
     findAllAdmins,
     findByUsername,
@@ -344,5 +391,6 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
     findResidents,
     findResidentAccounts,
     findResidentsForExport,
+    findApartmentIdByUserId,
   };
 };

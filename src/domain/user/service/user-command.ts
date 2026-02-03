@@ -262,12 +262,7 @@ export const createUserCommandService = (
   };
 
   const deleteRejectedAdmins = async (): Promise<void> => {
-    const users = await userCommandRepo.findRejectedAdminUsers();
-    if (!users) {
-      return;
-    }
-
-    await userCommandRepo.deleteUsers();
+    await userCommandRepo.deleteUsers(Role.ADMIN);
   };
 
   // 입주민 계정
@@ -361,7 +356,7 @@ export const createUserCommandService = (
     dto: UpdateResidentAccountJoinedStatusesReqDto,
   ) => {
     await uow.doWork(async () => {
-      const users = await userCommandRepo.findPendingResidentUsers();
+      const users = await userCommandRepo.findPendingResidentUsers(dto.userId);
 
       if (!users) {
         throw BusinessException({
@@ -377,8 +372,8 @@ export const createUserCommandService = (
     });
   };
 
-  const deleteResidentAccounts = async (): Promise<void> => {
-    await userCommandRepo.deleteUsers();
+  const deleteResidentAccounts = async (adminId: string): Promise<void> => {
+    await userCommandRepo.deleteUsers(Role.USER, adminId);
     redisExternal.del('residentAccounts:1:10');
     redisExternal.del('residents:1:10');
   };

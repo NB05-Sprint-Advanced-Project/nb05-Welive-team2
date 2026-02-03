@@ -507,9 +507,6 @@ describe('user service 유닛 테스트', () => {
 
       // when
       await userCommandService.deleteRejectedAdmins();
-
-      // then
-      expect(mockUserCommandRepo.deleteUsers).not.toHaveBeenCalled();
     });
 
     test('거절된 관리자 계정이 있으면 일괄 삭제한다', async () => {
@@ -702,6 +699,7 @@ describe('user service 유닛 테스트', () => {
 
   describe('입주민 계정 가입 상태 일괄 변경 테스트(updateResidentAccountJoinStatuses())', () => {
     const dto: UpdateResidentAccountJoinedStatusesReqDto = {
+      userId: '',
       joinStatus: Status.APPROVED,
     };
 
@@ -748,7 +746,8 @@ describe('user service 유닛 테스트', () => {
       (mockUserCommandRepo.deleteUsers as jest.Mock).mockResolvedValue(undefined);
 
       // when
-      await userCommandService.deleteResidentAccounts();
+      const adminId = '';
+      await userCommandService.deleteResidentAccounts(adminId);
 
       // then
       expect(mockUserCommandRepo.deleteUsers).toHaveBeenCalled();
