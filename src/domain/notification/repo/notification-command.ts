@@ -47,9 +47,20 @@ export const createNotificationCommandRepo = (
     }
   };
 
+  const remove = async () => {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    await prisma().notifications.deleteMany({
+      where: {
+        createdAt: { lte: thirtyDaysAgo },
+      },
+    });
+  };
+
   return {
     markAsRead,
     bulkSave,
+    delete: remove,
   };
 };
 

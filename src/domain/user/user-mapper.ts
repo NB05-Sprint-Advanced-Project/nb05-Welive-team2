@@ -337,10 +337,12 @@ export const UserMapper = {
   },
 
   toAdminJoinRequestAlarmState: (residentEntity: ResidentAccountProps): StateProps => {
+    const apartmentId = residentEntity.userApartmentLink?.[0]?.apartmentId;
     return StateEntity.create({
       workType: WorkType.ALARM,
       payload: {
         receiverType: Role.ADMIN,
+        apartmentId,
         message: `[회원가입] 입주민 ${residentEntity.name}님이 회원가입을 요청했습니다.`,
       },
     });

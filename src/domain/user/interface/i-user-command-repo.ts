@@ -6,6 +6,8 @@ import { ResidentAccountProps } from '../entity/resident-account';
 export interface IUserCommandRepo {
   findByRole: (role: Role) => Promise<BaseAllUserProps[]>;
 
+  findByRoleAndApartmentId: (role: Role, apartmentId: string) => Promise<BaseAllUserProps[]>;
+
   findAdminById: (id: string) => Promise<AdminAccountProps | null>;
 
   findResidentAccountUserById: (id: string) => Promise<ResidentAccountProps | null>;

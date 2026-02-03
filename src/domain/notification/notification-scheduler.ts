@@ -16,6 +16,9 @@ export const createNotificationScheduler = (
 
     intervalId = setInterval(async () => {
       notificationRunner(async () => {
+        // 0. 상태 테이블을 읽어 전송 완료된 알림을 지운다
+        await stateCommandService.deleteProcessedNotification();
+
         // 1. 상태 테이블을 읽어서 처리 대기중인 알림을 가져온다
         const pendingStatesDto = await stateCommandService.findPendingNotification();
 
@@ -27,6 +30,9 @@ export const createNotificationScheduler = (
 
         // 4. 상태 테이블 변경 (Processed)
         await stateCommandService.markAsProcessed(pendingStatesDto);
+
+        // 5. 30일 경과한 알림 삭제
+        await notificationCommandService.deleteOldNotification();
       });
     }, intervalMs);
 

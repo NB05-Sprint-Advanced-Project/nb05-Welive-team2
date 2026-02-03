@@ -29,13 +29,38 @@ export const createNotificationCommandService = (
 
   const bulkSave = async (dtos: createNotificationDTO[]) => {
     try {
-      const roles = Array.from(new Set(dtos.map((dto) => dto.receiverType)));
+      const filteredDtos = dtos.filter(
+        (dto) => dto.receiverType === 'SUPER_ADMIN' || dto.apartmentId,
+      );
 
-      const usersByRole = await Promise.all(roles.map((role) => userCommandRepo.findByRole(role)));
+      const roleApartmentMap = new Map(
+        filteredDtos.map((dto) => [
+          `${dto.receiverType}-${dto.apartmentId}`,
+          { role: dto.receiverType, apartmentId: dto.apartmentId },
+        ]),
+      );
 
-      const users = usersByRole.flat();
+      const roleApartmentPairs = Array.from(roleApartmentMap.values());
 
-      const notifications = NotificationMapper.createNotifications(dtos, users);
+      const usersByRoleAndApartment = await Promise.all(
+        roleApartmentPairs.map(({ role, apartmentId }) => {
+          if (role === 'SUPER_ADMIN') {
+            return userCommandRepo.findByRole(role);
+          }
+
+          if (!apartmentId) {
+            throw BusinessException({
+              type: BusinessExceptionType.INVALID_REQUEST,
+            });
+          }
+
+          return userCommandRepo.findByRoleAndApartmentId(role, apartmentId);
+        }),
+      );
+
+      const users = usersByRoleAndApartment.flat();
+
+      const notifications = NotificationMapper.createNotifications(filteredDtos, users);
 
       await notificationCommandRepo.bulkSave(notifications);
     } catch (err) {
@@ -71,10 +96,15 @@ export const createNotificationCommandService = (
     }
   };
 
+  const deleteOldNotification = async () => {
+    await notificationCommandRepo.delete();
+  };
+
   return {
     markAsRead,
     bulkSave,
     sendLiveNotifications,
+    deleteOldNotification,
   };
 };
 

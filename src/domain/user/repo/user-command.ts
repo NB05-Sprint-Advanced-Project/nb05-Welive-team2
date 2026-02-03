@@ -24,6 +24,25 @@ export const createUserCommandRepo = (prismaClient: PrismaClient): IUserCommandR
     return users.map((user) => UserMapper.toBaseUserEntity(user));
   };
 
+  const findByRoleAndApartmentId = async (
+    role: Role,
+    apartmentId: string,
+  ): Promise<BaseAllUserProps[]> => {
+    const users = await prisma().user.findMany({
+      where: {
+        role,
+        UserApartmentLink: {
+          some: {
+            apartmentId,
+          },
+        },
+      },
+      include: userIncludeWithApartment,
+    });
+
+    return users.map((user) => UserMapper.toBaseUserEntity(user));
+  };
+
   const findAdminById = async (id: string): Promise<AdminAccountProps | null> => {
     const user = await prisma().user.findUnique({
       where: { id },
@@ -479,6 +498,7 @@ SELECT COUNT(*)::int AS count FROM inserted_users;
 
   return {
     findByRole,
+    findByRoleAndApartmentId,
     findAdminById,
     findPendingAdminUsers,
     findRejectedAdminUsers,

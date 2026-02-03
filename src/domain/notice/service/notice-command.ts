@@ -34,6 +34,7 @@ export const createNoticeCommandService = (
           workType: WorkType.ALARM,
           payload: {
             receiverType: Role.USER,
+            apartmentId: notice.apartmentId,
             message: `[공지사항] ${notice.title} 등록됨`,
           } as unknown as JSON,
         });

@@ -37,6 +37,7 @@ export const createComplaintCommandService = (
         workType: WorkType.ALARM,
         payload: {
           receiverType: Role.ADMIN,
+          apartmentId: entity.apartmentId,
           message: `[민원 알림] 새 민원이 등록되었습니다. '${entity.title}' `,
         } as unknown as JSON,
       });
@@ -193,6 +194,7 @@ export const createComplaintCommandService = (
           workType: WorkType.ALARM,
           payload: {
             receiverType: Role.USER,
+            apartmentId: entity.apartmentId,
             message: `[민원 알림] 민원이 '${updateStatus}'입니다. `,
           } as unknown as JSON,
         });

@@ -42,10 +42,15 @@ export const createStateCommandService = (stateCommandRepo: IStateCommandRepo) =
     return;
   };
 
+  const deleteProcessedNotification = async () => {
+    await stateCommandRepo.delete();
+  };
+
   return {
     markAsProcessed,
     findPendingCsv,
     findPendingNotification,
+    deleteProcessedNotification,
   };
 };
 export type StateCommandService = ReturnType<typeof createStateCommandService>;

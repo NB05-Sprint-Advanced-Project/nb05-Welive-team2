@@ -46,10 +46,19 @@ export const createStateCommandRepo = (prismaClient: PrismaClient): IStateComman
     });
   };
 
+  const remove = async () => {
+    await prisma().state.deleteMany({
+      where: {
+        status: StatusType.PROCESSED,
+      },
+    });
+  };
+
   return {
     create,
     findAllByStatus,
     bulkUpdate,
+    delete: remove,
   };
 };
 

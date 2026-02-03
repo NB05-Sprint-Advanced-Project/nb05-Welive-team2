@@ -36,6 +36,7 @@ export const createPollCommandService = (
             workType: WorkType.ALARM,
             payload: {
               receiverType: Role.USER,
+              apartmentId: poll.apartmentId,
               message: `[투표] ${poll.title} 등록됨`,
             } as unknown as JSON,
           });
