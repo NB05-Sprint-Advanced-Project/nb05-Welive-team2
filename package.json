@@ -12,7 +12,7 @@
     "format": "prettier . --write",
     "test:db": "dotenv -e .env.test -- prisma migrate deploy",
     "test": "dotenv -e .env.test -- cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
-    "test:unit": "npm run test -- src/test/unit --runInBand",
+    "test:unit": "cross-env NODE_ENV=test jest src/test/unit --runInBand",
     "test:e2e": "npm run test -- src/test/e2e --runInBand --detectOpenHandles",
     "test:it": "npm run test:db && npm run test -- --runInBand",
     "format:check": "prettier . --check",
