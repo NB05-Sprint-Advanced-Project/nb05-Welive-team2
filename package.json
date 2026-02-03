@@ -8,7 +8,7 @@
     "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/index.ts",
     "prod": "cross-env NODE_ENV=production node ./dist/index.js",
     "k6-test": "k6 run --no-connection-reuse=false src/test/k6/k6-test.js",
-    "prepare": "husky",
+    "prepare": "husky install || true",
     "format": "prettier . --write",
     "test:db": "dotenv -e .env.test -- prisma migrate deploy",
     "test": "dotenv -e .env.test -- cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
