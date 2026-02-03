@@ -1,7 +1,7 @@
 {
   "name": "project-test",
   "version": "1.0.0",
-  "description": "nodejs 백엔드 고급 프로젝트",
+  "description": "nodejs 백엔드 고급 프로젝트 - 위리브",
   "scripts": {
     "start": "node ./build/main.js",
     "build": "tsc",
