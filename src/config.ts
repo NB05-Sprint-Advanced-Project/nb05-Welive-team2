@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  DATABASE_URL: z.url(),
+  DATABASE_URL: z.string(),
   PORT: z.coerce.number(),
   COOKIE_SECRET: z.string().min(10, '세션 아이디 비밀번호는 최소 10자 이상입니다.'),
   TOKEN_SECRET: z.string().min(10, '토큰 시크릿은 최소 10자 이상입니다.'),
