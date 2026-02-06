@@ -6,4 +6,5 @@ export interface IFileManager {
   getStorage: (type: UploadType) => multer.StorageEngine;
   getFile: (filePath: string) => Promise<ContentType>;
   readFile: (body: StreamingBlobPayloadOutputTypes) => Promise<string[]>;
+  getUrl: (filePath: string) => Promise<string>;
 }

@@ -449,9 +449,8 @@ export const createUserCommandService = (
 
     // 1. 파일 가져오기
     const data = await fileManager.getFile(key);
-
     // 2. 파일 타입 검증
-    if (!data.body || typeof data.body === 'string') {
+    if (!data.body || typeof data.body !== 'string') {
       throw BusinessException({ type: BusinessExceptionType.NOT_CSV_FILE });
     }
 
@@ -555,7 +554,7 @@ export const createUserCommandService = (
           });
         }
 
-        const imageUrl = await FileManager.getUrl(dto.key);
+        const imageUrl = await fileManager.getUrl(dto.key);
 
         await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, imageUrl));
       });

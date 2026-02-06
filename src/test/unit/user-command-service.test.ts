@@ -84,6 +84,7 @@ describe('user service 유닛 테스트', () => {
       getStorage: jest.fn(),
       getFile: jest.fn(),
       readFile: jest.fn(),
+      getUrl: jest.fn(),
     };
 
     mockUserCommandRepo = {

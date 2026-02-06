@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import csv from 'csv-parser';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { IFileManager } from '../interface/i-file-manager';
 
 export type UploadType = 'image' | 'csv';
 export type ContentType = {
@@ -19,7 +20,7 @@ export type ContentType = {
 let storage = null;
 let s3Client: S3Client;
 
-export const FileManager = () => {
+export const FileManager = (): IFileManager => {
   const getStorage = (type: UploadType) => {
     if (getEnv().NODE_ENV !== 'development') {
       const { localStorage } = FileStorage.createLocalStorage();
@@ -59,7 +60,7 @@ export const FileManager = () => {
       const response = await s3Client.send(command);
 
       return {
-        body: response.Body?.transformToString() ?? '',
+        body: (await response.Body?.transformToString()) ?? '',
         contentType: response.ContentType,
         contentLength: response.ContentLength,
       } as ContentType;
@@ -92,5 +93,16 @@ export const FileManager = () => {
     return contents;
     // throw new Error('Unsupported S3 Body type');
   };
-  return { getStorage, getFile, readFile };
+
+  const getUrl = async (filePath: string) => {
+    const command = new GetObjectCommand({
+      Bucket: getEnv().AWS_S3_BUCKET_NAME,
+      Key: filePath,
+    });
+
+    const signedUrl = await getSignedUrl(s3Client, command);
+
+    return signedUrl;
+  };
+  return { getStorage, getFile, readFile, getUrl };
 };
