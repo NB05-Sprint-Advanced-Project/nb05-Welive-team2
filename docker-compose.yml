@@ -32,8 +32,14 @@ services:
       - welive-proxy-net
       - welive-internal-net
     environment:
-      - VIRTUAL_HOST=3.36.64.10
+      - VIRTUAL_HOST=13.209.75.227
       - VIRTUAL_PORT=4000
+    env_file: .env.prod
+
+  migrator:
+    image: ${ECR_SERVER_URI}:migrator
+    networks:
+      - welive-internal-net
     env_file: .env.prod
 
   redis:
