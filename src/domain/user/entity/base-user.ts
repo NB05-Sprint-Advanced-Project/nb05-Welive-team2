@@ -12,6 +12,7 @@ export enum Role {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
   USER = 'USER', // Resident
+  INDIVIDUAL_USER = 'INDIVIDUAL_USER',
 }
 
 export type BaseAllUserProps = {

@@ -1,5 +1,4 @@
 import { PrismaClient, Prisma } from '@prisma/client';
-
 import { BaseRepo } from '../../../shared/base-command-repo';
 import { IStateCommandRepo } from '../interface/i-state-command-repo';
 import { NotificationStateProps, StateProps, StatusType, WorkType } from '../entity/state';

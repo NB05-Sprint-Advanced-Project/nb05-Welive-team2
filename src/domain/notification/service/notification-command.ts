@@ -75,25 +75,32 @@ export const createNotificationCommandService = (
   };
 
   const sendLiveNotifications = async (dtos: createNotificationDTO[]) => {
-    const { superAdmins, admins, residents } = ClientManager.get();
-
-    const { superAdminPayloads, adminPayloads, userPayloads } =
+    const { superAdminPayloads, payloadsByAptAndRole } =
       NotificationMapper.createLivePayloads(dtos);
 
-    if (superAdminPayloads.length !== 0) {
+    if (superAdminPayloads.length > 0) {
       console.log('슈퍼 관리자에게 알림 전송:', superAdminPayloads.length);
-      ClientManager.broadCast(superAdmins, superAdminPayloads);
+      ClientManager.broadcastToSuperAdmins(superAdminPayloads);
     }
 
-    if (adminPayloads.length !== 0) {
-      console.log('관리자에게 알림 전송:', adminPayloads.length);
-      ClientManager.broadCast(admins, adminPayloads);
-    }
+    payloadsByAptAndRole.forEach((payloads, aptId) => {
+      if (payloads.adminsPayloads.length > 0) {
+        console.log(`관리자에게 알림 전송`, payloads.adminsPayloads.length);
+        ClientManager.broadcastToAdmins(aptId, payloads.adminsPayloads);
+      }
 
-    if (userPayloads.length !== 0) {
-      console.log('입주민에게 알림 전송:', userPayloads.length);
-      ClientManager.broadCast(residents, userPayloads);
-    }
+      if (payloads.residentsPayloads.length > 0) {
+        console.log(`입주민에게 알림 전송:`, payloads.residentsPayloads.length);
+        ClientManager.broadcastToResidents(aptId, payloads.residentsPayloads);
+      }
+
+      payloads.individualPayloads.forEach((userPayloads, userId) => {
+        if (userPayloads.length > 0) {
+          console.log(`개별 알림 전송:`, userPayloads.length);
+          ClientManager.broadcastToIndividual(aptId, userId, userPayloads);
+        }
+      });
+    });
   };
 
   const deleteOldNotification = async () => {

@@ -24,16 +24,20 @@ export const createAuthService = (
       });
     }
 
+    const apartmentId = user.adminOf?.id ?? user.resident?.apartmentId;
+
     const accessToken = tokenManager.generateAccessToken({
       userId: user.id,
       role: user.role,
       name: user.name,
+      apartmentId,
     });
 
     const refreshToken = tokenManager.generateRefreshToken({
       userId: user.id,
       role: user.role,
       name: user.name,
+      apartmentId,
     });
 
     const { ...userWithoutPassword } = user;
@@ -55,12 +59,14 @@ export const createAuthService = (
       userId: payload.userId,
       role: payload.role,
       name: payload.name,
+      apartmentId: payload.apartmentId,
     });
 
     const refreshToken = tokenManager.generateRefreshToken({
       userId: payload.userId,
       role: payload.role,
       name: payload.name,
+      apartmentId: payload.apartmentId,
     });
 
     return { accessToken, refreshToken };

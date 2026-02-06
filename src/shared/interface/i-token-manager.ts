@@ -2,12 +2,14 @@ export type TokenPayload = {
   userId: string;
   role?: string;
   name?: string;
+  apartmentId?: string;
 };
 
 export type SecretTokenPayload = {
   userId: string;
   role: string;
   name: string;
+  apartmentId: string;
   exp: number;
 };
 

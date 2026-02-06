@@ -7,6 +7,7 @@ declare global {
         userId: string;
         role: string;
         name?: string;
+        apartmentId?: string;
       };
       userId?: string;
     }

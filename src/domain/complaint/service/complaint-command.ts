@@ -193,8 +193,9 @@ export const createComplaintCommandService = (
         const stateEntity = StateEntity.create({
           workType: WorkType.ALARM,
           payload: {
-            receiverType: Role.USER,
+            receiverType: Role.INDIVIDUAL_USER,
             apartmentId: entity.apartmentId,
+            userId: entity.userId,
             message: `[민원 알림] 민원이 '${updateStatus}'입니다. `,
           } as unknown as JSON,
         });

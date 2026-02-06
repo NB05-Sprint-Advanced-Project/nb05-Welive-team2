@@ -23,6 +23,7 @@ export const createNotificationHandler = (
     ClientManager.set({
       userId: req.user.userId,
       role: req.user.role as Role,
+      apartmentId: req.user.apartmentId,
       connection: res,
     });
 
