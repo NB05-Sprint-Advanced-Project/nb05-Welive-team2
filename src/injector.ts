@@ -170,7 +170,7 @@ export const createInjector = (mockPrisma?: PrismaClient) => {
     userQueryService,
   );
 
-  const authController = createAuthController(authService);
+  const authController = createAuthController(authService, redisExternal);
   const userController = createUserController(middlewares, userCommandService, userQueryService);
   const residentUserController = createResidentUserController(
     middlewares,

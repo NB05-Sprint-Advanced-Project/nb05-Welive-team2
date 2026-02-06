@@ -80,12 +80,13 @@
 // export type AuthHandlers = ReturnType<typeof createAuthHandlers>;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { IRedisExternal } from '../../../shared/interface/i-redis';
 import { validate } from '../../../shared/utils/controller-util';
 import { AuthService } from '../auth-service';
 import { loginSchema, cookieTokenSchema } from '../dto/auth-request';
 import { Request, Response } from 'express';
 
-export const createAuthHandlers = (authService: AuthService) => {
+export const createAuthHandlers = (authService: AuthService, redisExternal: IRedisExternal) => {
   /**
    * 쿠키 옵션을 한 곳에서 통일
    * - HTTP 환경 기준
@@ -129,6 +130,7 @@ export const createAuthHandlers = (authService: AuthService) => {
   const refreshToken = async (req: Request, res: Response) => {
     // req.headers.cookie (raw string) 사용 금지
     // cookie-parser 기준 req.cookies 사용
+    const oldAccessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;
 
     // validate 대상도 raw cookie가 아니라 실제 refreshToken
@@ -136,6 +138,10 @@ export const createAuthHandlers = (authService: AuthService) => {
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await authService.refreshToken(dto);
+
+    if (oldAccessToken) {
+      await redisExternal.del(`auth:token:${oldAccessToken}`);
+    }
 
     // access token 재발급
     res.cookie('access_token', newAccessToken, {

@@ -32,6 +32,8 @@ export const createAuthService = (
 
     const refreshToken = tokenManager.generateRefreshToken({
       userId: user.id,
+      role: user.role,
+      name: user.name,
     });
 
     const { ...userWithoutPassword } = user;
@@ -39,7 +41,10 @@ export const createAuthService = (
   };
 
   const refreshToken = (dto: CookieTokenDTO) => {
-    const oldToken = tokenManager.getCookieValue(dto.cookie, 'refresh_token');
+    console.log('refreshtoken= ', dto.refreshToken);
+    const oldToken = dto.refreshToken;
+
+    // const oldToken = tokenManager.getCookieValue(dto.refreshToken, 'refresh_token');
     if (!oldToken) {
       throw BusinessException({
         type: BusinessExceptionType.BAD_REQUEST,
@@ -50,10 +55,14 @@ export const createAuthService = (
 
     const accessToken = tokenManager.generateAccessToken({
       userId: payload.userId,
+      role: payload.role,
+      name: payload.name,
     });
 
     const refreshToken = tokenManager.generateRefreshToken({
       userId: payload.userId,
+      role: payload.role,
+      name: payload.name,
     });
 
     return { accessToken, refreshToken };

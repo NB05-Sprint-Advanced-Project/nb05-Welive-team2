@@ -7,7 +7,7 @@ export const loginSchema = z.object({
 });
 
 export const cookieTokenSchema = z.object({
-  cookie: z.string().min(1, '쿠키가 필요합니다.'),
+  refreshToken: z.string().min(1, '쿠키가 필요합니다.'),
 });
 
 export type LoginDTO = z.infer<typeof loginSchema>;
