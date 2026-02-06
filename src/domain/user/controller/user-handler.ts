@@ -92,7 +92,7 @@ export const createUserHandlers = (
   const updateAvatarUrl = async (req: Request, res: Response) => {
     const dto = validate(updateAvatarUrlSchema, {
       userId: req.userId,
-      avatarUrl: (req.file as Express.MulterS3.File).location,
+      key: (req.file as Express.MulterS3.File).key,
     });
     await userCommandService.updateAvatarUrl(dto);
     return res.sendStatus(204);

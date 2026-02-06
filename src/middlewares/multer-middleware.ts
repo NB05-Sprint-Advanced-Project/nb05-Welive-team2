@@ -45,8 +45,8 @@ export const createMulterMiddleware = (fileManager: IFileManager) => {
   };
 
   return {
-    image: createUploader('image').single('image'),
-    csv: createUploader('csv').single('csv'),
+    image: createUploader('image').single('avatarImage'),
+    csv: createUploader('csv').single('file'),
     mapS3Path,
   };
 };

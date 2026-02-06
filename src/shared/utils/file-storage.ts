@@ -35,7 +35,7 @@ export const FileStorage = {
       s3: s3client,
       bucket: getEnv().AWS_S3_BUCKET_NAME,
       contentType: multerS3.AUTO_CONTENT_TYPE,
-      acl: type === 'image' ? 'public-read' : 'private',
+      acl: 'private',
       key: (req, file, callback) => {
         const ext = path.extname(file.originalname);
         const filename = `${path.basename(file.originalname, ext)}.${Date.now()}${ext}`;

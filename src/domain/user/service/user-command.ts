@@ -555,7 +555,9 @@ export const createUserCommandService = (
           });
         }
 
-        await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, dto.avatarUrl));
+        const imageUrl = await FileManager.getUrl(dto.key);
+
+        await userCommandRepo.updateAvatar(BaseUserEntity.updateAvatar(user, imageUrl));
       });
     } catch (err) {
       if (isTechnicalException(err) && err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {

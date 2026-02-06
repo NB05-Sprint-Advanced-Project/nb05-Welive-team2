@@ -7,6 +7,7 @@ import { StreamingBlobPayloadOutputTypes } from '@smithy/types';
 import path from 'path';
 import fs from 'fs';
 import csv from 'csv-parser';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export type UploadType = 'image' | 'csv';
 export type ContentType = {
@@ -56,6 +57,7 @@ export const FileManager = () => {
       });
 
       const response = await s3Client.send(command);
+
       return {
         body: response.Body?.transformToString() ?? '',
         contentType: response.ContentType,

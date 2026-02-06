@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import {
-  avatarUrlSchema,
   buildingSchema,
   contactSchema,
   emailSchema,
@@ -140,7 +139,7 @@ export type GetResidentAccountsReqDto = z.infer<typeof getResidentAccountsSchema
 // 기타
 export const updateAvatarUrlSchema = z.object({
   userId: userIdSchema,
-  avatarUrl: avatarUrlSchema,
+  key: z.string(),
 });
 
 export const updatePasswordSchema = z.object({

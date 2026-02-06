@@ -27,7 +27,7 @@ export const createUserQueryRepo = (prisma: PrismaClient): IUserQueryRepo => {
       role: Role.ADMIN,
       ...(searchKeyword && {
         OR: [
-          { username: { contains: searchKeyword } },
+          { name: { contains: searchKeyword } },
           { email: { contains: searchKeyword } },
           {
             UserApartmentLink: {
