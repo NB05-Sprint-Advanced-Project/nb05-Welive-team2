@@ -162,12 +162,12 @@ export const createUserQueryService = (
     const filePath = 'CSV-form/resident_upload_form.csv';
     const data = await fileManager.getFile(filePath);
 
-    if (!data.body || typeof data.body === 'string') {
+    if (!data.body || typeof data.body !== 'string') {
       throw BusinessException({ type: BusinessExceptionType.NOT_CSV_FILE });
     }
 
     return {
-      stream: data.body as NodeJS.ReadableStream,
+      stream: Readable.from(data.body),
       contentType: data.contentType ?? 'text/csv',
       contentLength: data.contentLength,
       fileName: 'resident_bulk_template.csv',
