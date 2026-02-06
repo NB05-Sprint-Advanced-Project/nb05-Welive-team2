@@ -100,7 +100,9 @@ export const FileManager = (): IFileManager => {
       Key: filePath,
     });
 
-    const signedUrl = await getSignedUrl(s3Client, command);
+    const signedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 60 * 60 * 24 * 7,
+    });
 
     return signedUrl;
   };
