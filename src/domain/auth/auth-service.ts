@@ -41,10 +41,8 @@ export const createAuthService = (
   };
 
   const refreshToken = (dto: CookieTokenDTO) => {
-    console.log('refreshtoken= ', dto.refreshToken);
     const oldToken = dto.refreshToken;
 
-    // const oldToken = tokenManager.getCookieValue(dto.refreshToken, 'refresh_token');
     if (!oldToken) {
       throw BusinessException({
         type: BusinessExceptionType.BAD_REQUEST,
