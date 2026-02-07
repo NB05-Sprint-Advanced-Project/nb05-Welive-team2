@@ -20,7 +20,7 @@ export const registerPollRoutes = (
 
   router.patch(
     '/:pollId',
-    catchHandler(middlewares.auth.authAdmin),
+    // catchHandler(middlewares.auth.authAdmin),
     catchHandler(handler.updatePoll),
   );
 

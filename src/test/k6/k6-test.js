@@ -17,16 +17,16 @@ export const options = {
   },
 };
 
-export default () => {
-  const res = http.get('http://localhost:4000/api/v2/residents', {
-    headers: {
-      Cookie:
-        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MmQ5ZjJlMC0xYTUzLTRjNTYtYmU5Mi1hOTE0ZWRhOGYxY2IiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njk0MTE5MDUsImV4cCI6MTc2OTQzMzUwNX0.we4hKjqfeqUv4NLrbBixuQV7lZCNsbV8I6mC5SjSyj4;',
-    },
-  });
-  check(res, { 'status was 200': (r) => r.status === 200 });
-  sleep(1);
-};
+// export default () => {
+//   const res = http.get('http://localhost:4000/api/v2/residents', {
+//     headers: {
+//       Cookie:
+//         'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MmQ5ZjJlMC0xYTUzLTRjNTYtYmU5Mi1hOTE0ZWRhOGYxY2IiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njk0MTE5MDUsImV4cCI6MTc2OTQzMzUwNX0.we4hKjqfeqUv4NLrbBixuQV7lZCNsbV8I6mC5SjSyj4;',
+//     },
+//   });
+//   check(res, { 'status was 200': (r) => r.status === 200 });
+//   sleep(1);
+// };
 
 // export default () => {
 
@@ -41,3 +41,14 @@ export default () => {
 //   check(res, { 'status was 200': (r) => r.status === 200 });
 //   sleep(1);
 // };
+
+export default () => {
+  const res = http.get('http://localhost:4000/api/v2/notificatoins', {
+    headers: {
+      Cookie:
+        'access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MmQ5ZjJlMC0xYTUzLTRjNTYtYmU5Mi1hOTE0ZWRhOGYxY2IiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Njk0MTE5MDUsImV4cCI6MTc2OTQzMzUwNX0.we4hKjqfeqUv4NLrbBixuQV7lZCNsbV8I6mC5SjSyj4;',
+    },
+  });
+  check(res, { 'status was 200': (r) => r.status === 200 });
+  sleep(1);
+};

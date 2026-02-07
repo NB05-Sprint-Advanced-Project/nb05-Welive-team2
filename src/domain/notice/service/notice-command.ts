@@ -49,6 +49,7 @@ export const createNoticeCommandService = (
     );
   };
 
+  // 낙관적 락
   const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
     try {
       return await uow.doWork(async () => {
@@ -76,6 +77,35 @@ export const createNoticeCommandService = (
       throw err;
     }
   };
+
+  // 비관적 락
+  // const updateNotice = async (dto: UpdateNoticeDto): Promise<void> => {
+  //   try {
+  //     return await uow.doWork(async () => {
+  //       const { noticeId, ...data } = dto;
+  //       const foundNotice = await noticeRepo.findById(noticeId, "exclusive");
+  //       if (!foundNotice) {
+  //         throw BusinessException({
+  //           type: BusinessExceptionType.NOTICE_NOT_FOUND,
+  //         });
+  //       }
+  //       await noticeRepo.update(NoticeEntity.update(foundNotice, { ...data }));
+  //       await redisExternal.del(`noticeId:${noticeId}`);
+  //     }, {transactionOptions: {useTransaction: true, isolationLevel: "ReadCommitted"}, useOptimisticLock: false});
+  //   } catch (err) {
+  //     if (isTechnicalException(err)) {
+  //       if (err.type === TechnicalExceptionType.OPTIMISTIC_LOCK_FAILED) {
+  //         throw BusinessException({ type: BusinessExceptionType.CONCURRENT_MODIFICATION });
+  //       }
+
+  //       throw TechnicalException({
+  //         type: TechnicalExceptionType.UNKNOWN_ERROR,
+  //         error: err,
+  //       });
+  //     }
+  //     throw err;
+  //   }
+  // };
 
   const deleteNotice = async (dto: DeleteNoticeDto): Promise<void> => {
     return await uow.doWork(

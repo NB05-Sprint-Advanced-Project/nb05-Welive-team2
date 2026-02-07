@@ -28,7 +28,7 @@ export const registerNoticeRoutes = (
 
   router.patch(
     '/notices/:noticeId',
-    catchHandler(middleware.auth.authAdmin),
+    // catchHandler(middleware.auth.authAdmin),
     catchHandler(handler.updateNotice),
   );
 

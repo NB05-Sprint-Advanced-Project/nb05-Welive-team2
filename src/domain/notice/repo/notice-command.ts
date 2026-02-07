@@ -108,7 +108,10 @@ export const createNoticeCommandRepo = (prismaClient: PrismaClient): INoticeComm
   };
 
   const update = async (props: NoticeProps): Promise<void> => {
-    const { event, ...data } = props as any;
+    // const { event, apartmentId, author, ...data } = props as any;
+    const { event, apartmentId, userId, author, event_startdate, event_enddate, ...data } =
+      props as any;
+
     try {
       await prisma().notices.update({
         where: { id: data.id, version: props.version },
