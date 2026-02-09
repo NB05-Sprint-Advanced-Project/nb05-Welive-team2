@@ -133,13 +133,15 @@ npm run dev
 
 #### 민원
 
-![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-3.png)
-![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image.png)
+<img width="2932" height="1758" alt="Image" src="https://github.com/user-attachments/assets/ce53f030-575c-4661-b516-d5c7fbb88c0f" />
+
+<img width="2932" height="1758" alt="Image" src="https://github.com/user-attachments/assets/7b6875ce-4dcf-42f3-8da8-b86bf0d53f10" />
 
 #### 댓글
 
-![alt text](Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-1.png)
-![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-2.png)
+<img width="2932" height="1758" alt="Image" src="https://github.com/user-attachments/assets/48b3d4bc-eab1-4f2b-8bd4-11c733b40202" />
+
+<img width="2932" height="1758" alt="Image" src="https://github.com/user-attachments/assets/9f31bd00-4b86-48b8-b782-5c6358e2fc50" />
 
 ---
 
