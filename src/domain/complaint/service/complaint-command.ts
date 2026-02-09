@@ -119,6 +119,11 @@ export const createComplaintCommandService = (
           type: BusinessExceptionType.REQ_INFO_INVALID,
         });
       }
+      if (beforeContext.status !== 'PENDING') {
+        throw BusinessException({
+          type: BusinessExceptionType.DONT_DELETE_COMPLAINT,
+        });
+      }
       if (requesterRole === Role.USER && beforeContext.userId !== userId) {
         throw BusinessException({
           type: BusinessExceptionType.FORBIDDEN,

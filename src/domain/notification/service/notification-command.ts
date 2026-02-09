@@ -7,6 +7,8 @@ import { BusinessExceptionType } from '../../../shared/exception/business-except
 import { TechnicalExceptionType } from '../../../shared/exception/technical-exception/exception-info';
 import { isTechnicalException } from '../../../shared/exception/technical-exception/technical-exception';
 import { NotificationMapper } from '../notification-mapper';
+import { NotificationEntity } from '../entity/notification';
+import { Role } from '../../user/entity/base-user';
 
 export const createNotificationCommandService = (
   notificationCommandRepo: INotificationCommandRepo,
@@ -29,8 +31,11 @@ export const createNotificationCommandService = (
 
   const bulkSave = async (dtos: createNotificationDTO[]) => {
     try {
-      const filteredDtos = dtos.filter(
-        (dto) => dto.receiverType === 'SUPER_ADMIN' || dto.apartmentId,
+      const individualDtos = dtos.filter((dto) => dto.receiverType === Role.INDIVIDUAL_USER);
+      const groupDtos = dtos.filter((dto) => dto.receiverType !== Role.INDIVIDUAL_USER);
+
+      const filteredDtos = groupDtos.filter(
+        (dto) => dto.receiverType === Role.SUPER_ADMIN || dto.apartmentId,
       );
 
       const roleApartmentMap = new Map(
@@ -62,7 +67,17 @@ export const createNotificationCommandService = (
 
       const notifications = NotificationMapper.createNotifications(filteredDtos, users);
 
-      await notificationCommandRepo.bulkSave(notifications);
+      const individualNotifications = individualDtos
+        .filter((dto) => dto.userId)
+        .map((dto) =>
+          NotificationEntity.create({
+            id: `${dto.payloadId}-${dto.userId}`,
+            receiverId: dto.userId!,
+            content: dto.content,
+          }),
+        );
+
+      await notificationCommandRepo.bulkSave([...notifications, ...individualNotifications]);
     } catch (err) {
       if (isTechnicalException(err)) {
         if (err.type === TechnicalExceptionType.UNIQUE_VIOLATION_NOTIFICATION) {

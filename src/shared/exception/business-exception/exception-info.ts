@@ -30,6 +30,7 @@ export enum BusinessExceptionType {
   DONT_MODIFY_RESOLVED,
   DONT_MODIFY_REJECTED,
   DONT_MODIFY_COMPLAINT,
+  DONT_DELETE_COMPLAINT,
   INCORRECT_PASSWORD,
   CORRECT_PASSWORD,
   TOKEN_EXPIRED,
@@ -127,6 +128,10 @@ export const BusinessExceptionTable: Record<
   [BusinessExceptionType.DONT_MODIFY_COMPLAINT]: {
     statusCode: 409,
     message: '관리자에게 민원이 접수되어 수정할 수 없습니다.',
+  },
+  [BusinessExceptionType.DONT_DELETE_COMPLAINT]: {
+    statusCode: 409,
+    message: '처리 중/완료/불가 상태의 민원은 삭제할 수 없습니다.',
   },
   [BusinessExceptionType.ALREADY_VOTED]: {
     statusCode: 409,
