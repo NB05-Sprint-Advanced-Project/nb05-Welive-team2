@@ -82,7 +82,7 @@
 **투표 상태 관리**
 
 - 투표 시작 시간과 종료 시간을 기준으로 투표의 상태를 변경합니다.
-    - 투표 전(`PENDING`), 투표 중(`IN_PROGRESS`), 마감(`CLOSED`)
+  - 투표 전(`PENDING`), 투표 중(`IN_PROGRESS`), 마감(`CLOSED`)
 - 상태 변경은 스케줄링을 통해 서버에서 자동으로 처리되어야 합니다.
 
 ### 공지사항
@@ -96,7 +96,7 @@
 **공지 목록 조회**
 
 - 분류, 제목, 작성자, 등록 일시, 조회수, 댓글 수를 조회할 수 있습니다.
-    - 분류는 정기검진, 긴급사항, 커뮤니티, 주민투표, 민원, 기타 총 6개가 있습니다.
+  - 분류는 정기검진, 긴급사항, 커뮤니티, 주민투표, 민원, 기타 총 6개가 있습니다.
 - 분류로 필터링이 가능하며, 검색이 가능합니다.
 - 관리자와 입주민 모두 공지사항 조회가 가능합니다.
 
@@ -113,13 +113,17 @@
 - 관리자는 공지 삭제가 가능합니다.
 
 ### 참고자료
+
 #### 공지사항
+
 <img width="2848" height="1530" alt="image" src="https://github.com/user-attachments/assets/490454a2-d317-4a4a-81ba-4c1a79d60559" />
 
 #### 투표
+
 <img width="2849" height="1538" alt="image" src="https://github.com/user-attachments/assets/f7364f83-c793-4e43-be2f-ff01eab53178" />
 
 #### 일정
+
 <img width="2840" height="1532" alt="image" src="https://github.com/user-attachments/assets/4151cb72-ae85-4a2f-a7ee-76a3579d5b29" />
 
 ---
