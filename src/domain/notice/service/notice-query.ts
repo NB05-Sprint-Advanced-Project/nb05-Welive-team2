@@ -61,7 +61,7 @@ export const createNoticeQueryService = (
       category: NoticeCategory | 'ALL';
     },
   ): Promise<NoticesView> => {
-    const isDefaultReq = page === 1 && limit === 10 && searchKeyword === '' && category === 'ALL';
+    const isDefaultReq = page === 1 && limit === 20 && searchKeyword === '' && category === 'ALL';
     const key = `notices:list:${category}:default`;
 
     if (isDefaultReq) {
