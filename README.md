@@ -133,13 +133,13 @@ npm run dev
 
 #### 민원
 
-![alt text](image-3.png)
-![alt text](image.png)
+![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-3.png)
+![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image.png)
 
 #### 댓글
 
-![alt text](image-1.png)
-![alt text](image-2.png)
+![alt text](Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-1.png)
+![alt text](/Users/gyeongyeonk/Documents/dev/5-team-project/welive/nb05-Welive-team2/image-2.png)
 
 ---
 
