@@ -73,6 +73,53 @@ export const PollEntity = {
   }): PollProps => {
     return { ...props } as PollProps;
   },
+  // update: (
+  //   poll: PollProps,
+  //   props: {
+  //     title?: string;
+  //     content?: string;
+  //     startDate?: Date;
+  //     endDate?: Date;
+  //     building?: number;
+  //     options?: {
+  //       id?: string;
+  //       title: string;
+  //     }[];
+  //   },
+  // ): PollProps => {
+  //   if (props.title) {
+  //     poll.title = props.title;
+  //   }
+  //   if (props.content) {
+  //     poll.content = props.content;
+  //   }
+  //   if (props.startDate) {
+  //     poll.startDate = props.startDate;
+  //   }
+  //   if (props.endDate) {
+  //     poll.endDate = props.endDate;
+  //   }
+  //   if (props.building) {
+  //     poll.building = props.building;
+  //   }
+  //   if (props.options) {
+  //     const existOpt = props.options.filter((opt) => opt.id !== undefined);
+  //     const newOpt = props.options.filter((opt) => !opt.id);
+
+  //     for (const opt of newOpt) {
+  //       poll.options.push(OptionEntity.create({ title: opt.title }));
+  //     }
+
+  //     for (const opt of existOpt) {
+  //       const target = poll.options.find((befOpt) => befOpt.id === opt.id);
+  //       if (target) {
+  //         OptionEntity.updateTitle(target, opt.title);
+  //       }
+  //     }
+  //   }
+
+  //   return poll as PollProps;
+  // },
   update: (
     poll: PollProps,
     props: {
@@ -87,33 +134,25 @@ export const PollEntity = {
       }[];
     },
   ): PollProps => {
-    if (props.title) {
-      poll.title = props.title;
-    }
-    if (props.content) {
-      poll.content = props.content;
-    }
-    if (props.startDate) {
-      poll.startDate = props.startDate;
-    }
-    if (props.endDate) {
-      poll.endDate = props.endDate;
-    }
-    if (props.building) {
-      poll.building = props.building;
-    }
+    if (props.title) poll.title = props.title;
+    if (props.content) poll.content = props.content;
+    if (props.startDate) poll.startDate = props.startDate;
+    if (props.endDate) poll.endDate = props.endDate;
+    if (props.building !== undefined) poll.building = props.building;
+
     if (props.options) {
-      const existOpt = props.options.filter((opt) => opt.id !== undefined);
-      const newOpt = props.options.filter((opt) => !opt.id);
+      const incomingIds = props.options.filter((opt) => opt.id).map((opt) => opt.id);
 
-      for (const opt of newOpt) {
-        poll.options.push(OptionEntity.create({ title: opt.title }));
-      }
+      poll.options = poll.options.filter((exist) => incomingIds.includes(exist.id));
 
-      for (const opt of existOpt) {
-        const target = poll.options.find((befOpt) => befOpt.id === opt.id);
-        if (target) {
-          OptionEntity.updateTitle(target, opt.title);
+      for (const opt of props.options) {
+        if (opt.id) {
+          const target = poll.options.find((befOpt) => befOpt.id === opt.id);
+          if (target) {
+            OptionEntity.updateTitle(target, opt.title);
+          }
+        } else {
+          poll.options.push(OptionEntity.create({ title: opt.title }));
         }
       }
     }
